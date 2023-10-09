@@ -7,6 +7,7 @@
     <property name="docs.home" value="${basedir}/docs"/>
     <property name="src.home" value="${basedir}/src"/>
     <property name="lib.home" value="${basedir}/lib"/>
+	<property name="resources.home" value="${basedir}/resources"/>
     <property name="javac.encoding" value="UTF-8"/>
     <!--  ==================== Compile options ===========================  -->
     <property name="compile.debug" value="true"/>
@@ -42,16 +43,20 @@
         </copy>
     </target>
     <!--  ==================== Dist Target =====================================  -->
-    <target name="dist" depends="clean,compile,javadoc" description="Create binary distribution">
+    <target name="dist" depends="clean,compile,javadoc,copy-resources" description="Create binary distribution">
         <copy todir="${dist.home}/lib">
             <fileset dir="${lib.home}"/>
+			<fileset dir="${resources.home}"/>
         </copy>
         <!--  Create application JAR file  -->
         <jar jarfile="${dist.home}/${app.fullname}.jar" basedir="${build.home}">
             <manifest>
                 <attribute name="Main-Class" value="main.App"/>
-                <attribute name="Class-Path" value="lib/piecesPuzzle-0.1.jar"/>
+                <attribute name="Class-Path" value="lib/piecesPuzzle-0.1.jar lib/flatlaf-2.6.jar"/>
             </manifest>
+			<fileset dir="${resources.home}">
+				<include name="assets/**"/> <!-- Include all files and subdirectories in the assets folder -->
+			</fileset>
         </jar>
     </target>
     <!--  ==================== Javadoc Target ==================================  -->
@@ -64,6 +69,12 @@
                 </fileset>
             </classpath>
         </javadoc>
+    </target>
+	<!--  ==================== Resources Target ================================  -->
+    <target name="copy-resources" depends="compile">
+        <copy todir="${build.home}/assets">
+            <fileset dir="${resources.home}"/>
+        </copy>
     </target>
     <!--  ==================== Run Target ==================================  -->
     <target name="run" depends="dist">

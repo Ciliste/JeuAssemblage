@@ -1,5 +1,10 @@
 package view;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.Buffer;
+
 import javax.swing.JFrame;
 
 import com.formdev.flatlaf.FlatDarkLaf;
@@ -23,6 +28,23 @@ public class MainFrame extends JFrame {
         setSize(1200, 800);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		try {
+		
+			InputStream stream = MainFrame.class.getResourceAsStream("/assets/test.txt");
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+			reader.close();
+		} 
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		setVisible(true);
     }
 
     private static Runnable createSoloGameCreationCallback(MainFrame mainFrame) {
