@@ -9,6 +9,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -41,6 +42,9 @@ public class SoloGameCreation extends JPanel {
     private final JLabel lblNbPieces = new JLabel("Nb pièces :");
     private final JSpinner nbPiecesSpinner = new JSpinner();
 
+	private final JLabel lblDifficulty = new JLabel("Difficulté :");
+	private final JList<String> difficultyList = new JList<String>(new String[] { "Facile", "Intermédiaire", "Difficile" });
+
     private final JButton btnPlay = new JButton("Jouer");
 
     public SoloGameCreation(Runnable backCallback) {
@@ -65,10 +69,17 @@ public class SoloGameCreation extends JPanel {
         this.add(lblNbPieces);
         this.add(nbPiecesSpinner);
 
+		this.add(lblDifficulty);
+		this.add(difficultyList);
+		difficultyList.setSelectedIndex(0);
+
+		this.add(btnPlay);
+
         // LISTENERS
         //
 
-        this.addComponentListener(new ResizeListener(createResizeCallback(this)));
+		ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
+        this.addComponentListener(resizeListener);
 
         btnCancel.addActionListener(e -> backCallback.run());
 
@@ -77,13 +88,12 @@ public class SoloGameCreation extends JPanel {
         randomSeedCallback.run();
 
         txtSeed.getDocument().addDocumentListener(new SeedDocumentListener());
+
+		resizeListener.componentResized(null);
     }
 
     private void updateSeed(long seed) {
 
-        Random random = new Random(seed);
-
-        // TODO: Le controlleur devrait s'occuper de ça
         txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeX(seed)));
         txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeY(seed)));
         nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCount(seed));
@@ -180,6 +190,30 @@ public class SoloGameCreation extends JPanel {
                 getWidthTimesPourcent(soloGameCreation, .2f), 
                 BTN_CANCEL_HEIGHT
             );
+
+			soloGameCreation.lblDifficulty.setBounds(
+				PADDING_LEFT,
+				PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 7,
+				LBL_WIDTH,
+				BTN_CANCEL_HEIGHT
+			);
+
+			soloGameCreation.difficultyList.setBounds(
+				PADDING_LEFT,
+				PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
+				getWidthTimesPourcent(soloGameCreation, .2f),
+				BTN_CANCEL_HEIGHT * 3
+			);
+
+			final int PADDING_RIGHT = PADDING_LEFT;
+			final int PADDING_BOTTOM = PADDING_TOP;
+
+			soloGameCreation.btnPlay.setBounds(
+				soloGameCreation.getWidth() - PADDING_RIGHT - BTN_CANCEL_WIDTH * 5,
+				soloGameCreation.getHeight() - PADDING_BOTTOM - BTN_CANCEL_HEIGHT,
+				BTN_CANCEL_WIDTH * 5,
+				BTN_CANCEL_HEIGHT
+			);
         };
     }
 

@@ -2,14 +2,21 @@ package view;
 
 import javax.swing.JFrame;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+
 import view.screen.MainScreen;
 import view.screen.SoloGameCreation;
 
 public class MainFrame extends JFrame {
     
-    private final MainScreen mainScreen = new MainScreen(createSoloGameCreationCallback(this));
+    private final MainScreen mainScreen;
 
     public MainFrame() {
+
+		FlatDarkLaf.setup();
+
+		mainScreen = new MainScreen(createSoloGameCreationCallback(this));
 
         setContentPane(mainScreen);
 
