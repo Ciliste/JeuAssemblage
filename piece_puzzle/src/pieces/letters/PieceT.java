@@ -8,6 +8,7 @@ public class PieceT extends Piece{
         super(x, y);
     }
 
+    @Override
     public int[][] getBounds() {
         return new int[][] 
         {

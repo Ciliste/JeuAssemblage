@@ -1,6 +1,6 @@
 <project name="piecesPuzzle" default="run" basedir=".">
 	<property name="app.name" value="pieces_puzzle"/>
-	<property name="app.version" value="0.1"/>
+	<property name="app.version" value="0.1.0"/>
 	<property name="app.fullname" value="${app.name}-${app.version}"/>
 	<property name="build.home" value="${basedir}/build"/>
 	<property name="dist.home" value="${basedir}/dist"/>
