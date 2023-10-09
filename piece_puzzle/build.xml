@@ -69,9 +69,8 @@
 		<!--
 			Attention : copie ad-hoc pour satisfaire immédiatement une mise à jour de dépendance, car le projet "jeuAssemblage" a besoin de cette librairie 
 		-->
-		<!-- 
+		
 			<copy file="${dist.home}/${app.fullname}.jar" todir="${basedir}/../jeuAssemblage/lib"/>
-		-->
 	</target>
 	<!--
  ==================== Javadoc Target ================================== 
