@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import main.Controller;
 import view.component.Separator;
 import view.listener.ResizeListener;
 import view.utils.DocumentAdapter;
@@ -83,9 +84,9 @@ public class SoloGameCreation extends JPanel {
         Random random = new Random(seed);
 
         // TODO: Le controlleur devrait s'occuper de ça
-        txtSizeX.setText(String.valueOf(random.nextInt(10) + 5));
-        txtSizeY.setText(String.valueOf(random.nextInt(10) + 5));
-        nbPiecesSpinner.setValue(random.nextInt(10) + 5);
+        txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeX(seed)));
+        txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeY(seed)));
+        nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCount(seed));
     }
 
     private static Runnable createResizeCallback(SoloGameCreation soloGameCreation) {
