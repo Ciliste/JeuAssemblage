@@ -22,7 +22,16 @@ public class MainFrame extends JFrame {
 
         return () -> {
 
-            mainFrame.setContentPane(new SoloGameCreation());
+            mainFrame.setContentPane(new SoloGameCreation(createMainScreenCallback(mainFrame)));
+            mainFrame.revalidate();
+        };
+    }
+
+    private static Runnable createMainScreenCallback(MainFrame mainFrame) {
+
+        return () -> {
+
+            mainFrame.setContentPane(mainFrame.mainScreen);
             mainFrame.revalidate();
         };
     }

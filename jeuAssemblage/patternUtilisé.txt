@@ -1,2 +1,0 @@
-MVC pou l'appli
-Singleton pour le controller

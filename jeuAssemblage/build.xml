@@ -50,7 +50,7 @@
         <jar jarfile="${dist.home}/${app.fullname}.jar" basedir="${build.home}">
             <manifest>
                 <attribute name="Main-Class" value="main.App"/>
-                <attribute name="Class-Path" value="lib/pieces_puzzle-0.1.0.jar"/>
+                <attribute name="Class-Path" value="lib/piecesPuzzle-0.1.jar"/>
             </manifest>
         </jar>
     </target>
