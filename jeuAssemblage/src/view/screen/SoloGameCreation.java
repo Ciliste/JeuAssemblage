@@ -15,8 +15,11 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import main.Controller;
+import main.Difficulty;
 import view.component.Separator;
 import view.listener.ResizeListener;
 import view.utils.DocumentAdapter;
@@ -43,7 +46,7 @@ public class SoloGameCreation extends JPanel {
     private final JSpinner nbPiecesSpinner = new JSpinner();
 
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
-	private final JList<String> difficultyList = new JList<String>(new String[] { "Facile", "Intermédiaire", "Difficile" });
+	private final JList<String> difficultyList = new JList<String>(Difficulty.getDifficultysName());
 
     private final JButton btnPlay = new JButton("Jouer");
 
@@ -89,14 +92,28 @@ public class SoloGameCreation extends JPanel {
 
         txtSeed.getDocument().addDocumentListener(new SeedDocumentListener());
 
+		difficultyList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				
+				if (!e.getValueIsAdjusting()) {
+
+					updateSeed(Long.parseLong(txtSeed.getText()));
+				}
+			}
+		});
+
 		resizeListener.componentResized(null);
     }
 
     private void updateSeed(long seed) {
 
-        txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeX(seed)));
-        txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeY(seed)));
-        nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCount(seed));
+		Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+
+        txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeX(seed, difficulty)));
+        txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeY(seed, difficulty)));
+        nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCount(seed, difficulty));
     }
 
     private static Runnable createResizeCallback(SoloGameCreation soloGameCreation) {

@@ -40,6 +40,31 @@ public class Controller {
 		return new Random(seed + 2).nextInt(10) + 5;
 	}
 
+	// difficulty methods
+	public int getSizeX(long seed, Difficulty difficulty) {
+
+		int minSizeX = difficulty.getMinSizeX();
+		int maxSizeX = difficulty.getMaxSizeX();
+
+		return new Random(seed).nextInt(maxSizeX - minSizeX) + minSizeX;
+	}
+
+	public int getSizeY(long seed, Difficulty difficulty) {
+
+		int minSizeY = difficulty.getMinSizeY();
+		int maxSizeY = difficulty.getMaxSizeY();
+
+		return new Random(seed + 1).nextInt(maxSizeY - minSizeY) + minSizeY;
+	}
+
+	public int getPiecesCount(long seed, Difficulty difficulty) {
+
+		int minNbPieces = difficulty.getMinNbPieces();
+		int maxNbPieces = difficulty.getMaxNbPieces();
+
+		return new Random(seed + 2).nextInt(maxNbPieces - minNbPieces) + minNbPieces;
+	}
+
 	// play board methods
 	public void setPlayBoard(long seed, int difficulty ) {
 		this.model.initNumberPiece(getPiecesCount(seed));

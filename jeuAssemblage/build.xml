@@ -43,7 +43,7 @@
         </copy>
     </target>
     <!--  ==================== Dist Target =====================================  -->
-    <target name="dist" depends="clean,compile,javadoc,copy-resources" description="Create binary distribution">
+    <target name="dist" depends="clean,compile,copy-resources" description="Create binary distribution">
         <copy todir="${dist.home}/lib">
             <fileset dir="${lib.home}"/>
 			<fileset dir="${resources.home}"/>
