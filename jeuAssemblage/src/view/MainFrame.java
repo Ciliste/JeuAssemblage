@@ -41,7 +41,7 @@ public class MainFrame extends JFrame {
 			reader.close();
 		} 
 		catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 
 		setVisible(true);

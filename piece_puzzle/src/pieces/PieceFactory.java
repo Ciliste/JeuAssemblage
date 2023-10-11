@@ -4,6 +4,8 @@ import pieces.letters.*;
 
 public class PieceFactory {
 
+    public static final int NUMBER_PIECE = 5;
+
     public static Piece createPiece() {
         int rand = (int) (Math.random() * 5);
         

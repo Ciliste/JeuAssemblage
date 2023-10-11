@@ -8,33 +8,40 @@ import pieces.Piece;
 import pieces.PieceFactory;
 
 public class PlayBoard {
-    
-    public final static int SAME_PIECE_LIMIT = 3;
 
-    private Controller       controller;
+    private final Controller controller;
+
     private ArrayList<Piece> alPiece;
     private ArrayList<Piece> alPieceOnBoard;
-
     private int[][]          playBoard;
 
 
-    public PlayBoard(int sizeX, int sizeY, int numberPiece) {
+    public PlayBoard() {
         this.controller = Controller.getInstance();
 
         this.alPieceOnBoard = new ArrayList<Piece>();
 
-        this.playBoard = createPlayBoard(sizeX, sizeY);
-        this.alPiece = createPieces(numberPiece);
+        this.playBoard = null;
+        this.alPiece   = null;
 
+    }
+
+    public void initSizePB(int height, int width) {
+        this.playBoard = createPlayBoard(height, width);
+    }
+
+    public void initNumberPiece(int numberPiece) {
+        this.alPiece = createPieces(numberPiece);
     }
 
     private ArrayList<Piece> createPieces(int numberPiece) {
         ArrayList<Piece> tempAl = new ArrayList<Piece>();
+        int samePieceLimit = numberPiece/PieceFactory.NUMBER_PIECE;
         
         while ( tempAl.size() < numberPiece) {
             Piece p = PieceFactory.createPiece();
 
-            if ( PlayBoard.checkPiece(p, tempAl) ) { 
+            if ( PlayBoard.checkPiece(p, tempAl, samePieceLimit) ) {
                 tempAl.add(p); 
             }
         }
@@ -42,11 +49,11 @@ public class PlayBoard {
         return tempAl;
     }
 
-    private int[][] createPlayBoard(int sizeX, int sizeY) {
-        int[][] tempBoard = new int[sizeX][sizeY];
+    private int[][] createPlayBoard(int height, int width) {
+        int[][] tempBoard = new int[height][width];
 
-        for ( int i = 0; i < sizeX; i++) {
-            for ( int j = 0; j < sizeY; j++) {
+        for ( int i = 0; i < height; i++) {
+            for ( int j = 0; j < width; j++) {
                 tempBoard[i][j] = 0;
             }
         }
@@ -54,10 +61,13 @@ public class PlayBoard {
         return tempBoard;
     }
 
-    //GETTERS
+    // Getters
     public int[][]          getPlayBoards  () { return this.playBoard; }
     public ArrayList<Piece> getPieces      () { return this.alPiece; }
     public ArrayList<Piece> getPieceOnBoard() { return this.alPieceOnBoard; }
+
+    public int getHeight() {return this.playBoard.length; }
+    public int getWidth () {return this.playBoard[0].length; }
 
     
     /**
@@ -89,14 +99,14 @@ public class PlayBoard {
     }
 
 
-    // STATIC METHODS
-    private static boolean checkPiece( Piece p, ArrayList<Piece> alPiece) {
+    // Static methods
+    private static boolean checkPiece( Piece p, ArrayList<Piece> alPiece, int samePieceLimit) {
         Class<?> c = p.getClass();
         int numberPieceSameClass = 1;
         for ( Piece piece: alPiece) {
             if (piece.getClass() == c) { numberPieceSameClass += 1; } 
         }
 
-        return numberPieceSameClass <= PlayBoard.SAME_PIECE_LIMIT;
+        return numberPieceSameClass <= samePieceLimit;
     }
 }
