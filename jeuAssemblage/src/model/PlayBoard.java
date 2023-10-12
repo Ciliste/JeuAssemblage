@@ -36,8 +36,8 @@ public class PlayBoard {
 
     private ArrayList<Piece> createPieces(int numberPiece) {
         ArrayList<Piece> tempAl = new ArrayList<Piece>();
-        int samePieceLimit = numberPiece/PieceFactory.NUMBER_PIECE;
-        
+        int samePieceLimit = (int) Math.ceil(numberPiece/(PieceFactory.NUMBER_PIECE*1d));
+
         while ( tempAl.size() < numberPiece) {
             Piece p = PieceFactory.createPiece();
 
@@ -45,7 +45,6 @@ public class PlayBoard {
                 tempAl.add(p); 
             }
         }
-
         return tempAl;
     }
 
@@ -62,7 +61,7 @@ public class PlayBoard {
     }
 
     // Getters
-    public int[][]          getPlayBoards  () { return this.playBoard; }
+    public int[][]          getPlayBoard   () { return this.playBoard; }
     public ArrayList<Piece> getPieces      () { return this.alPiece; }
     public ArrayList<Piece> getPieceOnBoard() { return this.alPieceOnBoard; }
 

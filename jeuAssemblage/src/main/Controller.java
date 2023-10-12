@@ -28,20 +28,9 @@ public class Controller {
 
 
 	// seed methods
-	public int getSizeX(long seed) {
-		return new Random(seed).nextInt(10) + 5;
-	}
-
-	public int getSizeY(long seed) {
-		return new Random(seed + 1).nextInt(10) + 5;
-	}
-
-	public int getPiecesCount(long seed) {
-		return new Random(seed + 2).nextInt(10) + 5;
-	}
 
 	// difficulty methods
-	public int getSizeX(long seed, Difficulty difficulty) {
+	public int getSizeXBySeed(long seed, Difficulty difficulty) {
 
 		int minSizeX = difficulty.getMinSizeX();
 		int maxSizeX = difficulty.getMaxSizeX();
@@ -49,7 +38,7 @@ public class Controller {
 		return new Random(seed).nextInt(maxSizeX - minSizeX) + minSizeX;
 	}
 
-	public int getSizeY(long seed, Difficulty difficulty) {
+	public int getSizeYBySeed(long seed, Difficulty difficulty) {
 
 		int minSizeY = difficulty.getMinSizeY();
 		int maxSizeY = difficulty.getMaxSizeY();
@@ -57,7 +46,7 @@ public class Controller {
 		return new Random(seed + 1).nextInt(maxSizeY - minSizeY) + minSizeY;
 	}
 
-	public int getPiecesCount(long seed, Difficulty difficulty) {
+	public int getPiecesCountBySeed(long seed, Difficulty difficulty) {
 
 		int minNbPieces = difficulty.getMinNbPieces();
 		int maxNbPieces = difficulty.getMaxNbPieces();
@@ -66,17 +55,25 @@ public class Controller {
 	}
 
 	// play board methods
-	public void setPlayBoard(long seed, int difficulty ) {
-		this.model.initNumberPiece(getPiecesCount(seed));
-		this.model.initSizePB(getSizeX(seed), getSizeY(seed));
+	public void setPlayBoard(long seed, Difficulty difficulty ) {
+		this.model.initNumberPiece(getPiecesCountBySeed(seed, difficulty));
+		this.model.initSizePB(getSizeXBySeed(seed, difficulty), getSizeYBySeed(seed, difficulty));
 	}
 
-	public int getWidth() {
-		return this.model.getWidth();
+	public int getWidthBoard() {
+		return this.model.getPlayBoard()[0].length;
 	}
 
-	public int getHeight() {
-		return this.model.getHeight();
+	public int getHeightBoard() {
+		return this.model.getPlayBoard().length;
+	}
+
+	public int getPieceCount() {
+		return this.model.getPieces().size() + this.model.getPieceOnBoard().size();
+	}
+
+	public int[][] getPlayBoard() {
+		return this.model.getPlayBoard();
 	}
 
 	public boolean canBeAddedToBoard(Piece p) {

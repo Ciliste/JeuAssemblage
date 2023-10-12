@@ -3,6 +3,8 @@ package view.screen;
 import static view.utils.SwingUtils.*;
 
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Random;
 
 import javax.swing.Box;
@@ -50,7 +52,10 @@ public class SoloGameCreation extends JPanel {
 
     private final JButton btnPlay = new JButton("Jouer");
 
-    public SoloGameCreation(Runnable backCallback) {
+    private final Controller controller = Controller.getInstance();
+    private SoloGameScreen soloGameScreen;
+
+    public SoloGameCreation(Runnable backCallback, Runnable playCallBack) {
 
         this.setLayout(null);
 
@@ -79,7 +84,6 @@ public class SoloGameCreation extends JPanel {
 		this.add(btnPlay);
 
         // LISTENERS
-        //
 
 		ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
         this.addComponentListener(resizeListener);
@@ -92,28 +96,33 @@ public class SoloGameCreation extends JPanel {
 
         txtSeed.getDocument().addDocumentListener(new SeedDocumentListener());
 
-		difficultyList.addListSelectionListener(new ListSelectionListener() {
+		difficultyList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                updateSeed(Long.parseLong(txtSeed.getText()));
+            }
+        });
 
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				
-				if (!e.getValueIsAdjusting()) {
-
-					updateSeed(Long.parseLong(txtSeed.getText()));
-				}
-			}
-		});
+        this.btnPlay.addActionListener(e -> {
+            SoloGameCreation.this.initPlayBoard();
+            playCallBack.run();
+        });
 
 		resizeListener.componentResized(null);
+    }
+
+    private void initPlayBoard() {
+        Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+
+        this.controller.setPlayBoard(Long.parseLong(txtSeed.getText()), difficulty);
     }
 
     private void updateSeed(long seed) {
 
 		Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
 
-        txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeX(seed, difficulty)));
-        txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeY(seed, difficulty)));
-        nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCount(seed, difficulty));
+        txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeXBySeed(seed, difficulty)));
+        txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeYBySeed(seed, difficulty)));
+        nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCountBySeed(seed, difficulty));
     }
 
     private static Runnable createResizeCallback(SoloGameCreation soloGameCreation) {

@@ -12,6 +12,7 @@ import com.formdev.flatlaf.FlatLaf;
 
 import view.screen.MainScreen;
 import view.screen.SoloGameCreation;
+import view.screen.SoloGameScreen;
 
 public class MainFrame extends JFrame {
     
@@ -29,21 +30,6 @@ public class MainFrame extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		try {
-		
-			InputStream stream = MainFrame.class.getResourceAsStream("/assets/test.txt");
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-			}
-			reader.close();
-		} 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		setVisible(true);
     }
 
@@ -51,7 +37,10 @@ public class MainFrame extends JFrame {
 
         return () -> {
 
-            mainFrame.setContentPane(new SoloGameCreation(createMainScreenCallback(mainFrame)));
+            mainFrame.setContentPane(new SoloGameCreation(
+                    createMainScreenCallback(mainFrame),
+                    createSoloGameScreenCallback(mainFrame)
+            ));
             mainFrame.revalidate();
         };
     }
@@ -61,6 +50,15 @@ public class MainFrame extends JFrame {
         return () -> {
 
             mainFrame.setContentPane(mainFrame.mainScreen);
+            mainFrame.revalidate();
+        };
+    }
+
+    private static Runnable createSoloGameScreenCallback(MainFrame mainFrame) {
+
+        return () -> {
+
+            mainFrame.setContentPane(new SoloGameScreen(createMainScreenCallback(mainFrame)));
             mainFrame.revalidate();
         };
     }
