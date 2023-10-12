@@ -7,15 +7,17 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import view.MainFrame;
+
 import java.awt.FlowLayout;
 
 public class MainScreen extends JPanel {
     
-    private final Runnable soloGameCreationCallback;
+    private final MainFrame mainFrame;
 
-    public MainScreen(Runnable soloGameCreationCallback) {
+    public MainScreen(MainFrame mainFrame) {
 
-        this.soloGameCreationCallback = soloGameCreationCallback;
+        this.mainFrame = mainFrame;
 
         JButton btnSolo    = new JButton("SOLO");
         JButton btnMulti   = new JButton("MULTIJOUEUR");
@@ -49,7 +51,7 @@ public class MainScreen extends JPanel {
 
         btnSolo.addActionListener(e -> {
 
-            MainScreen.this.soloGameCreationCallback.run();
+            MainScreen.this.mainFrame.setContentPane(new SoloGameCreation(MainScreen.this.mainFrame));
         });
     }
 }

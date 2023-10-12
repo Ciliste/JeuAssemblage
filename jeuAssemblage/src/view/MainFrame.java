@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,7 +23,7 @@ public class MainFrame extends JFrame {
 
 		FlatDarkLaf.setup();
 
-		mainScreen = new MainScreen(createSoloGameCreationCallback(this));
+		mainScreen = new MainScreen(this);
 
         setContentPane(mainScreen);
 
@@ -30,36 +31,25 @@ public class MainFrame extends JFrame {
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		try {
+		
+			InputStream stream = MainFrame.class.getResourceAsStream("/assets/icon.png");
+
+			setIconImage(javax.imageio.ImageIO.read(stream));
+		} 
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		setVisible(true);
     }
 
-    private static Runnable createSoloGameCreationCallback(MainFrame mainFrame) {
-
-        return () -> {
-
-            mainFrame.setContentPane(new SoloGameCreation(
-                    createMainScreenCallback(mainFrame),
-                    createSoloGameScreenCallback(mainFrame)
-            ));
-            mainFrame.revalidate();
-        };
-    }
-
-    private static Runnable createMainScreenCallback(MainFrame mainFrame) {
-
-        return () -> {
-
-            mainFrame.setContentPane(mainFrame.mainScreen);
-            mainFrame.revalidate();
-        };
-    }
-
-    private static Runnable createSoloGameScreenCallback(MainFrame mainFrame) {
-
-        return () -> {
-
-            mainFrame.setContentPane(new SoloGameScreen(createMainScreenCallback(mainFrame)));
-            mainFrame.revalidate();
-        };
-    }
+	@Override
+	public void setContentPane(Container contentPane) {
+		
+		super.setContentPane(contentPane);
+		
+		revalidate();
+		repaint();
+	}
 }

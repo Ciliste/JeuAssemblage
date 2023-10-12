@@ -22,6 +22,7 @@ import javax.swing.event.ListSelectionListener;
 
 import main.Controller;
 import main.Difficulty;
+import view.MainFrame;
 import view.component.Separator;
 import view.listener.ResizeListener;
 import view.utils.DocumentAdapter;
@@ -51,11 +52,11 @@ public class SoloGameCreation extends JPanel {
 	private final JList<String> difficultyList = new JList<String>(Difficulty.getDifficultysName());
 
     private final JButton btnPlay = new JButton("Jouer");
-
+    
     private final Controller controller = Controller.getInstance();
     private SoloGameScreen soloGameScreen;
 
-    public SoloGameCreation(Runnable backCallback, Runnable playCallBack) {
+    public SoloGameCreation(MainFrame mainFrame) {
 
         this.setLayout(null);
 
@@ -88,7 +89,7 @@ public class SoloGameCreation extends JPanel {
 		ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
         this.addComponentListener(resizeListener);
 
-        btnCancel.addActionListener(e -> backCallback.run());
+        btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
 
         final Runnable randomSeedCallback = createRandomSeedCallback(this);
         btnRandomSeed.addActionListener(e -> randomSeedCallback.run());
@@ -102,12 +103,15 @@ public class SoloGameCreation extends JPanel {
             }
         });
 
-        this.btnPlay.addActionListener(e -> {
-            SoloGameCreation.this.initPlayBoard();
-            playCallBack.run();
-        });
+		btnPlay.addActionListener(e -> {
 
-		resizeListener.componentResized(null);
+			long seed = Long.parseLong(txtSeed.getText());
+			Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+
+			mainFrame.setContentPane(new SoloGameScreen());
+		});
+
+		revalidate();
     }
 
     private void initPlayBoard() {

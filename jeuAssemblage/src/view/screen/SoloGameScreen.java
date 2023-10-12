@@ -14,7 +14,7 @@ public class SoloGameScreen extends JPanel {
     private PlayBoardScreen playBoardScreen;
     private PieceBoardScreen pieceBoardScreen;
 
-    public SoloGameScreen( Runnable mainScreenCallBack ) {
+    public SoloGameScreen() {
         this.controller = Controller.getInstance();
 
         this.setLayout(new GridLayout(2,1));
