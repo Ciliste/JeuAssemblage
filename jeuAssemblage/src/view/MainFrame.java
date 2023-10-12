@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,7 +22,7 @@ public class MainFrame extends JFrame {
 
 		FlatDarkLaf.setup();
 
-		mainScreen = new MainScreen(createSoloGameCreationCallback(this));
+		mainScreen = new MainScreen(this);
 
         setContentPane(mainScreen);
 
@@ -47,21 +48,12 @@ public class MainFrame extends JFrame {
 		setVisible(true);
     }
 
-    private static Runnable createSoloGameCreationCallback(MainFrame mainFrame) {
-
-        return () -> {
-
-            mainFrame.setContentPane(new SoloGameCreation(createMainScreenCallback(mainFrame)));
-            mainFrame.revalidate();
-        };
-    }
-
-    private static Runnable createMainScreenCallback(MainFrame mainFrame) {
-
-        return () -> {
-
-            mainFrame.setContentPane(mainFrame.mainScreen);
-            mainFrame.revalidate();
-        };
-    }
+	@Override
+	public void setContentPane(Container contentPane) {
+		
+		super.setContentPane(contentPane);
+		
+		revalidate();
+		repaint();
+	}
 }

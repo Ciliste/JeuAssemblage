@@ -20,6 +20,7 @@ import javax.swing.event.ListSelectionListener;
 
 import main.Controller;
 import main.Difficulty;
+import view.MainFrame;
 import view.component.Separator;
 import view.listener.ResizeListener;
 import view.utils.DocumentAdapter;
@@ -50,7 +51,7 @@ public class SoloGameCreation extends JPanel {
 
     private final JButton btnPlay = new JButton("Jouer");
 
-    public SoloGameCreation(Runnable backCallback) {
+    public SoloGameCreation(MainFrame mainFrame) {
 
         this.setLayout(null);
 
@@ -84,7 +85,7 @@ public class SoloGameCreation extends JPanel {
 		ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
         this.addComponentListener(resizeListener);
 
-        btnCancel.addActionListener(e -> backCallback.run());
+        btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
 
         final Runnable randomSeedCallback = createRandomSeedCallback(this);
         btnRandomSeed.addActionListener(e -> randomSeedCallback.run());
