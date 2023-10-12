@@ -39,6 +39,7 @@ public class PlayBoard {
         int samePieceLimit = (int) Math.ceil(numberPiece/(PieceFactory.NUMBER_PIECE*1d));
 
         while ( tempAl.size() < numberPiece) {
+			
             Piece p = PieceFactory.createPiece();
 
             if ( PlayBoard.checkPiece(p, tempAl, samePieceLimit) ) {

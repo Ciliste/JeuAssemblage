@@ -1,4 +1,4 @@
-package view.screen.board.utils;
+package view.component.board.utils;
 
 import static view.utils.SwingUtils.*;
 
@@ -11,7 +11,7 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-public class GrilleBoard extends JPanel{
+public class GrilleBoard extends JPanel {
 
     private Controller controller;
 
@@ -25,6 +25,7 @@ public class GrilleBoard extends JPanel{
 
     @Override
     public void paintComponent(Graphics g) {
+
         super.paintComponent(g);
 
         double componentSize = Math.min(

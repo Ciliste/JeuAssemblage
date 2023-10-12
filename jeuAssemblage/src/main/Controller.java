@@ -55,9 +55,10 @@ public class Controller {
 	}
 
 	// play board methods
-	public void setPlayBoard(long seed, Difficulty difficulty ) {
-		this.model.initNumberPiece(getPiecesCountBySeed(seed, difficulty));
-		this.model.initSizePB(getSizeXBySeed(seed, difficulty), getSizeYBySeed(seed, difficulty));
+	public void setPlayBoard(int sizeX, int sizeY, int nbPieces) {
+
+		this.model.initNumberPiece(nbPieces);
+		this.model.initSizePB(sizeY, sizeX);
 	}
 
 	public int getWidthBoard() {

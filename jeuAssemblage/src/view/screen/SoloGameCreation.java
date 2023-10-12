@@ -86,8 +86,8 @@ public class SoloGameCreation extends JPanel {
 
         // LISTENERS
 
-		ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
-        this.addComponentListener(resizeListener);
+		// ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
+        // this.addComponentListener(resizeListener);
 
         btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
 
@@ -105,8 +105,7 @@ public class SoloGameCreation extends JPanel {
 
 		btnPlay.addActionListener(e -> {
 
-			long seed = Long.parseLong(txtSeed.getText());
-			Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+			initPlayBoard();
 
 			mainFrame.setContentPane(new SoloGameScreen());
 		});
@@ -114,10 +113,129 @@ public class SoloGameCreation extends JPanel {
 		revalidate();
     }
 
-    private void initPlayBoard() {
-        Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+	@Override
+	public void doLayout() {
 
-        this.controller.setPlayBoard(Long.parseLong(txtSeed.getText()), difficulty);
+		final int PADDING_LEFT = getWidthTimesPourcent(this, .05f);
+
+		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
+
+		final int BTN_CANCEL_WIDTH = Math.max(getWidthTimesPourcent(this, .03f), getHeightTimesPourcent(this, .03f));
+		final int BTN_CANCEL_HEIGHT = BTN_CANCEL_WIDTH;
+
+		btnCancel.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP, 
+			BTN_CANCEL_WIDTH, 
+			BTN_CANCEL_HEIGHT
+		);
+
+		final int PADDING_TOP_LBL_SEED = PADDING_TOP + BTN_CANCEL_HEIGHT + getHeightTimesPourcent(this, .05f);
+
+		final int LBL_WIDTH = getWidthTimesPourcent(this, .1f);
+
+		lblSeed.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP_LBL_SEED, 
+			LBL_WIDTH, 
+			BTN_CANCEL_HEIGHT
+		);
+
+		txtSeed.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT, 
+			getWidthTimesPourcent(this, .2f), 
+			BTN_CANCEL_HEIGHT
+		);
+
+		btnRandomSeed.setBounds(
+			PADDING_LEFT + getWidthTimesPourcent(this, .2f),
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT,
+			BTN_CANCEL_WIDTH,
+			BTN_CANCEL_HEIGHT 
+		);
+
+		separator.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 2, 
+			getWidthTimesPourcent(this, .9f), 
+			BTN_CANCEL_HEIGHT
+		);
+
+		lblSizeX.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 3, 
+			LBL_WIDTH, 
+			BTN_CANCEL_HEIGHT
+		);
+
+		txtSizeX.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 4, 
+			getWidthTimesPourcent(this, .2f), 
+			BTN_CANCEL_HEIGHT
+		);
+
+		lblSizeY.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 5, 
+			LBL_WIDTH, 
+			BTN_CANCEL_HEIGHT
+		);
+
+		txtSizeY.setBounds(
+			PADDING_LEFT, 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 6, 
+			getWidthTimesPourcent(this, .2f), 
+			BTN_CANCEL_HEIGHT
+		);
+
+		lblNbPieces.setBounds(
+			PADDING_LEFT + getWidthTimesPourcent(this, .3f), 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 3, 
+			LBL_WIDTH, 
+			BTN_CANCEL_HEIGHT
+		);
+
+		nbPiecesSpinner.setBounds(
+			PADDING_LEFT + getWidthTimesPourcent(this, .3f), 
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 4, 
+			getWidthTimesPourcent(this, .2f), 
+			BTN_CANCEL_HEIGHT
+		);
+
+		lblDifficulty.setBounds(
+			PADDING_LEFT,
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 7,
+			LBL_WIDTH,
+			BTN_CANCEL_HEIGHT
+		);
+
+		difficultyList.setBounds(
+			PADDING_LEFT,
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
+			getWidthTimesPourcent(this, .2f),
+			BTN_CANCEL_HEIGHT * 3
+		);
+
+		final int PADDING_RIGHT = PADDING_LEFT;
+		final int PADDING_BOTTOM = PADDING_TOP;
+
+		btnPlay.setBounds(
+			getWidth() - PADDING_RIGHT - BTN_CANCEL_WIDTH * 5,
+			getHeight() - PADDING_BOTTOM - BTN_CANCEL_HEIGHT,
+			BTN_CANCEL_WIDTH * 5,
+			BTN_CANCEL_HEIGHT
+		);
+	}
+
+    private void initPlayBoard() {
+
+		int sizeX = Integer.parseInt(txtSizeX.getText());
+		int sizeY = Integer.parseInt(txtSizeY.getText());
+		int nbPieces = (int) nbPiecesSpinner.getValue();
+
+        this.controller.setPlayBoard(sizeX, sizeY, nbPieces);
     }
 
     private void updateSeed(long seed) {
@@ -133,117 +251,7 @@ public class SoloGameCreation extends JPanel {
 
         return () -> {
 
-            final int PADDING_LEFT = getWidthTimesPourcent(soloGameCreation, .05f);
-
-            final int PADDING_TOP = getHeightTimesPourcent(soloGameCreation, .05f);
-
-            final int BTN_CANCEL_WIDTH = Math.max(getWidthTimesPourcent(soloGameCreation, .03f), getHeightTimesPourcent(soloGameCreation, .03f));
-            final int BTN_CANCEL_HEIGHT = BTN_CANCEL_WIDTH;
-
-            soloGameCreation.btnCancel.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP, 
-                BTN_CANCEL_WIDTH, 
-                BTN_CANCEL_HEIGHT
-            );
-
-            final int PADDING_TOP_LBL_SEED = PADDING_TOP + BTN_CANCEL_HEIGHT + getHeightTimesPourcent(soloGameCreation, .05f);
-
-            final int LBL_WIDTH = getWidthTimesPourcent(soloGameCreation, .1f);
-
-            soloGameCreation.lblSeed.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP_LBL_SEED, 
-                LBL_WIDTH, 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.txtSeed.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT, 
-                getWidthTimesPourcent(soloGameCreation, .2f), 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.btnRandomSeed.setBounds(
-                PADDING_LEFT + getWidthTimesPourcent(soloGameCreation, .2f),
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT,
-                BTN_CANCEL_WIDTH,
-                BTN_CANCEL_HEIGHT 
-            );
-
-            soloGameCreation.separator.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 2, 
-                getWidthTimesPourcent(soloGameCreation, .9f), 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.lblSizeX.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 3, 
-                LBL_WIDTH, 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.txtSizeX.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 4, 
-                getWidthTimesPourcent(soloGameCreation, .2f), 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.lblSizeY.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 5, 
-                LBL_WIDTH, 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.txtSizeY.setBounds(
-                PADDING_LEFT, 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 6, 
-                getWidthTimesPourcent(soloGameCreation, .2f), 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.lblNbPieces.setBounds(
-                PADDING_LEFT + getWidthTimesPourcent(soloGameCreation, .3f), 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 3, 
-                LBL_WIDTH, 
-                BTN_CANCEL_HEIGHT
-            );
-
-            soloGameCreation.nbPiecesSpinner.setBounds(
-                PADDING_LEFT + getWidthTimesPourcent(soloGameCreation, .3f), 
-                PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 4, 
-                getWidthTimesPourcent(soloGameCreation, .2f), 
-                BTN_CANCEL_HEIGHT
-            );
-
-			soloGameCreation.lblDifficulty.setBounds(
-				PADDING_LEFT,
-				PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 7,
-				LBL_WIDTH,
-				BTN_CANCEL_HEIGHT
-			);
-
-			soloGameCreation.difficultyList.setBounds(
-				PADDING_LEFT,
-				PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
-				getWidthTimesPourcent(soloGameCreation, .2f),
-				BTN_CANCEL_HEIGHT * 3
-			);
-
-			final int PADDING_RIGHT = PADDING_LEFT;
-			final int PADDING_BOTTOM = PADDING_TOP;
-
-			soloGameCreation.btnPlay.setBounds(
-				soloGameCreation.getWidth() - PADDING_RIGHT - BTN_CANCEL_WIDTH * 5,
-				soloGameCreation.getHeight() - PADDING_BOTTOM - BTN_CANCEL_HEIGHT,
-				BTN_CANCEL_WIDTH * 5,
-				BTN_CANCEL_HEIGHT
-			);
+            
         };
     }
 

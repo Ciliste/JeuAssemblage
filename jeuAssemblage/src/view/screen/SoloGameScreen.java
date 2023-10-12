@@ -1,30 +1,42 @@
 package view.screen;
 
-import main.Controller;
-import view.screen.board.PieceBoardScreen;
-import view.screen.board.PlayBoardScreen;
+import javax.swing.JPanel;
 
-import javax.swing.*;
-import java.awt.*;
+import view.component.GamePanel;
+import view.utils.SwingUtils;
+
+import java.awt.Graphics;
 
 public class SoloGameScreen extends JPanel {
 
-    private final Controller controller;
-
-    private PlayBoardScreen playBoardScreen;
-    private PieceBoardScreen pieceBoardScreen;
+	private final GamePanel gamePanel;
 
     public SoloGameScreen() {
-        this.controller = Controller.getInstance();
 
-        this.setLayout(new GridLayout(2,1));
+        setLayout(null);
 
-        this.playBoardScreen = new PlayBoardScreen();
-        this.pieceBoardScreen = new PieceBoardScreen();
+		this.gamePanel = new GamePanel();
 
-        this.add(this.playBoardScreen);
-        this.add(this.pieceBoardScreen);
+		this.add(this.gamePanel);
 
-        this.setVisible(true);
+		super.doLayout();
     }
+
+	@Override
+	public void paintComponent(Graphics g) {
+
+		super.paintComponent(g);
+		
+		SwingUtils.drawDebugBounds(this, g);
+	}
+
+	@Override
+	public void doLayout() {
+
+		super.doLayout();
+
+		final int PADDING = SwingUtils.getHeightTimesPourcent(this, 0.05f);
+
+		gamePanel.setBounds(PADDING, PADDING, getWidth() - (PADDING * 2), getHeight() - (PADDING * 2));
+	}
 }
