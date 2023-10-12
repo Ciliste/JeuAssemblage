@@ -32,14 +32,9 @@ public class MainFrame extends JFrame {
 
 		try {
 		
-			InputStream stream = MainFrame.class.getResourceAsStream("/assets/test.txt");
+			InputStream stream = MainFrame.class.getResourceAsStream("/assets/icon.png");
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-			String line;
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-			}
-			reader.close();
+			setIconImage(javax.imageio.ImageIO.read(stream));
 		} 
 		catch (Exception e) {
 			e.printStackTrace();
