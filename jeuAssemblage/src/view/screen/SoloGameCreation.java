@@ -105,7 +105,15 @@ public class SoloGameCreation extends JPanel {
 			}
 		});
 
-		resizeListener.componentResized(null);
+		btnPlay.addActionListener(e -> {
+
+			long seed = Long.parseLong(txtSeed.getText());
+			Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+
+			mainFrame.setContentPane(new SoloGameScreen(seed, difficulty));
+		});
+
+		revalidate();
     }
 
     private void updateSeed(long seed) {

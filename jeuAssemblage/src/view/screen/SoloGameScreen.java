@@ -7,6 +7,7 @@ import main.Difficulty;
 import view.component.GameGrid;
 import view.listener.ResizeListener;
 
+import java.awt.Color;
 import java.awt.Graphics;
 
 public class SoloGameScreen extends JPanel {
@@ -33,7 +34,8 @@ public class SoloGameScreen extends JPanel {
 
 		super.paintComponent(g);
 
-		g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+		g.setColor(Color.RED);
+		g.drawRect(1, 1, getWidth() - 2, getHeight() - 2);
 	}
 
 	protected Runnable createResizeCallback() {
