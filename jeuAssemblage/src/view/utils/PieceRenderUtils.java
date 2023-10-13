@@ -63,7 +63,7 @@ public final class PieceRenderUtils {
         return new Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
     }
 
-	private static Color getRandomColor() {
+	public static Color getRandomColor() {
 
 		return new Color((int) (Math.random() * 0x1000000));
 	}

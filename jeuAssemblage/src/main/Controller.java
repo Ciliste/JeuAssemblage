@@ -4,6 +4,7 @@ import java.util.Random;
 
 import model.PlayBoard;
 import pieces.Piece;
+import pieces.PieceColor;
 import view.MainFrame;
 
 public class Controller {
@@ -70,18 +71,23 @@ public class Controller {
 	}
 
 	public int getPieceCount() {
-		return this.model.getPieces().size() + this.model.getPieceOnBoard().size();
+		return this.model.getPieceOnBoard().size();
 	}
 
 	public int[][] getPlayBoard() {
 		return this.model.getPlayBoard();
 	}
 
-	public boolean canBeAddedToBoard(Piece p) {
+	public boolean canBeAddedToBoard(PieceColor pc) {
+		Piece p = pc.piece;
 		return this.model.canBeAddedToBoard(
 			p.getX(),
 			p.getY(),
 			p.getBounds()
 		);
+	}
+
+	public void cleaningRunSpace() {
+		this.model.cleaningRunSpace();
 	}
 }

@@ -1,6 +1,8 @@
 package view;
 
 import java.awt.Container;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,6 +13,7 @@ import javax.swing.JFrame;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 
+import main.Controller;
 import view.screen.MainScreen;
 import view.screen.SoloGameCreation;
 import view.screen.SoloGameScreen;
@@ -44,6 +47,11 @@ public class MainFrame extends JFrame {
 		}
 
 		setVisible(true);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				Controller.getInstance().cleaningRunSpace();
+			}
+		});
     }
 
 	@Override
