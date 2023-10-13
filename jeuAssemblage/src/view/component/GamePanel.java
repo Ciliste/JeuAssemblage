@@ -1,11 +1,13 @@
 package view.component;
 
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import view.component.board.Grid;
 import view.component.board.PieceBoard;
 import view.utils.SwingUtils;
 
+import java.awt.BorderLayout;
 import java.awt.Graphics;
 
 public class GamePanel extends JPanel{
@@ -17,10 +19,15 @@ public class GamePanel extends JPanel{
 		
 		super();
 
+		this.setLayout(new BorderLayout());
+
+
 		this.grid = new Grid();
 		this.pieceBoard = new PieceBoard();
 
-		this.setLayout(null);
+
+		this.add(this.grid, BorderLayout.CENTER);
+
 	}
 
 	@Override

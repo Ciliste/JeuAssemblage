@@ -21,6 +21,8 @@ public class MainFrame extends JFrame {
 
     public MainFrame() {
 
+		super("Puzzle GAMING");
+
 		FlatDarkLaf.setup();
 
 		mainScreen = new MainScreen(this);
