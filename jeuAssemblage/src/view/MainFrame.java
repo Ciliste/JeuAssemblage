@@ -1,11 +1,13 @@
 package view;
 
 import java.awt.Container;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.Buffer;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import com.formdev.flatlaf.FlatDarkLaf;
@@ -35,7 +37,10 @@ public class MainFrame extends JFrame {
 		
 			InputStream stream = MainFrame.class.getResourceAsStream("/assets/icon.png");
 
-			setIconImage(javax.imageio.ImageIO.read(stream));
+			// Scale down the image
+			Image image = ImageIO.read(stream).getScaledInstance(25, 25, Image.SCALE_SMOOTH);
+
+			setIconImage(image);
 		} 
 		catch (Exception e) {
 			e.printStackTrace();

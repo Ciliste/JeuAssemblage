@@ -99,12 +99,13 @@ public final class PieceRenderUtils {
 
 	public static void main(String[] args) {
 		
-		BufferedImage image = createPieceImage(PieceFactory.createPiece().getBounds());
+		int[][] piece = PieceFactory.createPieceL().getBounds();
 
-		// Save the image
+		BufferedImage image = createPieceImage(piece, new Color(0xfa8d12));
+
 		try {
-            File output = new File("output.png"); // Specify the file path and format
-            ImageIO.write(image, "png", output); // png is lossless
+            File output = new File("output.png");
+            ImageIO.write(image, "png", output);
         } catch (Exception e) {
             e.printStackTrace();
         }

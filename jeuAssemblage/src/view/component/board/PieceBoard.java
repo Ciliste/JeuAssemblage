@@ -9,6 +9,15 @@ import java.awt.*;
 
 public class PieceBoard extends JPanel {
 
+	private final Controller controller = Controller.getInstance();
+
+	public PieceBoard() {
+
+		// controller.getPlayBoard().
+
+		setLayout(null);
+	}
+
 	@Override
 	public void paintComponent(Graphics g) {
 
