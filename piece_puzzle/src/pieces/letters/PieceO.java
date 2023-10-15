@@ -9,12 +9,12 @@ public class PieceO extends Piece {
     }
 
     @Override
-    public int[][] getBounds() {
-        return new int[][] 
+    protected int[][] getInitialBounds(){
+        return new int[][]
         {
-            {1,1,1},
-            {1,0,1},
-            {1,1,1}
+            {1, 1, 1},
+            {1, 0, 1},
+            {1, 1, 1}
         };
     }
 }

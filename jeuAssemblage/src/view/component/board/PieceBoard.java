@@ -1,7 +1,6 @@
 package view.component.board;
 
 import main.Controller;
-import view.component.board.utils.GrilleBoard;
 import view.utils.SwingUtils;
 
 import javax.swing.*;

@@ -64,24 +64,29 @@ public class Controller {
 	public int getWidthBoard() {
 		return this.model.getPlayBoard()[0].length;
 	}
-
 	public int getHeightBoard() {
 		return this.model.getPlayBoard().length;
 	}
-
 	public int getPieceCount() {
-		return this.model.getPieces().size() + this.model.getPieceOnBoard().size();
+		return this.model.getPieces().size();
 	}
+
+	public Piece getPieceById(int id) { return this.model.getPieceById(id); }
 
 	public int[][] getPlayBoard() {
 		return this.model.getPlayBoard();
 	}
 
-	public boolean canBeAddedToBoard(Piece p) {
+	public boolean canBeAddedToBoard(Piece p, int x, int y) {
 		return this.model.canBeAddedToBoard(
-			p.getX(),
-			p.getY(),
+			x,
+			y,
 			p.getBounds()
 		);
+	}
+
+	public void addPieceOnBoard(Piece p, int x, int y) {
+		this.model.addPieceOnBoard(p, x, y);
+		this.view.repaint();
 	}
 }

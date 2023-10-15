@@ -3,11 +3,14 @@ package pieces;
 public abstract class Piece {
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
-    
+
+    private static int id = 0;
+
+    private int instanceId;
     private int x;
     private int y;
-    private int rotate;
-    private int size;
+    protected int rotate;
+    protected int size;
 
     //CONSTRUCTORS
     public Piece( int x, int y, int size, int rotate) {
@@ -15,6 +18,7 @@ public abstract class Piece {
         this.y = y;
         this.rotate = rotate;
         this.size = size;
+        this.instanceId = Piece.id++;
     }
 
     public Piece(int x, int y, int size) {
@@ -29,11 +33,11 @@ public abstract class Piece {
     //METHODS
     public void rotate(int sense) {
         if (sense == Piece.LEFT) {
-            this.rotate = (this.rotate - 90) % 180; 
+            this.rotate = (this.rotate - 1) % 4;
         }
 
         if (sense == Piece.RIGHT) {
-            this.rotate = (this.rotate + 90) % 180; 
+            this.rotate = (this.rotate + 1) % 4;
         }
     }
 
@@ -47,11 +51,53 @@ public abstract class Piece {
     public int getX() { return this.x; }
     public int getY() { return this.y; }
 
-    public int getSize  () { return this.size; }
-    public int getRotate() { return this.rotate; }
+    public int getInstanceId () { return this.instanceId; }
+    public int getSize       () { return this.size; }
+    public int getRotate     () { return this.rotate; }
 
     //ABSTRACTS
-    public abstract int[][] getBounds();
+    protected abstract int[][] getInitialBounds();
+
+    //BOUNDS
+    private int[][] getRotateBounds () {
+        int[][] initBounds = getInitialBounds();
+        int[][] retBounds  = new int[initBounds.length][initBounds[0].length];
+
+        if ( this.rotate == 0) return initBounds;
+
+        if ( this.rotate == 2) {
+            for (int i = 0; i < initBounds.length; i++) {
+                for ( int j = 0 ; j < initBounds[i].length; j++) {
+                    retBounds[i][j] = initBounds[6-j][i];
+                }
+            }
+        }
+
+        if ( this.rotate == 1) {
+            for (int i = 0; i < initBounds.length; i++) {
+                for ( int j = 0 ; j < initBounds[i].length; j++) {
+                    retBounds[i][j] = initBounds[j][6-i];
+                }
+            }
+        }
+
+        if ( this.rotate == 3 ) {
+            for (int i = 0; i < initBounds.length; i++) {
+                for ( int j = 0 ; j < initBounds[i].length; j++) {
+                    retBounds[i][j] = initBounds[6-j][6-i];
+                }
+            }
+        }
+
+        return retBounds;
+    }
+
+    public int[][] getBounds() {
+        return this.getRotateBounds();
+    }
+
+    public int getWidth () { return 3; }
+    public int getHeight() { return 3; }
 
     public static void main(String[] args) {
         System.out.println("bozo");

@@ -70,6 +70,9 @@ public final class PieceRenderUtils {
 
 	public static BufferedImage createPieceImage(int[][] piece, Color color) {
 
+		// TODO NE PAS DESSINER LES LIGNES OU COLLONNES VIDES
+
+		
 		// Create a new image
 		BufferedImage image = new BufferedImage(CELL_PIXEL_SIZE * piece.length, CELL_PIXEL_SIZE * piece[0].length, BufferedImage.TYPE_INT_ARGB);
 

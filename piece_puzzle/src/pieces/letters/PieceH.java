@@ -9,8 +9,8 @@ public class PieceH extends Piece {
     }
 
     @Override
-    public int[][] getBounds() {
-        return new int[][] 
+    protected int[][] getInitialBounds(){
+        return new int[][]
         {
             {1,0,1},
             {1,1,1},
