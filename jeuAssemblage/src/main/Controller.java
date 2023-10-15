@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.*;
 import java.util.Random;
 
 import model.PlayBoard;
@@ -71,6 +72,7 @@ public class Controller {
 		return this.model.getPieces().size();
 	}
 
+	public Image getImageById(int id) { return this.model.getImageById(id); }
 	public Piece getPieceById(int id) { return this.model.getPieceById(id); }
 
 	public int[][] getPlayBoard() {

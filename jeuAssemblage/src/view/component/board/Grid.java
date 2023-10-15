@@ -25,13 +25,6 @@ public class Grid extends JPanel {
         this.setVisible(true);
     }
 
-    private Image getImage(Piece p) {
-        try {
-            BufferedImage img = ImageIO.read(new File(PlayBoard.PATH_IMG + "" + p.getInstanceId() + ".png"));
-            return img;
-        } catch(Exception e) {return null;}
-    }
-
 	@Override
 	public void paintComponent(Graphics g) {
 
@@ -61,7 +54,7 @@ public class Grid extends JPanel {
 
                     Piece p = this.controller.getPieceById(matrices[i][j]);
                     if (!alreadyDraw.contains(p)) {
-                        Image img = this.getImage(p);
+                        Image img = this.controller.getImageById(p.getInstanceId());
 
                         g2d.drawImage(img,
                                 (int) x,
@@ -69,9 +62,6 @@ public class Grid extends JPanel {
                                 (int) componentSize * p.getWidth(),
                                 (int) componentSize * p.getHeight(),
                                 null);
-
-                        System.out.print(componentSize);
-                        System.out.print(componentSize * p.getWidth());
 
                         alreadyDraw.add(p);
                     }

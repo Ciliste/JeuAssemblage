@@ -1,9 +1,11 @@
 package model;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import main.Controller;
 import pieces.Piece;
@@ -19,12 +21,14 @@ public class PlayBoard {
     private final Controller controller;
 
     private ArrayList<Piece> alPieceOnBoard;
+    private HashMap<Integer, Image> hmPieceImage;
     private int[][]          playBoard;
 
 
     public PlayBoard() {
         this.controller = Controller.getInstance();
 
+        this.hmPieceImage = new HashMap<Integer, Image>();
         this.alPieceOnBoard = null;
         this.playBoard = null;
     }
@@ -63,6 +67,7 @@ public class PlayBoard {
                 File output = new File(PATH_IMG + "/" + p.getInstanceId() + ".png");
                 output.createNewFile();
                 ImageIO.write(image, "png", output);
+                this.hmPieceImage.put(p.getInstanceId(), ImageIO.read(output));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -85,7 +90,8 @@ public class PlayBoard {
     public int[][]          getPlayBoard () { return this.playBoard; }
     public ArrayList<Piece> getPieces    () { return this.alPieceOnBoard; }
 
-    public Piece getPieceById (int id)        {return this.alPieceOnBoard.get(id-1);}
+    public Image getImageById (int id) { return this.hmPieceImage.get(id); }
+    public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
     
     /**
     * bla bla 
@@ -98,10 +104,15 @@ public class PlayBoard {
     public void addPieceOnBoard(Piece p, int x, int y) {
 
         int[][] bounds = p.getBounds();
+        int k = 0;
+        int l = 0;
         for (int i = x; i < x + bounds.length; i++) {
+            l = 0;
             for (int j = y; j < y + bounds[i].length; j++) {
-                this.playBoard[i][j] = p.getInstanceId() + 1;
+                this.playBoard[i][j] = bounds[k][l] * (p.getInstanceId() + 1);
+                l++;
             }
+            k++;
         }
 
         p.setX(x);
