@@ -1,11 +1,11 @@
 /out/
 /.idea/
 
-jeuAssemblage/bin/
-jeuAssemblage/build/
-jeuAssemblage/dist/
+jeuAssemblage/bin/*
+jeuAssemblage/build/*
+jeuAssemblage/dist/*
 jeuAssemblage/jeuAssemblage.iml
 
-piece_puzzle/build/
-piece_puzzle/dist/
+piece_puzzle/build/*
+piece_puzzle/dist/*
 piece_puzzle/piece_puzzle.iml
