@@ -9,3 +9,5 @@ jeuAssemblage/jeuAssemblage.iml
 piece_puzzle/build/*
 piece_puzzle/dist/*
 piece_puzzle/piece_puzzle.iml
+
+*.class
