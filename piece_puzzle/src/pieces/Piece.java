@@ -99,6 +99,11 @@ public abstract class Piece {
     public int getWidth () { return 3; }
     public int getHeight() { return 3; }
 
+    public void destroy() {
+        Piece.id--;
+    }
+
+    // Main
     public static void main(String[] args) {
         System.out.println("bozo");
     }

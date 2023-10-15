@@ -55,8 +55,8 @@ public class Controller {
 		return new Random(seed + 2).nextInt(maxNbPieces - minNbPieces) + minNbPieces;
 	}
 
-	public boolean difficultyPossible(int sixeX, int sizeY, int nbPieces) {
-		return sixeX * sizeY > nbPieces * 9;
+	public boolean difficultyPossible(int sizeX, int sizeY, int nbPieces) {
+		return sizeX * sizeY > nbPieces * 9;
 	}
 
 	// play board methods
@@ -66,28 +66,21 @@ public class Controller {
 		this.model.initSizePB(sizeY, sizeX);
 	}
 
-	public int getWidthBoard() {
-		return this.model.getPlayBoard()[0].length;
-	}
-	public int getHeightBoard() {
-		return this.model.getPlayBoard().length;
-	}
-	public int getPieceCount() {
-		return this.model.getPieces().size();
-	}
+	public int     getWidthBoard () { return this.model.getPlayBoard()[0].length; }
+	public int     getHeightBoard() { return this.model.getPlayBoard().length; }
+	public int     getPieceCount () { return this.model.getPieces().size(); }
+	public int[][] getPlayBoard  () { return this.model.getPlayBoard(); }
 
 	public Image getImageById(int id) { return this.model.getImageById(id); }
 	public Piece getPieceById(int id) { return this.model.getPieceById(id); }
 
-	public int[][] getPlayBoard() {
-		return this.model.getPlayBoard();
-	}
 
 	public boolean canBeAddedToBoard(Piece p, int x, int y) {
 		return this.model.canBeAddedToBoard(
 			x,
 			y,
-			p.getBounds()
+			p.getWidth(),
+			p.getHeight()
 		);
 	}
 

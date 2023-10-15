@@ -38,7 +38,10 @@ public class PlayBoard {
 
         //TODO remove
         this.addPieceOnBoard(this.alPieceOnBoard.get(0), 0, 0);
-        this.addPieceOnBoard(this.alPieceOnBoard.get(1), 2, 0);
+
+        if (this.controller.canBeAddedToBoard(this.alPieceOnBoard.get(1), 2, 0)) {
+            this.addPieceOnBoard(this.alPieceOnBoard.get(1), 2, 0);
+        }
     
         printMatrice(this.playBoard);
     }
@@ -59,6 +62,8 @@ public class PlayBoard {
 
             if (PlayBoard.checkPiece(p, tempAl, samePieceLimit)) {
                 tempAl.add(p);
+            } else {
+                p.destroy();
             }
         }
         return tempAl;
@@ -126,13 +131,21 @@ public class PlayBoard {
     }
 
     /**
-    * @param  x         is int of top left matrices
-    * @param  y         is int of top left matrices
-    * @param  bounds    is int[][] and represent the shape of a piece
+    * @param  x         int that represent of top left matrices
+    * @param  y         int that represent of top left matrices
+    * @param  width     int that represent of top left matrices
+    * @param  height    int that represent of top left matrices
     * @return           True if the piece can be added on the board else False
     */
-    public boolean canBeAddedToBoard(int x, int y, int[][] bounds) {
+    public boolean canBeAddedToBoard(int x, int y, int width, int height) {
+        if ( x + width  > this.playBoard.length   ) return false;
+        if ( y + height > this.playBoard[0].length) return false;
 
+        for (int i = y; i < y + height; i++) {
+            for (int j = x; j < x + width; j++) {
+                if (this.playBoard[i][j] != 0 ) return false;
+            }
+        }
         return true;
     }
 
