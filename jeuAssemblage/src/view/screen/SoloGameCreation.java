@@ -105,9 +105,12 @@ public class SoloGameCreation extends JPanel {
 
 		btnPlay.addActionListener(e -> {
 
-			initPlayBoard();
+			if (initPlayBoard()) {
+				mainFrame.setContentPane(new SoloGameScreen());
+			} else {
+				System.out.println("Impossible mon ga");
+			}
 
-			mainFrame.setContentPane(new SoloGameScreen());
 		});
 
 		revalidate();
@@ -229,13 +232,19 @@ public class SoloGameCreation extends JPanel {
 		);
 	}
 
-    private void initPlayBoard() {
+    private boolean initPlayBoard() {
 
 		int sizeX = Integer.parseInt(txtSizeX.getText());
 		int sizeY = Integer.parseInt(txtSizeY.getText());
 		int nbPieces = (int) nbPiecesSpinner.getValue();
 
-        this.controller.setPlayBoard(sizeX, sizeY, nbPieces);
+		if (!this.controller.difficultyPossible(sizeX, sizeY, nbPieces)) {
+			return false;
+		}
+
+		this.controller.setPlayBoard(sizeX, sizeY, nbPieces);
+		
+		return true;
     }
 
     private void updateSeed(long seed) {

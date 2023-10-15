@@ -35,7 +35,12 @@ public class PlayBoard {
 
     public void initSizePB(int height, int width) {
         this.playBoard = createPlayBoard(height, width);
+
+        //TODO remove
         this.addPieceOnBoard(this.alPieceOnBoard.get(0), 0, 0);
+        this.addPieceOnBoard(this.alPieceOnBoard.get(1), 2, 0);
+    
+        printMatrice(this.playBoard);
     }
 
     public void initNumberPiece(int numberPiece) {
@@ -106,9 +111,9 @@ public class PlayBoard {
         int[][] bounds = p.getBounds();
         int k = 0;
         int l = 0;
-        for (int i = x; i < x + bounds.length; i++) {
+        for (int i = y; i < y + p.getHeight(); i++) {
             l = 0;
-            for (int j = y; j < y + bounds[i].length; j++) {
+            for (int j = x; j < x + p.getWidth(); j++) {
                 this.playBoard[i][j] = bounds[k][l] * (p.getInstanceId() + 1);
                 l++;
             }

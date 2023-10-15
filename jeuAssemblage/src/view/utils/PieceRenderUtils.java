@@ -86,8 +86,7 @@ public final class PieceRenderUtils {
 			for (int j = 0; j < piece[i].length; j++) {
 
 				if (piece[i][j] == 1) {
-
-					g.drawImage(cellImage, i * CELL_PIXEL_SIZE, j * CELL_PIXEL_SIZE, null);
+					g.drawImage(cellImage, j * CELL_PIXEL_SIZE, i * CELL_PIXEL_SIZE, null);
 				}
 			}
 		}
@@ -102,7 +101,7 @@ public final class PieceRenderUtils {
 
 	public static void main(String[] args) {
 		
-		int[][] piece = PieceFactory.createPieceL().getBounds();
+		int[][] piece = PieceFactory.createPieceT().getBounds();
 
 		BufferedImage image = createPieceImage(piece, new Color(0xfa8d12));
 

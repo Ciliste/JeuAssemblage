@@ -59,8 +59,8 @@ public class Grid extends JPanel {
                         g2d.drawImage(img,
                                 (int) x,
                                 (int) y,
-                                (int) componentSize * p.getWidth(),
-                                (int) componentSize * p.getHeight(),
+                                (int) componentSize * 3,
+                                (int) componentSize * 3,
                                 null);
 
                         alreadyDraw.add(p);

@@ -55,6 +55,10 @@ public class Controller {
 		return new Random(seed + 2).nextInt(maxNbPieces - minNbPieces) + minNbPieces;
 	}
 
+	public boolean difficultyPossible(int sixeX, int sizeY, int nbPieces) {
+		return sixeX * sizeY > nbPieces * 9;
+	}
+
 	// play board methods
 	public void setPlayBoard(int sizeX, int sizeY, int nbPieces) {
 
