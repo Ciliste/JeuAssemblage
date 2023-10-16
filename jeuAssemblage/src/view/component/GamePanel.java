@@ -24,6 +24,7 @@ public class GamePanel extends JPanel{
 		this.pieceBoard = new PieceBoard();
 
 		this.add(this.grid, BorderLayout.CENTER);
+		
 	}
 
 	@Override
