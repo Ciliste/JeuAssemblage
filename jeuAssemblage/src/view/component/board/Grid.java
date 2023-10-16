@@ -26,8 +26,6 @@ public class Grid extends JPanel {
 
 		super.paintComponent(g);
 
-		drawDebugBounds(this, g);
-
         double componentSize = Math.min(
                 getHeightTimesPourcent(this, 0.9f)/(this.controller.getHeightBoard()*1d),
                 getWidthTimesPourcent(this,0.9f)/(this.controller.getWidthBoard()*1d)
@@ -53,10 +51,10 @@ public class Grid extends JPanel {
                         Image img = this.controller.getImageById(p.getInstanceId());
 
                         g2d.drawImage(img,
-                                (int) x,
-                                (int) y,
-                                (int) componentSize * 3,
-                                (int) componentSize * 3,
+                                (int) Math.floor(x),
+                                (int) Math.floor(y),
+                                (int) Math.floor(componentSize * 3),
+                                (int) Math.floor(componentSize * 3),
                                 null);
 
                         alreadyDraw.add(p);

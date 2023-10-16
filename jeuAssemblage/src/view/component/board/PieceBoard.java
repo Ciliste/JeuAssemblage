@@ -24,6 +24,5 @@ public class PieceBoard extends JPanel {
 
 		SwingUtils.drawDebugBounds(this, g);
 
-		g.drawString("null", 0, 0);
 	}
 }

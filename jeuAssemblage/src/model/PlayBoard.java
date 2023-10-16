@@ -16,40 +16,25 @@ import javax.imageio.ImageIO;
 
 public class PlayBoard {
 
-    private final Controller controller;
-
-    private ArrayList<Piece> alPieceOnBoard;
+    private ArrayList<Piece>        alPieceOnBoard;
+    private Piece                   selectedPiece;
+    
     private HashMap<Integer, Image> hmPieceImage;
-    private int[][]          playBoard;
+    private int[][]                 playBoard;
 
 
     public PlayBoard() {
-        this.controller = Controller.getInstance();
-
         this.hmPieceImage = new HashMap<Integer, Image>();
+        
         this.alPieceOnBoard = null;
-        this.playBoard = null;
+        this.playBoard      = null;
+        this.selectedPiece  = null;
+
     }
 
     public void initSizePB(int height, int width) {
         this.playBoard = createPlayBoard(height, width);
-
-        //TODO remove
-        this.addPieceOnBoard(this.alPieceOnBoard.get(0), 0, 0);
-
-        if (this.controller.canBeAddedToBoard(this.alPieceOnBoard.get(1), 2, 0)) {
-            this.addPieceOnBoard(this.alPieceOnBoard.get(1), 2, 0);
-        }
-
-        if (this.controller.canBeAddedToBoard(this.alPieceOnBoard.get(2), 2, 2)) {
-            this.addPieceOnBoard(this.alPieceOnBoard.get(2), 2, 2);
-        }
-
-        if (this.controller.canBeAddedToBoard(this.alPieceOnBoard.get(3), 3, 2)) {
-            this.addPieceOnBoard(this.alPieceOnBoard.get(3), 3, 2);
-        }
-    
-        printMatrice(this.playBoard);
+        placePieceOnBoard();
     }
 
     public void initNumberPiece(int numberPiece) {
@@ -94,22 +79,56 @@ public class PlayBoard {
         return tempBoard;
     }
 
+    private void placePieceOnBoard() {
+        // TODO : changer ça en vrai fonction qui vérifie les possibilités avant d'ajouter, backtracking ?
+        for ( Piece p: this.alPieceOnBoard) {
+            int x, y;
+            do {
+                x = (int) (Math.random() * (this.playBoard[0].length - p.getWidth ()));
+                y = (int) (Math.random() * (this.playBoard.length    - p.getHeight()));
+            } while( !canBeAddedToBoard(x, y, p.getWidth(), p.getHeight()) );
+
+            addPieceOnBoard(p, x, y);
+        }
+    }
+
     // Getters
-    public int[][]          getPlayBoard () { return this.playBoard; }
-    public ArrayList<Piece> getPieces    () { return this.alPieceOnBoard; }
+    public int[][]          getPlayBoard     () { return this.playBoard; }
+    public ArrayList<Piece> getPieces        () { return this.alPieceOnBoard; }
+    public Piece            getSelectedPiece () { return this.selectedPiece; }
 
     public Image getImageById (int id) { return this.hmPieceImage.get(id); }
     public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
+    
+    // Setters
+    public void setPieceSelected(Piece p) { this.selectedPiece = p; }
     
     /**
     * bla bla 
     * <p>
     * bla bla
-    *
-    * @param  p     is a Piece that is placed on the Board
+    * @param  x     int that represent of top left matrices
+    * @param  y     int that represent of top left matrices
     * @see          Piece
     */
-    public void addPieceOnBoard(Piece p, int x, int y) {
+    public void addSelectedPiece(int x, int y) {
+        if (this.selectedPiece == null) return;
+
+        this.addPieceOnBoard(this.selectedPiece, x, y);
+    }
+
+    /**
+    * @param  x         int that represent of top left matrices
+    * @param  y         int that represent of top left matrices
+    * @return           True if the selected piece can be added on the board else False
+    */
+    public boolean selectedPieceCanBeAddedToBoard(int x, int y) {
+        if (this.selectedPiece == null) return false;
+
+        return this.canBeAddedToBoard(x, y, this.selectedPiece.getWidth(), this.selectedPiece.getHeight());
+    }
+
+    private void addPieceOnBoard(Piece p, int x, int y) {
 
         int[][] bounds = p.getBounds();
         int k = 0;
@@ -128,14 +147,7 @@ public class PlayBoard {
 
     }
 
-    /**
-    * @param  x         int that represent of top left matrices
-    * @param  y         int that represent of top left matrices
-    * @param  width     int that represent of top left matrices
-    * @param  height    int that represent of top left matrices
-    * @return           True if the piece can be added on the board else False
-    */
-    public boolean canBeAddedToBoard(int x, int y, int width, int height) {
+    private boolean canBeAddedToBoard(int x, int y, int width, int height) {
         if ( x + width  > this.playBoard.length   ) return false;
         if ( y + height > this.playBoard[0].length) return false;
 
