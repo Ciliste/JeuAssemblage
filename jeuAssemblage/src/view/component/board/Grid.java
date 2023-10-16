@@ -3,15 +3,11 @@ package view.component.board;
 import static view.utils.SwingUtils.*;
 
 import main.Controller;
-import model.PlayBoard;
 import pieces.Piece;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.ArrayList;
 
 public class Grid extends JPanel {

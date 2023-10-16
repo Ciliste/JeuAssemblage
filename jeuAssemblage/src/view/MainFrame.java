@@ -2,8 +2,6 @@ package view;
 
 import java.awt.Container;
 import java.awt.Image;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
@@ -11,7 +9,6 @@ import javax.swing.JFrame;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
-import model.PlayBoard;
 import view.screen.MainScreen;
 
 public class MainFrame extends JFrame {
@@ -26,12 +23,6 @@ public class MainFrame extends JFrame {
 		this.setContentPane(mainScreen);
 
 		this.setFrameIcon();
-		this.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				PlayBoard.cleaningRunSpace();
-			}
-		});
 
 		this.setSize(1200, 800);
 		this.setVisible(true);

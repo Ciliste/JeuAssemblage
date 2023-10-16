@@ -14,7 +14,7 @@ public class PieceBoard extends JPanel {
 
 		// controller.getPlayBoard().
 
-		setLayout(null);
+		this.setLayout(null);
 	}
 
 	@Override
@@ -23,5 +23,7 @@ public class PieceBoard extends JPanel {
 		super.paintComponent(g);
 
 		SwingUtils.drawDebugBounds(this, g);
+
+		g.drawString("null", 0, 0);
 	}
 }

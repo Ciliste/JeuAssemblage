@@ -16,8 +16,6 @@ import javax.imageio.ImageIO;
 
 public class PlayBoard {
 
-    public static final String PATH_IMG = "resources/run/";
-
     private final Controller controller;
 
     private ArrayList<Piece> alPieceOnBoard;
@@ -42,6 +40,14 @@ public class PlayBoard {
         if (this.controller.canBeAddedToBoard(this.alPieceOnBoard.get(1), 2, 0)) {
             this.addPieceOnBoard(this.alPieceOnBoard.get(1), 2, 0);
         }
+
+        if (this.controller.canBeAddedToBoard(this.alPieceOnBoard.get(2), 2, 2)) {
+            this.addPieceOnBoard(this.alPieceOnBoard.get(2), 2, 2);
+        }
+
+        if (this.controller.canBeAddedToBoard(this.alPieceOnBoard.get(3), 3, 2)) {
+            this.addPieceOnBoard(this.alPieceOnBoard.get(3), 3, 2);
+        }
     
         printMatrice(this.playBoard);
     }
@@ -55,7 +61,7 @@ public class PlayBoard {
     private ArrayList<Piece> createPieces(int numberPiece) {
         ArrayList<Piece> tempAl = new ArrayList<Piece>();
         int samePieceLimit = (int) Math.ceil(numberPiece / (PieceFactory.NUMBER_PIECE * 1d));
-
+        
         while (tempAl.size() < numberPiece) {
 
             Piece p = PieceFactory.createPiece();
@@ -72,15 +78,7 @@ public class PlayBoard {
     private void createPieceImage() {
         for (Piece p : this.alPieceOnBoard) {
             BufferedImage image = PieceRenderUtils.createPieceImage(p.getBounds());
-
-            try {
-                File output = new File(PATH_IMG + "/" + p.getInstanceId() + ".png");
-                output.createNewFile();
-                ImageIO.write(image, "png", output);
-                this.hmPieceImage.put(p.getInstanceId(), ImageIO.read(output));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            this.hmPieceImage.put(p.getInstanceId(), image);
         }
     }
 
@@ -168,13 +166,5 @@ public class PlayBoard {
                 System.out.print(matrice[i][j] + " ");
             }
         }
-    }
-
-    public static void cleaningRunSpace() {
-        File dir = new File(PATH_IMG);
-
-        for(File file: dir.listFiles())
-            if (!file.isDirectory())
-                file.delete();
     }
 }

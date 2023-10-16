@@ -17,13 +17,15 @@ public class GamePanel extends JPanel{
 
 	public GamePanel() {
 		super();
-		this.setLayout(new BorderLayout());
+		this.setLayout(null);
 
 
 		this.grid = new Grid();
+		this.grid.setBounds(0, 0, this.getWidth() /2, this.getHeight()/2);
 		this.pieceBoard = new PieceBoard();
 
-		this.add(this.grid, BorderLayout.CENTER);
+		this.add(this.grid);
+		
 	}
 
 	@Override
