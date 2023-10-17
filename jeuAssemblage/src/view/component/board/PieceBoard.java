@@ -25,7 +25,7 @@ public class PieceBoard extends JPanel {
 
 		super.paintComponent(g);
 
-		SwingUtils.drawDebugBounds(this, g);
+        SwingUtils.drawDebugBounds(this, g);
 
 	}
 }

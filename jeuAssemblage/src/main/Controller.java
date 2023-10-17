@@ -27,9 +27,6 @@ public class Controller {
 
 	private Controller() {}
 
-
-	// seed methods
-
 	// difficulty methods
 	public int getSizeXBySeed(long seed, Difficulty difficulty) {
 
@@ -59,7 +56,7 @@ public class Controller {
 		return sizeX * sizeY > nbPieces * 9;
 	}
 
-	// play board methods
+	// model methods
 	public void setPlayBoard(int sizeX, int sizeY, int nbPieces) {
 
 		this.model.initNumberPiece(nbPieces);
@@ -75,6 +72,7 @@ public class Controller {
 	public Image getImageById(int id) { return this.model.getImageById(id); }
 	public Piece getPieceById(int id) { return this.model.getPieceById(id); }
 
+	public int[] areaInfomartion()    { return this.model.rectangleArea(); }
 
 	public boolean canBeAddedToBoard(int x, int y) {
 		return this.model.selectedPieceCanBeAddedToBoard(

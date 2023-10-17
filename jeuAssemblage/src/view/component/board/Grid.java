@@ -4,6 +4,7 @@ import static view.utils.SwingUtils.*;
 
 import main.Controller;
 import pieces.Piece;
+import view.utils.SwingUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,9 +27,11 @@ public class Grid extends JPanel {
 
 		super.paintComponent(g);
 
+        SwingUtils.drawDebugBounds(this, g);
+
         double componentSize = Math.min(
-                getHeightTimesPourcent(this, 0.9f)/(this.controller.getHeightBoard()*1d),
-                getWidthTimesPourcent(this,0.9f)/(this.controller.getWidthBoard()*1d)
+                getHeightTimesPourcent(this, 0.95f)/(this.controller.getHeightBoard()*1d),
+                getWidthTimesPourcent(this,0.95f)/(this.controller.getWidthBoard()*1d)
         );
 
 
@@ -38,10 +41,10 @@ public class Grid extends JPanel {
 
         ArrayList<Piece> alreadyDraw = new ArrayList<Piece>();
         for ( int i = 0; i < matrices.length; i++) {
-            double y = i*componentSize;
+            double y = i*componentSize + componentSize/2;
 
             for ( int j = 0; j < matrices[i].length; j++) {
-                double x = j*componentSize;
+                double x = j*componentSize + componentSize/2;
                 Rectangle2D shape = new Rectangle2D.Double(x,y, componentSize, componentSize);
 
                 if (matrices[i][j] != 0) {
@@ -51,8 +54,8 @@ public class Grid extends JPanel {
                         Image img = this.controller.getImageById(p.getInstanceId());
 
                         g2d.drawImage(img,
-                                (int) Math.floor(x),
-                                (int) Math.floor(y),
+                                (int) Math.ceil(x) + 1,
+                                (int) Math.ceil(y) + 1,
                                 (int) Math.floor(componentSize * 3),
                                 (int) Math.floor(componentSize * 3),
                                 null);

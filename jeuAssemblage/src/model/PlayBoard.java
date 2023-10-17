@@ -29,17 +29,69 @@ public class PlayBoard {
         this.alPieceOnBoard = null;
         this.playBoard      = null;
         this.selectedPiece  = null;
-
     }
 
     public void initSizePB(int height, int width) {
         this.playBoard = createPlayBoard(height, width);
-        placePieceOnBoard();
+        this.placePieceOnBoard();
     }
 
     public void initNumberPiece(int numberPiece) {
         this.alPieceOnBoard = createPieces(numberPiece);
         this.createPieceImage();
+    }
+
+    // Getters
+    public int[][]          getPlayBoard     () { return this.playBoard; }
+    public ArrayList<Piece> getPieces        () { return this.alPieceOnBoard; }
+    public Piece            getSelectedPiece () { return this.selectedPiece; }
+
+    public Image getImageById (int id) { return this.hmPieceImage.get(id); }
+    public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
+    
+    // Setters
+    public void setPieceSelected(Piece p) { this.selectedPiece = p; }
+    
+    // Public 
+    /**
+    * bla bla 
+    * <p>
+    * bla bla
+    * @param  x     int that represent of top left matrices
+    * @param  y     int that represent of top left matrices
+    * @see          Piece
+    */
+    public void addSelectedPiece(int x, int y) {
+        if (this.selectedPiece == null) return;
+
+        this.addPieceOnBoard(this.selectedPiece, x, y);
+    }
+
+    /**
+    * @param  x         int that represent of top left matrices
+    * @param  y         int that represent of top left matrices
+    * @return           True if the selected piece can be added on the board else False
+    */
+    public boolean selectedPieceCanBeAddedToBoard(int x, int y) {
+        if (this.selectedPiece == null) return false;
+
+        return this.canBeAddedToBoard(x, y, this.selectedPiece.getWidth(), this.selectedPiece.getHeight());
+    }
+
+    /**
+    * bla bla 
+    *
+    * @return   a int[], last one is a int whose the number of piece cube in the area and the 4 others 
+    *           are representation of an rectangle,  contains respectively x, y, width, height 
+    */
+    public int[] rectangleArea() {
+        int[] temp = this.getArea();
+        int[] ret = new int[temp.length + 1];
+        for (int i = 0; i < temp.length; i++) {
+            ret[i] = temp[i];
+        }
+        ret[4] = this.getPreciseArea();
+        return ret;
     }
 
     // Privates
@@ -92,42 +144,6 @@ public class PlayBoard {
         }
     }
 
-    // Getters
-    public int[][]          getPlayBoard     () { return this.playBoard; }
-    public ArrayList<Piece> getPieces        () { return this.alPieceOnBoard; }
-    public Piece            getSelectedPiece () { return this.selectedPiece; }
-
-    public Image getImageById (int id) { return this.hmPieceImage.get(id); }
-    public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
-    
-    // Setters
-    public void setPieceSelected(Piece p) { this.selectedPiece = p; }
-    
-    /**
-    * bla bla 
-    * <p>
-    * bla bla
-    * @param  x     int that represent of top left matrices
-    * @param  y     int that represent of top left matrices
-    * @see          Piece
-    */
-    public void addSelectedPiece(int x, int y) {
-        if (this.selectedPiece == null) return;
-
-        this.addPieceOnBoard(this.selectedPiece, x, y);
-    }
-
-    /**
-    * @param  x         int that represent of top left matrices
-    * @param  y         int that represent of top left matrices
-    * @return           True if the selected piece can be added on the board else False
-    */
-    public boolean selectedPieceCanBeAddedToBoard(int x, int y) {
-        if (this.selectedPiece == null) return false;
-
-        return this.canBeAddedToBoard(x, y, this.selectedPiece.getWidth(), this.selectedPiece.getHeight());
-    }
-
     private void addPieceOnBoard(Piece p, int x, int y) {
 
         int[][] bounds = p.getBounds();
@@ -144,7 +160,6 @@ public class PlayBoard {
 
         p.setX(x);
         p.setY(y);
-
     }
 
     private boolean canBeAddedToBoard(int x, int y, int width, int height) {
@@ -159,6 +174,39 @@ public class PlayBoard {
         return true;
     }
 
+    private int getPreciseArea() {
+        int sum = 0;
+        for ( int i = 0; i < this.playBoard.length; i++) {
+            for ( int j = 0; j < this.playBoard[i].length; j++) {
+                if ( this.playBoard[i][j] != 0 ) sum += 1; 
+            }   
+        }
+
+        return sum;
+    }
+
+    private int[] getArea() {
+        int x = -1;
+        int y = -1;
+        int width  = -1;
+        int height = -1;
+        for ( int i = 0; i < this.playBoard[0].length; i++) {
+            for ( int j = 0; j < this.playBoard.length; j++) {
+                if (this.playBoard[j][i] != 0) {
+                    if ( x == -1 && y == -1) {
+                        x = i;
+                        y = j;
+                    } else {
+                        if ( (i - x) > width  ) width  = (i - x);
+                        if ( (j - y) > height ) height = (j - y);
+                    }
+                }
+
+            }   
+        }
+        
+        return new int[]{ x, y, width, height};
+    }
 
     // Static methods
     private static boolean checkPiece( Piece p, ArrayList<Piece> alPiece, int samePieceLimit) {

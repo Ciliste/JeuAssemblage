@@ -1,5 +1,7 @@
 package view.component;
 
+import static view.utils.SwingUtils.*;
+
 import javax.swing.JPanel;
 
 import view.component.board.Grid;
@@ -17,14 +19,34 @@ public class GamePanel extends JPanel{
 
 	public GamePanel() {
 		super();
-		this.setLayout(new BorderLayout());
+		this.setLayout(null);
 
 
 		this.grid = new Grid();
 		this.pieceBoard = new PieceBoard();
 
-		this.add(this.grid, BorderLayout.CENTER);
-		this.add(this.pieceBoard, BorderLayout.SOUTH);
+		this.add(this.grid);
+		this.add(this.pieceBoard);
+	}
+
+	@Override
+	public void doLayout() {
+		super.doLayout();
+
+		this.grid.setBounds(
+			0,
+		 	0,
+		 	getWidthTimesPourcent(this, .5f),
+		 	this.getHeight()
+		);
+
+		this.pieceBoard.setBounds(
+			this.grid.getWidth(),
+		 	0,
+		 	getWidthTimesPourcent (this, .2f),
+		 	getHeightTimesPourcent(this, .2f)
+		);
+		
 	}
 
 	@Override
