@@ -14,7 +14,10 @@ public class PieceBoard extends JPanel {
 
 		// controller.getPlayBoard().
 
-		this.setLayout(null);
+		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+
+		this.add(Box.createHorizontalGlue());
+		this.add(new JLabel("PieceBoard"));
 	}
 
 	@Override
