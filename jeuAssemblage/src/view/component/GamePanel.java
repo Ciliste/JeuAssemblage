@@ -4,6 +4,7 @@ import static view.utils.SwingUtils.*;
 
 import javax.swing.JPanel;
 
+import view.component.board.Finish;
 import view.component.board.Grid;
 import view.component.board.PieceBoard;
 import view.utils.SwingUtils;
@@ -16,6 +17,7 @@ public class GamePanel extends JPanel{
 	
 	private final Grid grid;
 	private final PieceBoard pieceBoard;
+	private final Finish finish;
 
 	public GamePanel() {
 		super();
@@ -24,9 +26,11 @@ public class GamePanel extends JPanel{
 
 		this.grid = new Grid();
 		this.pieceBoard = new PieceBoard();
+		this.finish = new Finish();
 
 		this.add(this.grid);
 		this.add(this.pieceBoard);
+		this.add(this.finish);
 	}
 
 	@Override
@@ -43,6 +47,13 @@ public class GamePanel extends JPanel{
 		this.pieceBoard.setBounds(
 			this.grid.getWidth(),
 		 	0,
+		 	getWidthTimesPourcent (this, .2f),
+		 	getHeightTimesPourcent(this, .4f)
+		);
+
+		this.finish.setBounds(
+			this.grid.getWidth(),
+		 	this.getHeight() - getHeightTimesPourcent(this, .4f),
 		 	getWidthTimesPourcent (this, .2f),
 		 	getHeightTimesPourcent(this, .4f)
 		);

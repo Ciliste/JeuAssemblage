@@ -3,6 +3,7 @@ package main;
 import java.awt.*;
 import java.util.Random;
 
+import main.event.EventManager;
 import model.PlayBoard;
 import pieces.Piece;
 import view.MainFrame;
@@ -16,6 +17,7 @@ public class Controller {
             instance = new Controller();
 			instance.model = new PlayBoard();
 			instance.view = new MainFrame();
+			instance.eventManager = new EventManager();
         }
 
         return instance;
@@ -23,9 +25,14 @@ public class Controller {
 
 	private PlayBoard model;
 	private MainFrame view;
+	private EventManager eventManager;
 
 
 	private Controller() {}
+	
+	public EventManager getEventManager() {
+		return this.eventManager;
+	}
 
 	// difficulty methods
 	public int getSizeXBySeed(long seed, Difficulty difficulty) {
@@ -83,5 +90,6 @@ public class Controller {
 	public void addPieceOnBoard(int x, int y) {
 		this.model.addSelectedPiece(x, y);
 		this.view.repaint();
+		this.eventManager.fireEvent();
 	}
 }

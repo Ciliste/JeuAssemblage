@@ -17,6 +17,7 @@ public class Grid extends JPanel {
 
     public Grid() {
         this.controller = Controller.getInstance();
+        
         this.setLayout(null);
 
         this.setVisible(true);
