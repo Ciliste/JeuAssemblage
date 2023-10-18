@@ -73,7 +73,7 @@ public abstract class Piece implements Cloneable {
         if ( this.rotate == 2) {
             for (int i = 0; i < initBounds.length; i++) {
                 for ( int j = 0 ; j < initBounds[i].length; j++) {
-                    retBounds[i][j] = initBounds[6-j][i];
+                    retBounds[i][j] = initBounds[initBounds.length - 1 -j][i];
                 }
             }
         }
@@ -81,7 +81,7 @@ public abstract class Piece implements Cloneable {
         if ( this.rotate == 1) {
             for (int i = 0; i < initBounds.length; i++) {
                 for ( int j = 0 ; j < initBounds[i].length; j++) {
-                    retBounds[i][j] = initBounds[j][6-i];
+                    retBounds[i][j] = initBounds[j][initBounds.length - 1 -i];
                 }
             }
         }
@@ -89,7 +89,7 @@ public abstract class Piece implements Cloneable {
         if ( this.rotate == 3 ) {
             for (int i = 0; i < initBounds.length; i++) {
                 for ( int j = 0 ; j < initBounds[i].length; j++) {
-                    retBounds[i][j] = initBounds[6-j][6-i];
+                    retBounds[i][j] = initBounds[initBounds.length - 1 -j][initBounds.length - 1 -i];
                 }
             }
         }
