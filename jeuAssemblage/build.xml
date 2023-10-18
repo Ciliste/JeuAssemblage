@@ -80,4 +80,8 @@
     <target name="run" depends="dist">
         <java jar="${dist.home}/${app.fullname}.jar" fork="true"/>
     </target>
+    <!--  ==================== runWithoutComp Target ==================================  -->
+    <target name="runWithoutComp">
+        <java jar="${dist.home}/${app.fullname}.jar" fork="true"/>
+    </target>
 </project>
