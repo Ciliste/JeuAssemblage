@@ -78,13 +78,27 @@ public class PlayBoard {
     * @see          Piece
     */
     public void addSelectedPiece(int x, int y) {
+
         if (this.selectedPiece == null) return;
 
         this.addPieceOnBoard(this.selectedPiece, x, y);
 
+		int index = this.alPieceOnBoard.indexOf(this.getPieceById(this.selectedPiece.getInstanceId()));
         this.alPieceOnBoard.remove(this.getPieceById(this.selectedPiece.getInstanceId()));
+		this.alPieceOnBoard.add(index, this.selectedPiece);
         this.selectedPiece = null;
+
+		printMatrice(playBoard);
     }
+
+	public void removeSelectedPiece() {
+
+		if (this.selectedPiece == null) return;
+
+		this.removePieceOnBoard(this.selectedPiece);
+
+		this.alPieceOnBoard.add(this.getPieceById(this.selectedPiece.getInstanceId()));
+	}
 
     /**
     * @param  x         int that represent of top left matrices
@@ -230,18 +244,36 @@ public class PlayBoard {
         int[][] bounds = p.getBounds();
         int k = 0;
         int l = 0;
-        for (int i = y; i < y + p.getHeight(); i++) {
-            l = 0;
-            for (int j = x; j < x + p.getWidth(); j++) {
-                this.playBoard[i][j] = bounds[k][l] * (p.getInstanceId() + 1);
-                l++;
-            }
-            k++;
-        }
+
+        for (int i = y; i < y + bounds.length; i++) {
+
+			for (int j = x; j < x + bounds[i - y].length; j++) {
+
+				if (bounds[k][l] == 1) {
+
+					this.playBoard[i][j] = p.getInstanceId() + 1;
+				}
+
+				l++;
+			}
+			k++;
+			l = 0;
+		}
 
         p.setX(x);
         p.setY(y);
     }
+
+	public void removePieceOnBoard(Piece p) {
+
+		for (int i = p.getY(); i < p.getY() + p.getHeight(); i++) {
+
+			for (int j = p.getX(); j < p.getX() + p.getWidth(); j++) {
+
+				this.playBoard[i][j] = 0;
+			}
+		}
+	}
 
     private boolean canBeAddedToBoard(int x, int y, int width, int height) {
         if ( x + width  > this.playBoard.length   ) return false;

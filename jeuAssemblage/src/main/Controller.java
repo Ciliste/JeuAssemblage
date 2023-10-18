@@ -104,7 +104,15 @@ public class Controller {
 	}
 
 	public void addPieceOnBoard(int x, int y) {
+
 		this.model.addSelectedPiece(x, y);
+		this.view.repaint();
+		this.eventManager.fireEvent();
+	}
+
+	public void removeSelectedPiece() {
+
+		this.model.removeSelectedPiece();
 		this.view.repaint();
 		this.eventManager.fireEvent();
 	}

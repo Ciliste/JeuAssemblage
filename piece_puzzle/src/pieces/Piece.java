@@ -13,6 +13,8 @@ public abstract class Piece implements Cloneable {
     protected int rotate;
     protected int size;
 
+	private int[][] bounds = getInitialBounds();
+
     //CONSTRUCTORS
     private Piece(int x, int y, int size, int rotate, int instanceId) {
         this.x = x;
@@ -37,12 +39,30 @@ public abstract class Piece implements Cloneable {
 
     //METHODS
     public void rotate(int sense) {
-        if (sense == Piece.LEFT) {
-            this.rotate = (this.rotate - 1) % 4;
+
+		if (sense == Piece.RIGHT) {
+
+			int rows = bounds.length;
+			int cols = bounds[0].length;
+
+			int[][] rotatedMatrix = new int[cols][rows];
+
+			for (int i = 0; i < rows; i++) {
+
+				for (int j = 0; j < cols; j++) {
+
+					rotatedMatrix[j][rows - 1 - i] = bounds[i][j];
+				}
+			}
+
+			bounds = rotatedMatrix;
         }
 
-        if (sense == Piece.RIGHT) {
-            this.rotate = (this.rotate + 1) % 4;
+        if (sense == Piece.LEFT) {
+
+			rotate(Piece.RIGHT);
+			rotate(Piece.RIGHT);
+			rotate(Piece.RIGHT);
         }
     }
 
@@ -63,46 +83,36 @@ public abstract class Piece implements Cloneable {
     //ABSTRACTS
     protected abstract int[][] getInitialBounds();
 
-    //BOUNDS
-    private int[][] getRotateBounds () {
-        int[][] initBounds = getInitialBounds();
-        int[][] retBounds  = new int[initBounds.length][initBounds[0].length];
+	public void reverse() {
 
-        if ( this.rotate == 0) return initBounds;
+		int rows = bounds.length;
+		int cols = bounds[0].length;
 
-        if ( this.rotate == 2) {
-            for (int i = 0; i < initBounds.length; i++) {
-                for ( int j = 0 ; j < initBounds[i].length; j++) {
-                    retBounds[i][j] = initBounds[initBounds.length - 1 -j][i];
-                }
-            }
-        }
+		int[][] reversedMatrix = new int[rows][cols];
 
-        if ( this.rotate == 1) {
-            for (int i = 0; i < initBounds.length; i++) {
-                for ( int j = 0 ; j < initBounds[i].length; j++) {
-                    retBounds[i][j] = initBounds[j][initBounds.length - 1 -i];
-                }
-            }
-        }
+		for (int i = 0; i < rows; i++) {
 
-        if ( this.rotate == 3 ) {
-            for (int i = 0; i < initBounds.length; i++) {
-                for ( int j = 0 ; j < initBounds[i].length; j++) {
-                    retBounds[i][j] = initBounds[initBounds.length - 1 -j][initBounds.length - 1 -i];
-                }
-            }
-        }
+			for (int j = 0; j < cols; j++) {
 
-        return retBounds;
-    }
+				reversedMatrix[i][j] = bounds[i][cols - 1 - j];
+			}
+		}
+
+		bounds = reversedMatrix;
+	}
 
     public int[][] getBounds() {
-        return this.getRotateBounds();
+        return this.bounds;
     }
 
-    public int getWidth () { return 3; }
-    public int getHeight() { return 3; }
+    public int getWidth () {
+		
+		return this.bounds[0].length;
+	}
+    public int getHeight() {
+		
+		return this.bounds.length;
+	}
 
     public void destroy() {
         Piece.id--;
@@ -127,7 +137,7 @@ public abstract class Piece implements Cloneable {
 
 	@Override
 	public boolean equals(Object obj) {
-		
+
 		if (obj == null) return false;
 		if (!(obj instanceof Piece)) return false;
 		

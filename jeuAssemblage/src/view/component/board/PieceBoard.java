@@ -7,6 +7,7 @@ import view.utils.SwingUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.Arrays;
 
 public class PieceBoard extends JPanel {
 
@@ -14,6 +15,7 @@ public class PieceBoard extends JPanel {
 
 	private final JButton btnTurnLeft  = new JButton("<-");
 	private final JButton btnTurnRight = new JButton("->");
+	private final JButton btnReverse   = new JButton("<>");
 
 	private final JButton btnCancel = new JButton("X");
 
@@ -25,19 +27,29 @@ public class PieceBoard extends JPanel {
 
 		this.add(btnTurnLeft);
 		this.add(btnTurnRight);
+		this.add(btnReverse);
 
 		this.add(btnCancel);
 
 		btnTurnLeft.addActionListener(e -> {
 
 			controller.getSelectedPiece().rotate(Piece.LEFT);
-			repaint();
+			System.out.println(Arrays.deepToString(controller.getSelectedPiece().getBounds()));
+			getParent().repaint();
 		});
 
 		btnTurnRight.addActionListener(e -> {
 
 			controller.getSelectedPiece().rotate(Piece.RIGHT);
-			repaint();
+			System.out.println(Arrays.deepToString(controller.getSelectedPiece().getBounds()));
+			getParent().repaint();
+		});
+
+		btnReverse.addActionListener(e -> {
+
+			controller.getSelectedPiece().reverse();
+			System.out.println(Arrays.deepToString(controller.getSelectedPiece().getBounds()));
+			getParent().repaint();
 		});
 
 		btnCancel.addActionListener(e -> {
@@ -52,7 +64,7 @@ public class PieceBoard extends JPanel {
 
 		final int MARGIN_TOP = SwingUtils.getHeightTimesPourcent(this, 0.5f);
 
-		final int BTN_WIDTH  = SwingUtils.getWidthTimesPourcent(this, 0.33f);
+		final int BTN_WIDTH  = SwingUtils.getWidthTimesPourcent(this, 0.2f);
 		final int BTN_HEIGHT = SwingUtils.getHeightTimesPourcent(this, 0.2f);
 
 		final int BTN_MARGIN = SwingUtils.getWidthTimesPourcent(this, 0.11f);
@@ -64,8 +76,15 @@ public class PieceBoard extends JPanel {
 			BTN_HEIGHT
 		);
 
-		btnTurnRight.setBounds(
+		btnReverse.setBounds(
 			BTN_MARGIN + BTN_WIDTH + BTN_MARGIN,
+			MARGIN_TOP,
+			BTN_WIDTH,
+			BTN_HEIGHT
+		);
+
+		btnTurnRight.setBounds(
+			BTN_MARGIN + BTN_WIDTH + BTN_MARGIN + BTN_WIDTH + BTN_MARGIN,
 			MARGIN_TOP,
 			BTN_WIDTH,
 			BTN_HEIGHT
@@ -93,18 +112,11 @@ public class PieceBoard extends JPanel {
 
         SwingUtils.drawDebugBounds(this, g);
 
-		if (this.controller.getSelectedPiece() == null) {
-
-			btnTurnLeft.setVisible(false);
-			btnTurnRight.setVisible(false);
-			btnCancel.setVisible(false);
-		}
-		else {
-
-			btnTurnLeft.setVisible(true);
-			btnTurnRight.setVisible(true);
-			btnCancel.setVisible(true);
-		}
+		boolean hasSelectedPiece = controller.getSelectedPiece() != null;
+		btnTurnLeft.setVisible(hasSelectedPiece);
+		btnTurnRight.setVisible(hasSelectedPiece);
+		btnReverse.setVisible(hasSelectedPiece);
+		btnCancel.setVisible(hasSelectedPiece);
 
 		final Piece p = this.controller.getSelectedPiece();
 		if (p == null) return;
@@ -171,8 +183,8 @@ public class PieceBoard extends JPanel {
 
 						g2d.drawImage(
 							img,
-							i * CELL_SIZE,
 							j * CELL_SIZE,
+							i * CELL_SIZE,
 							CELL_SIZE,
 							CELL_SIZE,
 							null

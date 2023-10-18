@@ -12,7 +12,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 
 public class Grid extends JPanel {
 
@@ -33,6 +32,7 @@ public class Grid extends JPanel {
         this.setVisible(true);
 
 		this.addMouseListener(new GridClickListener());
+		this.addMouseMotionListener(new GridMouseMotionListener());
     }
 
 	@Override
@@ -58,7 +58,8 @@ public class Grid extends JPanel {
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
-        int[][] matrices = this.controller.getPlayBoard();
+
+		int[][] matrices = this.controller.getPlayBoard();
 
         for ( int i = 0; i < matrices.length; i++) {
 
@@ -74,8 +75,6 @@ public class Grid extends JPanel {
                     Piece p = this.controller.getPieceById(matrices[i][j]);
 
 					if (p.equals(controller.getSelectedPiece())) {
-
-						System.out.println("Piece selected");
 
 						g2d.setColor(Color.RED);
 						g2d.fill(shape);
@@ -101,14 +100,53 @@ public class Grid extends JPanel {
                 }
             }
         }
+
+		if (controller.getSelectedPiece() != null) {
+
+			// Get the position of the mouse in the grid
+			int x = (int) ((mousePosition.getX() - xGridDeb) / ((xGridFin - xGridDeb) / matrices[0].length));
+			int y = (int) ((mousePosition.getY() - yGridDeb) / ((yGridFin - yGridDeb) / matrices.length));
+
+			int[][] piece = controller.getSelectedPiece().getBounds();
+			Image img = controller.getImageById(controller.getSelectedPiece().getInstanceId());
+
+			for (int i = 0; i < piece.length; i++) {
+
+				for (int j = 0; j < piece[i].length; j++) {
+
+					if (piece[i][j] != 0) {
+
+						int x2 = (x + j - 1);
+						int y2 = (y + i - 1);
+
+						if (x2 - j < 0) x2 = j;
+						if (y2 - i < 0) y2 = i;
+
+						if (x2 + (piece[i].length - j) > matrices[0].length) x2 = matrices[0].length - piece[i].length + j;
+						if (y2 + (piece.length - i) > matrices.length) y2 = matrices.length - piece.length + i;
+
+						g2d.drawImage(
+							img,
+							x2 * (int) componentSize + (int) paddingWidth / 2 + 1,
+							y2 * (int) componentSize + (int) paddingHeight / 2 + 1,
+							(int) componentSize,
+							(int) componentSize,
+							null
+						);
+					}
+				}
+			}
+		}
 	}
+
+	private final Point mousePosition = new Point(0, 0);
 
 	private class GridClickListener extends MouseAdapter {
 	
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
-			System.out.println("Grid clicked");
+			mousePosition.setLocation(e.getX(), e.getY());
 
 			int[][] grille = controller.getPlayBoard();
 
@@ -122,20 +160,43 @@ public class Grid extends JPanel {
 			int x = (int) ((e.getX() - xGridDeb) / ((xGridFin - xGridDeb) / grille[0].length));
 			int y = (int) ((e.getY() - yGridDeb) / ((yGridFin - yGridDeb) / grille.length));
 
-			System.out.println("x: " + x + " y: " + y);
-
 			int pieceId = grille[y][x];
 
 			if (pieceId == 0) {
-				System.out.println("No piece here");
+
+				if (controller.getSelectedPiece() == null) return;
+
+				if (controller.canBeAddedToBoard(x, y)) {
+
+					controller.addPieceOnBoard(x, y);
+					controller.setPieceSelected(null);
+					getParent().repaint();
+				}
+				else {
+
+					System.out.println("Piece can't be added to the board");
+				}
+
 				return;
 			}
 
-			System.out.println("Piece id: " + pieceId);
 			Piece piece = controller.getPieceById(pieceId);
 
 			controller.setPieceSelected(piece);
 			getParent().repaint();
+		}
+	}
+
+	private class GridMouseMotionListener extends MouseAdapter {
+
+		@Override
+		public void mouseMoved(MouseEvent e) {
+
+			if (controller.getSelectedPiece() != null) {
+
+				mousePosition.setLocation(e.getX(), e.getY());
+				repaint();
+			}
 		}
 	}
 }

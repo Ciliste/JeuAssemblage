@@ -9,30 +9,12 @@ public class PieceI extends Piece {
     }
 
     @Override
-    public int getWidth() {
-        if (rotate == 0 || rotate == 2) {
-            return 1;
-        }
-
-        return 3;
-    }
-
-    @Override
-    public int getHeight() {
-        if (rotate == 1 || rotate == 3) {
-            return 1;
-        }
-
-        return 3;
-    }
-
-    @Override
     protected int[][] getInitialBounds(){
         return new int[][]
         {
-            {1, 0, 0},
-            {1, 0, 0},
-            {1, 0, 0}
+            {1},
+            {1},
+            {1}
         };
     }
 }
