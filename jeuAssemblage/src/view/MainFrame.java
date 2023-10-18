@@ -12,14 +12,12 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import view.screen.MainScreen;
 
 public class MainFrame extends JFrame {
-    
-    private final MainScreen mainScreen;
 
 	public MainFrame() {
 
 		FlatDarkLaf.setup();
 
-		mainScreen = new MainScreen(this);
+		MainScreen mainScreen = new MainScreen(this);
 		this.setContentPane(mainScreen);
 
 		this.setFrameIcon();

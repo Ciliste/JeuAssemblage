@@ -1,15 +1,15 @@
 package main.event;
 
-import java.util.TreeSet;
+import java.util.ArrayList;
 
 import main.listener.EventListener;
 
 public class EventManager {
 
-    private TreeSet<EventListener> eventListeners;
+    private ArrayList<EventListener> eventListeners;
 
     public EventManager() {
-        this.eventListeners = new TreeSet<EventListener>();
+        this.eventListeners = new ArrayList<EventListener>();
     }
 
     public void addListener(EventListener e) {

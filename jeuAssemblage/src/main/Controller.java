@@ -35,6 +35,9 @@ public class Controller {
 		this.eventManager.addListener(e);
 	}
 
+	public void finishGame() {
+	}
+
 	// difficulty methods
 	public int getSizeXBySeed(long seed, Difficulty difficulty) {
 
@@ -80,6 +83,8 @@ public class Controller {
 	public Piece getPieceById(int id) { return this.model.getPieceById(id); }
 
 	public int[] areaInfomartion()    { return this.model.rectangleArea(); }
+	
+	public void setPieceSelected(Piece p) { this.model.setPieceSelected(p); }
 
 	public boolean canBeAddedToBoard(int x, int y) {
 		return this.model.selectedPieceCanBeAddedToBoard(
