@@ -1,6 +1,7 @@
 package pieces;
 
-public abstract class Piece {
+public abstract class Piece implements Cloneable {
+    
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
 
@@ -13,12 +14,16 @@ public abstract class Piece {
     protected int size;
 
     //CONSTRUCTORS
-    public Piece( int x, int y, int size, int rotate) {
+    private Piece(int x, int y, int size, int rotate, int instanceId) {
         this.x = x;
         this.y = y;
         this.rotate = rotate;
         this.size = size;
-        this.instanceId = Piece.id++;
+        this.instanceId = instanceId;
+    }
+
+    public Piece( int x, int y, int size, int rotate) {
+        this(x, y, size, rotate, Piece.id++);
     }
 
     public Piece(int x, int y, int size) {
@@ -102,6 +107,18 @@ public abstract class Piece {
     public void destroy() {
         Piece.id--;
     }
+
+    @Override
+    public Object clone() {
+        try {
+            Piece p = (Piece) super.clone();
+            return p;
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        
+        return null;
+      }
 
     // Main
     public static void main(String[] args) {

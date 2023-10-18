@@ -50,7 +50,7 @@ public class PlayBoard {
     public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
     
     // Setters
-    public void setPieceSelected(Piece p) { this.selectedPiece = p; }
+    public void setPieceSelected(Piece p) { this.selectedPiece = p.clone(); }
     
     // Public 
     /**
@@ -65,6 +65,9 @@ public class PlayBoard {
         if (this.selectedPiece == null) return;
 
         this.addPieceOnBoard(this.selectedPiece, x, y);
+
+        this.alPieceOnBoard.remove(this.getPieceById(this.selectedPiece.getInstanceId()));
+        this.selectedPiece = null;
     }
 
     /**
