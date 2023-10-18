@@ -124,4 +124,15 @@ public abstract class Piece implements Cloneable {
     public static void main(String[] args) {
         System.out.println("bozo");
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		
+		if (obj == null) return false;
+		if (!(obj instanceof Piece)) return false;
+		
+		Piece p = (Piece) obj;
+		
+		return (this.instanceId == p.instanceId);
+	}
 }

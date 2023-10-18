@@ -1,6 +1,8 @@
 package main;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+
 import main.listener.EventListener;
 import java.util.Random;
 
@@ -8,6 +10,7 @@ import main.event.EventManager;
 import model.PlayBoard;
 import pieces.Piece;
 import view.MainFrame;
+import view.utils.PieceRenderUtils;
 
 public class Controller {
     
