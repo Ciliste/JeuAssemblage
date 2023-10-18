@@ -67,7 +67,7 @@ public class SoloGameCreation extends JPanel {
 
 		this.add(lblDifficulty);
 		this.add(difficultyList);
-		difficultyList.setSelectedIndex(0);
+		difficultyList.setSelectedIndex(1);
 
 		this.add(btnPlay);
 

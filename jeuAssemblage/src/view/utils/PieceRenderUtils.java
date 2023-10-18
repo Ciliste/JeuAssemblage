@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.Buffer;
 
 import javax.imageio.ImageIO;
 
@@ -16,6 +17,11 @@ public final class PieceRenderUtils {
 
 	private PieceRenderUtils() {}
 	
+	public static BufferedImage createCellImage() {
+		
+		return createCellImage(getRandomColor());
+	}
+
 	public static BufferedImage createCellImage(Color color) {
 		
 		// Create a new image

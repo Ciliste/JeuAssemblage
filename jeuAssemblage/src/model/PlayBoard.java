@@ -45,7 +45,15 @@ public class PlayBoard {
     public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
     
     // Setters
-    public void setPieceSelected(Piece p) { this.selectedPiece = (Piece) p.clone(); }
+    public void setPieceSelected(Piece p) { 
+
+		if (p == null) {
+			this.selectedPiece = null;
+			return;
+		}
+		
+		this.selectedPiece = (Piece) p.clone(); 
+	}
     
     // Public 
     /**
@@ -124,7 +132,7 @@ public class PlayBoard {
     
     private void createPieceImage() {
         for (Piece p : this.alPieceOnBoard) {
-            BufferedImage image = PieceRenderUtils.createPieceImage(p.getBounds());
+            BufferedImage image = PieceRenderUtils.createCellImage();
             this.hmPieceImage.put(p.getInstanceId(), image);
         }
     }
