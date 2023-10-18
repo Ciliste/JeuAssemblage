@@ -36,7 +36,7 @@ public class GamePanel extends JPanel{
 		this.grid.setBounds(
 			0,
 		 	0,
-		 	getWidthTimesPourcent(this, .5f),
+		 	getWidthTimesPourcent(this, .8f),
 		 	this.getHeight()
 		);
 
@@ -44,7 +44,7 @@ public class GamePanel extends JPanel{
 			this.grid.getWidth(),
 		 	0,
 		 	getWidthTimesPourcent (this, .2f),
-		 	getHeightTimesPourcent(this, .2f)
+		 	getHeightTimesPourcent(this, .4f)
 		);
 		
 	}

@@ -58,7 +58,6 @@ public class Controller {
 
 	// model methods
 	public void setPlayBoard(int sizeX, int sizeY, int nbPieces) {
-
 		this.model.initNumberPiece(nbPieces);
 		this.model.initSizePB(sizeY, sizeX);
 	}

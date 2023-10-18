@@ -34,6 +34,10 @@ public class Grid extends JPanel {
                 getWidthTimesPourcent(this,0.95f)/(this.controller.getWidthBoard()*1d)
         );
 
+        double paddingWidth  = this.getWidth () - (componentSize * this.controller.getWidthBoard ());
+        double paddingHeight = this.getHeight() - (componentSize * this.controller.getHeightBoard());
+
+
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
@@ -41,16 +45,17 @@ public class Grid extends JPanel {
 
         ArrayList<Piece> alreadyDraw = new ArrayList<Piece>();
         for ( int i = 0; i < matrices.length; i++) {
-            double y = i*componentSize + componentSize/2;
+            double y = i*componentSize + paddingHeight/2;
 
             for ( int j = 0; j < matrices[i].length; j++) {
-                double x = j*componentSize + componentSize/2;
+                double x = j*componentSize + paddingWidth/2;
                 Rectangle2D shape = new Rectangle2D.Double(x,y, componentSize, componentSize);
 
                 if (matrices[i][j] != 0) {
 
                     Piece p = this.controller.getPieceById(matrices[i][j]);
                     if (!alreadyDraw.contains(p)) {
+                        // TODO rotate the image if needed
                         Image img = this.controller.getImageById(p.getInstanceId());
 
                         g2d.drawImage(img,

@@ -2,17 +2,12 @@ package model;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import main.Controller;
 import pieces.Piece;
 import pieces.PieceFactory;
 import view.utils.PieceRenderUtils;
-
-import javax.imageio.ImageIO;
 
 public class PlayBoard {
 
@@ -50,7 +45,7 @@ public class PlayBoard {
     public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
     
     // Setters
-    public void setPieceSelected(Piece p) { this.selectedPiece = p.clone(); }
+    public void setPieceSelected(Piece p) { this.selectedPiece = (Piece) p.clone(); }
     
     // Public 
     /**
