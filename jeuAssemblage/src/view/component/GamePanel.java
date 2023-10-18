@@ -10,10 +10,8 @@ import view.component.board.PieceBoard;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;
-import java.awt.BorderLayout;
 
-
-public class GamePanel extends JPanel{
+public class GamePanel extends JPanel {
 	
 	private final Grid grid;
 	private final PieceBoard pieceBoard;
