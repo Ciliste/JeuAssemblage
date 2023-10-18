@@ -36,6 +36,9 @@ public class Controller {
 	}
 
 	public void finishGame() {
+		this.eventManager = new EventManager();
+		this.model.destroy();
+		this.model = new PlayBoard();
 	}
 
 	// difficulty methods

@@ -92,6 +92,18 @@ public class PlayBoard {
         return ret;
     }
 
+    /**
+    * bla bla 
+    *          are representation of an rectangle,  contains respectively x, y, width, height 
+    */
+    public void destroy() {
+        while (!this.alPieceOnBoard.isEmpty()) {
+            Piece p = this.alPieceOnBoard.get(0);
+            p.destroy();
+            this.alPieceOnBoard.remove(p);
+        }
+    }
+
     // Privates
     private ArrayList<Piece> createPieces(int numberPiece) {
         ArrayList<Piece> tempAl = new ArrayList<Piece>();
@@ -184,26 +196,22 @@ public class PlayBoard {
     }
 
     private int[] getArea() {
-        int x = -1;
-        int y = -1;
-        int width  = -1;
-        int height = -1;
-        for ( int i = 0; i < this.playBoard[0].length; i++) {
-            for ( int j = 0; j < this.playBoard.length; j++) {
-                if (this.playBoard[j][i] != 0) {
-                    if ( x == -1 && y == -1) {
-                        x = i;
-                        y = j;
-                    } else {
-                        if ( (i - x) > width  ) width  = (i - x);
-                        if ( (j - y) > height ) height = (j - y);
-                    }
+        int x = this.playBoard[0].length;
+        int y = this.playBoard.length;
+        int xEnd = 0;
+        int yEnd = 0;
+        for (int i = 0; i < this.playBoard.length; i++) {
+            for (int j = 0; j < this.playBoard[i].length; j++) {
+                if ( this.playBoard[i][j] != 0 ) {
+                    if ( j < x ) x = j;
+                    if ( i < y ) y = i; 
+                    if ( j > xEnd ) xEnd = j; 
+                    if ( i > yEnd ) yEnd = i;  
                 }
-
-            }   
+            }
         }
         
-        return new int[]{ x, y, width, height};
+        return new int[]{ x, y, xEnd + 1, yEnd + 1};
     }
 
     // Static methods
