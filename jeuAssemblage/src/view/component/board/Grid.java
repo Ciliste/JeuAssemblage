@@ -62,11 +62,11 @@ public class Grid extends JPanel {
 
         for ( int i = 0; i < matrices.length; i++) {
 
-            int y = i * (int) componentSize + (int) paddingHeight / 2;
+            int y = i * componentSize + (int) paddingHeight / 2;
 
             for ( int j = 0; j < matrices[i].length; j++) {
 
-                int x = j * (int) componentSize + (int) paddingWidth / 2;
+                int x = j * componentSize + (int) paddingWidth / 2;
                 Rectangle2D shape = new Rectangle2D.Double(x,y, componentSize, componentSize);
 
                 if (matrices[i][j] != 0) {
