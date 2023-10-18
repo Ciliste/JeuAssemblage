@@ -48,7 +48,6 @@ public class GameSummary extends JPanel {
         double paddingWidth  = this.getWidth () - (componentSize * ((xEnd - xBegin)  * 1d));
         double paddingHeight = this.getHeight() - (componentSize * ((yEnd - yBegin) * 1d));
 
-        //TODO METTRE A JOUR LA METHODE
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
         int[][] matrices = this.controller.getPlayBoard();

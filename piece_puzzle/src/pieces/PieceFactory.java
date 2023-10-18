@@ -1,13 +1,22 @@
 package pieces;
 
+import java.util.Random;
+
 import pieces.letters.*;
 
 public class PieceFactory {
 
     public static final int NUMBER_PIECE = 5;
+    private static Random random;
+
+    public static void setSeed(long seed) {
+        random = new Random(seed);
+    }
 
     public static Piece createPiece() {
-        int rand = (int) (Math.random() * 5);
+        if ( random == null ) return null;
+        
+        int rand = random.nextInt(NUMBER_PIECE);
         
         switch ( rand ) {
             case 0: {
