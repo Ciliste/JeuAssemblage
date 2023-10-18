@@ -20,10 +20,10 @@ public class PieceT extends Piece{
     @Override
     public int getHeight() {
         if (rotate == 1 || rotate == 3) {
-            return 2;
+            return 3;
         }
 
-        return 3;
+        return 2;
     }
 
     @Override

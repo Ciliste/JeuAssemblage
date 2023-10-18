@@ -29,10 +29,10 @@ public class Grid extends JPanel {
         
         this.setLayout(null);
 
-        this.setVisible(true);
-
 		this.addMouseListener(new GridClickListener());
 		this.addMouseMotionListener(new GridMouseMotionListener());
+		
+		this.setVisible(true);
     }
 
 	@Override
@@ -73,9 +73,8 @@ public class Grid extends JPanel {
                 if (matrices[i][j] != 0) {
 
                     Piece p = this.controller.getPieceById(matrices[i][j]);
-
 					if (p.equals(controller.getSelectedPiece())) {
-
+						
 						g2d.setColor(Color.RED);
 						g2d.fill(shape);
 						g2d.setColor(Color.WHITE);
@@ -167,13 +166,9 @@ public class Grid extends JPanel {
 				if (controller.getSelectedPiece() == null) return;
 
 				if (controller.canBeAddedToBoard(x, y)) {
-
 					controller.addPieceOnBoard(x, y);
-					controller.setPieceSelected(null);
-					getParent().repaint();
 				}
 				else {
-
 					System.out.println("Piece can't be added to the board");
 				}
 
@@ -193,7 +188,6 @@ public class Grid extends JPanel {
 		public void mouseMoved(MouseEvent e) {
 
 			if (controller.getSelectedPiece() != null) {
-
 				mousePosition.setLocation(e.getX(), e.getY());
 				repaint();
 			}

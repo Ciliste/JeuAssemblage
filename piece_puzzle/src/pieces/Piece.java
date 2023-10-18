@@ -5,7 +5,7 @@ public abstract class Piece implements Cloneable {
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
 
-    private static int id = 0;
+    private static int id = 1;
 
     private int instanceId;
     private int x;
