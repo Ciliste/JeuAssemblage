@@ -5,6 +5,7 @@ import static view.utils.SwingUtils.*;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -13,6 +14,7 @@ import javax.swing.event.DocumentEvent;
 import main.Controller;
 import main.Difficulty;
 import view.MainFrame;
+import view.component.JTableArrangement;
 import view.component.Separator;
 import view.utils.DocumentAdapter;
 
@@ -39,7 +41,9 @@ public class SoloGameCreation extends JPanel {
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
 	private final JList<String> difficultyList = new JList<String>(Difficulty.getDifficultysName());
 
-    private final JButton btnPlay = new JButton("Jouer");
+	private final JButton btnPlay = new JButton("Jouer");
+	
+	private final JScrollPane tableArrangement = new JScrollPane(JTableArrangement.getJTable()); 
     
     private final Controller controller = Controller.getInstance();
 
@@ -68,6 +72,8 @@ public class SoloGameCreation extends JPanel {
 		this.add(lblDifficulty);
 		this.add(difficultyList);
 		difficultyList.setSelectedIndex(1);
+
+		this.add(tableArrangement);
 
 		this.add(btnPlay);
 
@@ -208,6 +214,13 @@ public class SoloGameCreation extends JPanel {
 			BTN_CANCEL_HEIGHT * 3
 		);
 
+		tableArrangement.setBounds(
+			PADDING_LEFT + getWidthTimesPourcent(this, .3f),
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
+			getWidthTimesPourcent(this, .2f),
+			BTN_CANCEL_HEIGHT * 3
+		);
+
 		final int PADDING_RIGHT = PADDING_LEFT;
 		final int PADDING_BOTTOM = PADDING_TOP;
 
@@ -219,8 +232,9 @@ public class SoloGameCreation extends JPanel {
 		);
 	}
 
-    private boolean initPlayBoard() {
+	private boolean initPlayBoard() {
 
+		long seed = Long.parseLong(txtSeed.getText());
 		int sizeX = Integer.parseInt(txtSizeX.getText());
 		int sizeY = Integer.parseInt(txtSizeY.getText());
 		int nbPieces = (int) nbPiecesSpinner.getValue();
@@ -229,7 +243,7 @@ public class SoloGameCreation extends JPanel {
 			return false;
 		}
 
-		this.controller.setPlayBoard(sizeX, sizeY, nbPieces);
+		this.controller.setPlayBoard(sizeX, sizeY, nbPieces, seed);
 		
 		return true;
     }

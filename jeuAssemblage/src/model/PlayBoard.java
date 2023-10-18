@@ -2,8 +2,12 @@ package model;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.*;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import java.util.*;
 
 import pieces.Piece;
 import pieces.PieceFactory;
@@ -16,6 +20,8 @@ public class PlayBoard {
     
     private HashMap<Integer, Image> hmPieceImage;
     private int[][]                 playBoard;
+    
+    private Long                    seed;
 
 
     public PlayBoard() {
@@ -24,8 +30,14 @@ public class PlayBoard {
         this.alPieceOnBoard = null;
         this.playBoard      = null;
         this.selectedPiece  = null;
+        this.seed           = null;
     }
 
+    public void initSeed(long seed) {
+        this.seed = seed;
+        PieceFactory.setSeed(seed);
+    }
+    
     public void initSizePB(int height, int width) {
         this.playBoard = createPlayBoard(height, width);
         this.placePieceOnBoard();
@@ -40,6 +52,7 @@ public class PlayBoard {
     public int[][]          getPlayBoard     () { return this.playBoard; }
     public ArrayList<Piece> getPieces        () { return this.alPieceOnBoard; }
     public Piece            getSelectedPiece () { return this.selectedPiece; }
+    public Long             getSeed          () { return this.seed; }
 
     public Image getImageById (int id) { return this.hmPieceImage.get(id); }
     public Piece getPieceById (int id) { return this.alPieceOnBoard.get(id-1);}
@@ -100,9 +113,53 @@ public class PlayBoard {
         return ret;
     }
 
+
+    public void registerArrangement() {
+        String str = this.playBoard.length + ";" + 
+            this.playBoard[0].length + ";" + 
+            this.alPieceOnBoard.size() + ";" + 
+                this.seed;
+
+        File f = new File(this.getPath() + "/maps.tetriste");
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(f, true));
+            writer.append(str);
+            writer.append('\n');
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public ArrayList<String> getArrangement() {
+        ArrayList<String> alRet = new ArrayList<String>();
+        File f = new File(this.getPath() + "/maps.tetriste");
+        if ( !f.exists() ) return alRet;
+        
+        try {
+            Scanner sc = new Scanner(f);
+            while (sc.hasNext()) {
+                alRet.add(sc.nextLine());
+            }
+            sc.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return alRet;
+    }
+
     /**
     * bla bla 
-    *          are representation of an rectangle,  contains respectively x, y, width, height 
+    * 
     */
     public void destroy() {
         while (!this.alPieceOnBoard.isEmpty()) {
@@ -113,6 +170,11 @@ public class PlayBoard {
     }
 
     // Privates
+    private String getPath() {
+        Path path = Paths.get("");
+        return path.toAbsolutePath().toString();
+    }
+
     private ArrayList<Piece> createPieces(int numberPiece) {
         ArrayList<Piece> tempAl = new ArrayList<Piece>();
         int samePieceLimit = (int) Math.ceil(numberPiece / (PieceFactory.NUMBER_PIECE * 1d));
@@ -151,11 +213,12 @@ public class PlayBoard {
 
     private void placePieceOnBoard() {
         // TODO : changer ça en vrai fonction qui vérifie les possibilités avant d'ajouter, backtracking ?
+        Random rand = new Random(this.seed);
         for ( Piece p: this.alPieceOnBoard) {
             int x, y;
             do {
-                x = (int) (Math.random() * (this.playBoard[0].length - p.getWidth ()));
-                y = (int) (Math.random() * (this.playBoard.length    - p.getHeight()));
+                x = rand.nextInt(this.playBoard[0].length - p.getWidth ());
+                y = rand.nextInt(this.playBoard.length    - p.getHeight());
             } while( !canBeAddedToBoard(x, y, p.getWidth(), p.getHeight()) );
 
             addPieceOnBoard(p, x, y);

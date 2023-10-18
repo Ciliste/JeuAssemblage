@@ -1,16 +1,14 @@
 package main;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 
 import main.listener.EventListener;
-import java.util.Random;
+import java.util.*;
 
 import main.event.EventManager;
 import model.PlayBoard;
 import pieces.Piece;
 import view.MainFrame;
-import view.utils.PieceRenderUtils;
 
 public class Controller {
     
@@ -74,7 +72,8 @@ public class Controller {
 	}
 
 	// model methods
-	public void setPlayBoard(int sizeX, int sizeY, int nbPieces) {
+	public void setPlayBoard(int sizeX, int sizeY, int nbPieces, long seed) {
+		this.model.initSeed(seed);
 		this.model.initNumberPiece(nbPieces);
 		this.model.initSizePB(sizeY, sizeX);
 	}
@@ -84,6 +83,7 @@ public class Controller {
 	public int     getPieceCount    () { return this.model.getPieces().size(); }
 	public Piece   getSelectedPiece () { return this.model.getSelectedPiece(); }
 	public int[][] getPlayBoard     () { return this.model.getPlayBoard(); }
+	public long    getSeeed         () { return this.model.getSeed(); }
 
 	public Image getImageById(int id) { return this.model.getImageById(id); }
 	public Piece getPieceById(int id) { return this.model.getPieceById(id); }
@@ -91,6 +91,10 @@ public class Controller {
 	public int[] areaInfomartion()    { return this.model.rectangleArea(); }
 	
 	public void setPieceSelected(Piece p) { this.model.setPieceSelected(p); }
+	
+	public void registerArrangement() { this.model.registerArrangement(); }
+	
+	public ArrayList<String> getArrangement() { return this.model.getArrangement(); }
 
 	public boolean canBeAddedToBoard(int x, int y) {
 		return this.model.selectedPieceCanBeAddedToBoard(
