@@ -37,8 +37,6 @@ public class Grid extends JPanel {
         double paddingWidth  = this.getWidth () - (componentSize * this.controller.getWidthBoard ());
         double paddingHeight = this.getHeight() - (componentSize * this.controller.getHeightBoard());
 
-
-
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
         int[][] matrices = this.controller.getPlayBoard();
