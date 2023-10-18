@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.*;
+import main.listener.EventListener;
 import java.util.Random;
 
 import main.event.EventManager;
@@ -30,8 +31,8 @@ public class Controller {
 
 	private Controller() {}
 	
-	public EventManager getEventManager() {
-		return this.eventManager;
+	public void addListener(EventListener e) {
+		this.eventManager.addListener(e);
 	}
 
 	// difficulty methods
