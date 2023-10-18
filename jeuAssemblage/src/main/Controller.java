@@ -17,7 +17,7 @@ public class Controller {
         if (instance == null) {
             instance = new Controller();
 			instance.model = new PlayBoard();
-			instance.view = new MainFrame();
+			instance.view = MainFrame.getInstance();
 			instance.eventManager = new EventManager();
         }
 
