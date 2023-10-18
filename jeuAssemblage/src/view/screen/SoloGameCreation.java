@@ -2,13 +2,6 @@ package view.screen;
 
 import static view.utils.SwingUtils.*;
 
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.Random;
-
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -16,17 +9,12 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import main.Controller;
 import main.Difficulty;
 import view.MainFrame;
 import view.component.Separator;
-import view.listener.ResizeListener;
 import view.utils.DocumentAdapter;
-import view.utils.SwingUtils;
 
 public class SoloGameCreation extends JPanel {
     
@@ -54,9 +42,8 @@ public class SoloGameCreation extends JPanel {
     private final JButton btnPlay = new JButton("Jouer");
     
     private final Controller controller = Controller.getInstance();
-    private SoloGameScreen soloGameScreen;
 
-    public SoloGameCreation(MainFrame mainFrame) {
+    public SoloGameCreation() {
 
         this.setLayout(null);
 
@@ -89,7 +76,7 @@ public class SoloGameCreation extends JPanel {
 		// ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
         // this.addComponentListener(resizeListener);
 
-        btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
+        btnCancel.addActionListener(e -> MainFrame.getInstance().setContentPane(new MainScreen()));
 
         final Runnable randomSeedCallback = createRandomSeedCallback(this);
         btnRandomSeed.addActionListener(e -> randomSeedCallback.run());
@@ -106,7 +93,7 @@ public class SoloGameCreation extends JPanel {
 		btnPlay.addActionListener(e -> {
 
 			if (initPlayBoard()) {
-				mainFrame.setContentPane(new SoloGameScreen());
+				MainFrame.getInstance().setContentPane(new SoloGameScreen());
 			} else {
 				System.out.println("Impossible mon ga");
 			}
@@ -254,14 +241,6 @@ public class SoloGameCreation extends JPanel {
         txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeXBySeed(seed, difficulty)));
         txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeYBySeed(seed, difficulty)));
         nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCountBySeed(seed, difficulty));
-    }
-
-    private static Runnable createResizeCallback(SoloGameCreation soloGameCreation) {
-
-        return () -> {
-
-            
-        };
     }
 
     private static long generateRandomSeed() {

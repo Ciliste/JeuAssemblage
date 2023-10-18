@@ -10,6 +10,8 @@ import javax.swing.JPanel;
 
 import main.Controller;
 import main.listener.EventListener;
+import view.MainFrame;
+import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
 public class Finish extends JPanel implements EventListener{
@@ -31,7 +33,7 @@ public class Finish extends JPanel implements EventListener{
         this.update();
 
         this.btnFinish.addActionListener(e -> {
-            Finish.this.controller.finishGame();
+            MainFrame.getInstance().setContentPane(new SoloGameFinishScreen());
         });
 
         this.add(this.lblPreciseArea);
@@ -45,7 +47,7 @@ public class Finish extends JPanel implements EventListener{
     public void update() {
         int[] areaInfo = this.controller.areaInfomartion();
         lblPreciseArea.setText("Nombre de carrés : " + areaInfo[4]);
-        lblArea.setText("Aire : " + (areaInfo[2] * areaInfo[3]));
+        lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
     }
 
     @Override

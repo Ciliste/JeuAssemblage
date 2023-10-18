@@ -13,19 +13,26 @@ import view.screen.MainScreen;
 
 public class MainFrame extends JFrame {
 
-	public MainFrame() {
+	private static MainFrame instance;
+
+	public static MainFrame getInstance() {
+		if ( instance != null ) return instance;
+		
+		instance = new MainFrame();
+		MainScreen mainScreen = new MainScreen();
+		instance.setContentPane(mainScreen);
+		return instance;
+	}
+
+	private MainFrame() {
 
 		FlatDarkLaf.setup();
-
-		MainScreen mainScreen = new MainScreen(this);
-		this.setContentPane(mainScreen);
 
 		this.setFrameIcon();
 
 		this.setSize(1200, 800);
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 	}
 	
 	private void setFrameIcon() {
@@ -47,6 +54,6 @@ public class MainFrame extends JFrame {
 		super.setContentPane(contentPane);
 		
 		revalidate();
-		repaint();
+		repaint(); 
 	}
 }

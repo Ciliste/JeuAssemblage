@@ -20,7 +20,7 @@ public class Controller {
         if (instance == null) {
             instance = new Controller();
 			instance.model = new PlayBoard();
-			instance.view = new MainFrame();
+			instance.view = MainFrame.getInstance();
 			instance.eventManager = new EventManager();
         }
 
@@ -39,6 +39,9 @@ public class Controller {
 	}
 
 	public void finishGame() {
+		this.eventManager = new EventManager();
+		this.model.destroy();
+		this.model = new PlayBoard();
 	}
 
 	// difficulty methods
