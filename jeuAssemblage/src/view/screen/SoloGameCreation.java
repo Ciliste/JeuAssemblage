@@ -147,7 +147,7 @@ public class SoloGameCreation extends JPanel {
 		btnRandomSeed.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .2f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT,
-			BTN_CANCEL_WIDTH,
+			BTN_CANCEL_WIDTH * 2,
 			BTN_CANCEL_HEIGHT 
 		);
 

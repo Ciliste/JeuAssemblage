@@ -161,7 +161,7 @@ public class Grid extends JPanel {
 
 			int pieceId = grille[y][x];
 
-			if (pieceId == 0) {
+			if (pieceId == 0 || (controller.getSelectedPiece() != null && pieceId == controller.getSelectedPiece().getInstanceId())) {
 
 				if (controller.getSelectedPiece() == null) return;
 
