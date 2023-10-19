@@ -285,6 +285,9 @@ public class PlayBoard {
 	}
 
     private boolean canBeAddedToBoard(Piece p, int x, int y) {
+
+        System.out.println("x : " + x + " y : " + y);
+
         if ( x + p.getWidth()  > this.playBoard.length   ) return false;
         if ( y + p.getHeight() > this.playBoard[0].length) return false;
 

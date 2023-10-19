@@ -47,14 +47,14 @@ public class Grid extends JPanel {
 			getWidthTimesPourcent(this,0.95f)/(this.controller.getWidthBoard()*1d)
         );
 
-        double paddingWidth  = this.getWidth () - (componentSize * this.controller.getWidthBoard ());
-        double paddingHeight = this.getHeight() - (componentSize * this.controller.getHeightBoard());
+        int paddingWidth  = this.getWidth () - (componentSize * this.controller.getWidthBoard ());
+        int paddingHeight = this.getHeight() - (componentSize * this.controller.getHeightBoard());
 
-		xGridDeb = (int) (paddingWidth / 2);
-		yGridFin = (int) (paddingHeight / 2);
+		xGridDeb = paddingWidth / 2;
+		yGridDeb = paddingHeight / 2;
 
-		xGridFin = (int) (getWidth() - paddingWidth / 2);
-		yGridFin = (int) (getHeight() - paddingHeight / 2);
+		xGridFin = getWidth() - paddingWidth / 2;
+		yGridFin = getHeight() - paddingHeight / 2;
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
@@ -63,7 +63,7 @@ public class Grid extends JPanel {
 
         for ( int i = 0; i < matrices.length; i++) {
 
-            int y = i * componentSize + (int) paddingHeight / 2;
+            int y = i * componentSize + paddingHeight / 2;
 
             for ( int j = 0; j < matrices[i].length; j++) {
 
@@ -158,6 +158,8 @@ public class Grid extends JPanel {
 			// Get the position of the click in the grid
 			int x = (int) ((e.getX() - xGridDeb) / ((xGridFin - xGridDeb) / grille[0].length));
 			int y = (int) ((e.getY() - yGridDeb) / ((yGridFin - yGridDeb) / grille.length));
+
+			System.out.println("Click on : " + x + " " + y);
 
 			int pieceId = grille[y][x];
 
