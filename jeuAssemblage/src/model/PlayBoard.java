@@ -126,9 +126,9 @@ public class PlayBoard {
     *
     */
     public void registerArrangement() {
-        String str = this.playBoard.length + ";" +
-                this.playBoard[0].length + ";" +
-                this.alPieceOnBoard.size() + ";" +
+        String str = this.playBoard[0].length + ";" +
+                this.playBoard.length         + ";" +
+                this.alPieceOnBoard.size()    + ";" +
                 this.seed;
 
         File f = new File(this.getPath() + "/maps.tetriste");
@@ -287,6 +287,8 @@ public class PlayBoard {
     private boolean canBeAddedToBoard(Piece p, int x, int y) {
         if ( x + p.getWidth()  > this.playBoard.length   ) return false;
         if ( y + p.getHeight() > this.playBoard[0].length) return false;
+        if ( x < 0 ) return false;
+        if ( y < 0 ) return false;
 
         int[][] bounds = p.getBounds();
         int k = 0;

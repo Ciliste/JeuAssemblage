@@ -8,6 +8,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 
@@ -43,7 +44,8 @@ public class SoloGameCreation extends JPanel {
 
 	private final JButton btnPlay = new JButton("Jouer");
 	
-	private final JScrollPane tableArrangement = new JScrollPane(JTableArrangement.getJTable()); 
+	private final JTable      tableArrangement = JTableArrangement.getJTable();
+	private final JScrollPane scrollArrangement = new JScrollPane(tableArrangement);
     
     private final Controller controller = Controller.getInstance();
 
@@ -73,7 +75,7 @@ public class SoloGameCreation extends JPanel {
 		this.add(difficultyList);
 		difficultyList.setSelectedIndex(1);
 
-		this.add(tableArrangement);
+		this.add(scrollArrangement);
 
 		this.add(btnPlay);
 
@@ -104,6 +106,11 @@ public class SoloGameCreation extends JPanel {
 				System.out.println("Impossible mon ga");
 			}
 
+		});
+
+		tableArrangement.getSelectionModel().addListSelectionListener(e->{
+			if (e.getValueIsAdjusting()) return;
+			SoloGameCreation.this.setParams(tableArrangement.getSelectedRow());
 		});
 
 		revalidate();
@@ -214,10 +221,10 @@ public class SoloGameCreation extends JPanel {
 			BTN_CANCEL_HEIGHT * 3
 		);
 
-		tableArrangement.setBounds(
+		scrollArrangement.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .3f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
-			getWidthTimesPourcent(this, .2f),
+			getWidthTimesPourcent(this, .4f),
 			BTN_CANCEL_HEIGHT * 3
 		);
 
@@ -256,6 +263,19 @@ public class SoloGameCreation extends JPanel {
         txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeYBySeed(seed, difficulty)));
         nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCountBySeed(seed, difficulty));
     }
+
+	private void setParams(int index) {
+
+		String sizeX = (String) this.tableArrangement.getValueAt(index, 0);
+		String sizeY = (String) this.tableArrangement.getValueAt(index, 1);
+		int pieceCount = Integer.parseInt((String) this.tableArrangement.getValueAt(index, 2));
+		String seed = (String) this.tableArrangement.getValueAt(index, 3);
+
+		this.txtSeed.setText(seed);
+		this.txtSizeX.setText(sizeX);
+		this.txtSizeY.setText(sizeY);
+		this.nbPiecesSpinner.setValue(pieceCount);
+	}
 
     private static long generateRandomSeed() {
 
