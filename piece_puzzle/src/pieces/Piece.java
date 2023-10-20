@@ -1,6 +1,8 @@
 package pieces;
 
-public abstract class Piece implements Cloneable {
+import observer.AbstractListenable;
+
+public abstract class Piece extends AbstractListenable implements Cloneable {
     
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
@@ -17,6 +19,7 @@ public abstract class Piece implements Cloneable {
 
     //CONSTRUCTORS
     private Piece(int x, int y, int size, int rotate, int instanceId) {
+        super();
         this.x = x;
         this.y = y;
         this.rotate = rotate;

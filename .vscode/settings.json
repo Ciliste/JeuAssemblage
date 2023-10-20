@@ -2,6 +2,7 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "jeuAssemblage/lib/flatlaf-2.6.jar",
-        "jeuAssemblage/lib/pieces_puzzle-1.0.0.jar"
+        "jeuAssemblage/lib/pieces_puzzle-1.0.0.jar",
+        "jeuAssemblage/lib/pieces_puzzle-0.1.0.jar"
     ]
 }
