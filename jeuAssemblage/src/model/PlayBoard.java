@@ -11,9 +11,10 @@ import java.util.*;
 
 import pieces.Piece;
 import pieces.PieceFactory;
+import observer.AbstractListenable;
 import view.utils.PieceRenderUtils;
 
-public class PlayBoard {
+public class PlayBoard extends AbstractListenable{
 
     private ArrayList<Piece>        alPieceOnBoard;
     private Piece                   selectedPiece;
@@ -25,6 +26,7 @@ public class PlayBoard {
 
 
     public PlayBoard() {
+        super();
         this.hmPieceImage = new HashMap<Integer, Image>();
         
         this.alPieceOnBoard = null;
