@@ -2,7 +2,7 @@ package pieces;
 
 import observer.AbstractListenable;
 
-public abstract class Piece extends AbstractListenable implements Cloneable {
+public abstract class Piece implements Cloneable {
     
     public static final int LEFT = 0;
     public static final int RIGHT = 1;
@@ -19,7 +19,7 @@ public abstract class Piece extends AbstractListenable implements Cloneable {
 
     //CONSTRUCTORS
     private Piece(int x, int y, int size, int rotate, int instanceId) {
-        super();
+
         this.x = x;
         this.y = y;
         this.rotate = rotate;
@@ -27,15 +27,18 @@ public abstract class Piece extends AbstractListenable implements Cloneable {
         this.instanceId = instanceId;
     }
 
-    public Piece( int x, int y, int size, int rotate) {
+    public Piece(int x, int y, int size, int rotate) {
+        
         this(x, y, size, rotate, Piece.id++);
     }
 
     public Piece(int x, int y, int size) {
+        
         this(x,y, size, 0);
     }
 
     public Piece(int x, int y) {
+
         this(x,y, 3, 0);
     }
 
@@ -82,6 +85,11 @@ public abstract class Piece extends AbstractListenable implements Cloneable {
     public int getInstanceId () { return this.instanceId; }
     public int getSize       () { return this.size; }
     public int getRotate     () { return this.rotate; }
+    
+    public int     getWidth () { return this.bounds[0].length; }
+    public int     getHeight() { return this.bounds.length; }
+    public int[][] getBounds() { return this.bounds; }
+
 
     //ABSTRACTS
     protected abstract int[][] getInitialBounds();
@@ -104,25 +112,11 @@ public abstract class Piece extends AbstractListenable implements Cloneable {
 		bounds = reversedMatrix;
 	}
 
-    public int[][] getBounds() {
-        return this.bounds;
-    }
-
-    public int getWidth () {
-		
-		return this.bounds[0].length;
-	}
-    public int getHeight() {
-		
-		return this.bounds.length;
-	}
-
-    public void destroy() {
-        Piece.id--;
-    }
+    public void destroy() { Piece.id--; }
 
     @Override
     public Object clone() {
+
         try {
             Piece p = (Piece) super.clone();
             return p;
@@ -132,11 +126,6 @@ public abstract class Piece extends AbstractListenable implements Cloneable {
         
         return null;
       }
-
-    // Main
-    public static void main(String[] args) {
-        System.out.println("bozo");
-    }
 
 	@Override
 	public boolean equals(Object obj) {
@@ -148,4 +137,9 @@ public abstract class Piece extends AbstractListenable implements Cloneable {
 		
 		return (this.instanceId == p.instanceId);
 	}
+    
+    // Main
+    public static void main(String[] args) {
+        System.out.println("bozo");
+    }
 }
