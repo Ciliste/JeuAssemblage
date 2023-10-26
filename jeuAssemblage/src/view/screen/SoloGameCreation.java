@@ -5,17 +5,14 @@ import static view.utils.SwingUtils.*;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JScrollPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 
-import main.Controller;
-import main.Difficulty;
+import model.Difficulty;
+import model.PlayBoard;
 import view.MainFrame;
-import view.component.JTableArrangement;
 import view.component.Separator;
 import view.utils.DocumentAdapter;
 
@@ -42,14 +39,15 @@ public class SoloGameCreation extends JPanel {
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
 	private final JList<String> difficultyList = new JList<String>(Difficulty.getDifficultysName());
 
-	private final JButton btnPlay = new JButton("Jouer");
-	
-	private final JTable      tableArrangement = JTableArrangement.getJTable();
-	private final JScrollPane scrollArrangement = new JScrollPane(tableArrangement);
+    private final JButton btnPlay = new JButton("Jouer");
     
-    private final Controller controller = Controller.getInstance();
+	private final MainFrame mainFrame;
 
-    public SoloGameCreation() {
+    public SoloGameCreation(MainFrame mainFrame) {
+
+		super();
+
+		this.mainFrame = mainFrame;
 
         this.setLayout(null);
 
@@ -75,8 +73,6 @@ public class SoloGameCreation extends JPanel {
 		this.add(difficultyList);
 		difficultyList.setSelectedIndex(1);
 
-		this.add(scrollArrangement);
-
 		this.add(btnPlay);
 
         // LISTENERS
@@ -84,7 +80,7 @@ public class SoloGameCreation extends JPanel {
 		// ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
         // this.addComponentListener(resizeListener);
 
-        btnCancel.addActionListener(e -> MainFrame.getInstance().setContentPane(new MainScreen()));
+        btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
 
         final Runnable randomSeedCallback = createRandomSeedCallback(this);
         btnRandomSeed.addActionListener(e -> randomSeedCallback.run());
@@ -94,23 +90,21 @@ public class SoloGameCreation extends JPanel {
 
 		difficultyList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                updateSeed(Long.parseLong(txtSeed.getText()));
+                seedUpdated(Long.parseLong(txtSeed.getText()));
             }
         });
 
 		btnPlay.addActionListener(e -> {
 
-			if (initPlayBoard()) {
-				MainFrame.getInstance().setContentPane(new SoloGameScreen());
-			} else {
-				System.out.println("Impossible mon ga");
-			}
+			PlayBoard playBoard = PlayBoard.constructPlayBoard(
+				Long.parseLong(txtSeed.getText()), 
+				Integer.parseInt(txtSizeX.getText()),
+				Integer.parseInt(txtSizeY.getText()), 
+				(int) nbPiecesSpinner.getValue(), 
+				Difficulty.getDifficultyFromName(difficultyList.getSelectedValue())
+			);
 
-		});
-
-		tableArrangement.getSelectionModel().addListSelectionListener(e->{
-			if (e.getValueIsAdjusting()) return;
-			SoloGameCreation.this.setParams(tableArrangement.getSelectedRow());
+			mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard));
 		});
 
 		revalidate();
@@ -154,7 +148,7 @@ public class SoloGameCreation extends JPanel {
 		btnRandomSeed.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .2f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT,
-			BTN_CANCEL_WIDTH * 2,
+			BTN_CANCEL_WIDTH,
 			BTN_CANCEL_HEIGHT 
 		);
 
@@ -221,13 +215,6 @@ public class SoloGameCreation extends JPanel {
 			BTN_CANCEL_HEIGHT * 3
 		);
 
-		scrollArrangement.setBounds(
-			PADDING_LEFT + getWidthTimesPourcent(this, .3f),
-			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
-			getWidthTimesPourcent(this, .4f),
-			BTN_CANCEL_HEIGHT * 3
-		);
-
 		final int PADDING_RIGHT = PADDING_LEFT;
 		final int PADDING_BOTTOM = PADDING_TOP;
 
@@ -239,43 +226,14 @@ public class SoloGameCreation extends JPanel {
 		);
 	}
 
-	private boolean initPlayBoard() {
-
-		long seed = Long.parseLong(txtSeed.getText());
-		int sizeX = Integer.parseInt(txtSizeX.getText());
-		int sizeY = Integer.parseInt(txtSizeY.getText());
-		int nbPieces = (int) nbPiecesSpinner.getValue();
-
-		if (!this.controller.difficultyPossible(sizeX, sizeY, nbPieces)) {
-			return false;
-		}
-
-		this.controller.setPlayBoard(sizeX, sizeY, nbPieces, seed);
-		
-		return true;
-    }
-
-    private void updateSeed(long seed) {
+    private void seedUpdated(long seed) {
 
 		Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
 
-        txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeXBySeed(seed, difficulty)));
-        txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeYBySeed(seed, difficulty)));
-        nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCountBySeed(seed, difficulty));
+        txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
+        txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));
+        nbPiecesSpinner.setValue(PlayBoard.getPiecesCountBySeedAndDifficulty(seed, difficulty));
     }
-
-	private void setParams(int index) {
-
-		String sizeX = (String) this.tableArrangement.getValueAt(index, 0);
-		String sizeY = (String) this.tableArrangement.getValueAt(index, 1);
-		int pieceCount = Integer.parseInt((String) this.tableArrangement.getValueAt(index, 2));
-		String seed = (String) this.tableArrangement.getValueAt(index, 3);
-
-		this.txtSeed.setText(seed);
-		this.txtSizeX.setText(sizeX);
-		this.txtSizeY.setText(sizeY);
-		this.nbPiecesSpinner.setValue(pieceCount);
-	}
 
     private static long generateRandomSeed() {
 
@@ -287,7 +245,7 @@ public class SoloGameCreation extends JPanel {
         return () -> {
 
             final long seed = generateRandomSeed();
-            soloGameCreation.updateSeed(seed);
+            soloGameCreation.seedUpdated(seed);
             soloGameCreation.txtSeed.setText(String.valueOf(seed));
         };
     }
@@ -313,7 +271,7 @@ public class SoloGameCreation extends JPanel {
             try {
 
                 long seed = Long.parseLong(text);
-                updateSeed(seed);
+                seedUpdated(seed);
             } 
             catch (NumberFormatException ignored) {}
         }

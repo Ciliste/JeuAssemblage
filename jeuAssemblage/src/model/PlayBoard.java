@@ -1,360 +1,354 @@
 package model;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.awt.Image;
+import java.awt.Point;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import java.util.*;
-
-import pieces.Piece;
-import pieces.PieceFactory;
+import factory.HFactory;
+import factory.IFactory;
+import factory.LFactory;
+import factory.OFactory;
+import factory.PieceFactory;
+import factory.TFactory;
+import factory.ZFactory;
+import piece.Piece;
 import view.utils.PieceRenderUtils;
 
 public class PlayBoard {
 
-    private ArrayList<Piece>        alPieceOnBoard;
-    private Piece                   selectedPiece;
-    
-    private HashMap<Integer, Image> hmPieceImage;
-    private int[][]                 playBoard;
-    
-    private Long                    seed;
+	private static final int EMPTY = 0;
 
+	private final int[][] board;
 
-    public PlayBoard() {
-        this.hmPieceImage = new HashMap<Integer, Image>();
-        
-        this.alPieceOnBoard = null;
-        this.playBoard      = null;
-        this.selectedPiece  = null;
-        this.seed           = null;
-    }
+	private final Map<Integer, Piece> piecesMap;
+	private final Map<Integer, Image> piecesImagesMap;
 
-    public void initSeed(long seed) {
-        this.seed = seed;
-        PieceFactory.setSeed(seed);
-    }
-    
-    public void initSizePB(int height, int width) {
-        this.playBoard = createPlayBoard(height, width);
-        this.placePieceOnBoard();
-    }
+	private final int sizeX;
+	private final int sizeY;
 
-    public void initNumberPiece(int numberPiece) {
-        this.alPieceOnBoard = createPieces(numberPiece);
-        this.createPieceImage();
-    }
+	private final long seed;
 
-    // Getters
-    public int[][]          getPlayBoard     () { return this.playBoard; }
-    public ArrayList<Piece> getPieces        () { return this.alPieceOnBoard; }
-    public Piece            getSelectedPiece () { return this.selectedPiece; }
-    public Long             getSeed          () { return this.seed; }
+	public PlayBoard(long seed, int sizeX, int sizeY) {
 
-    public Image getImageById (int id) { return this.hmPieceImage.get(id); }
+		this.board = new int[sizeY][sizeX];
 
-    public Piece getPieceById(int id) {
-        for (Piece p : this.alPieceOnBoard) {
-            if (p.getInstanceId() == id) {
-                return p;
-            }
-        }
-        return null;
-    }
-    
-    // Setters
-    public void setPieceSelected(Piece p) { 
+		this.sizeX = sizeX;
+		this.sizeY = sizeY;
 
-		if (p == null) {
-			this.selectedPiece = null;
-			return;
-		}
-		
-        this.selectedPiece = (Piece) p.clone();
-	}
-    
-    // Public 
-    /**
-    * bla bla 
-    * <p>
-    * bla bla
-    * @param  x     int that represent of top left matrices
-    * @param  y     int that represent of top left matrices
-    * @see          Piece
-    */
-    public void addSelectedPiece(int x, int y) {
+		this.seed = seed;
 
-        if (this.selectedPiece == null) return;
+		this.piecesMap = new HashMap<>();
+		this.piecesImagesMap = new HashMap<>();
 
-        this.removePieceOnBoard(this.getPieceById(this.selectedPiece.getInstanceId()));
-        this.addPieceOnBoard(this.selectedPiece, x - 1, y - 1);
-        this.removeSelectedPiece();
-    }
+		for (int i = 0; i < this.board.length; i++) {
 
-    /**
-    * @param  x         int that represent of top left matrices
-    * @param  y         int that represent of top left matrices
-    * @return           True if the selected piece can be added on the board else False
-    */
-    public boolean selectedPieceCanBeAddedToBoard(int x, int y) {
-        if (this.selectedPiece == null) return false;
+			for (int j = 0; j < this.board[i].length; j++) {
 
-        return this.canBeAddedToBoard(this.selectedPiece, x - 1, y - 1);
-    }
-
-    /**
-    * bla bla 
-    *
-    * @return   a int[], last one is a int whose the number of piece cube in the area and the 4 others 
-    *           are representation of an rectangle,  contains respectively x, y, width, height 
-    */
-    public int[] rectangleArea() {
-        int[] temp = this.getArea();
-        int[] ret = new int[temp.length + 1];
-        for (int i = 0; i < temp.length; i++) {
-            ret[i] = temp[i];
-        }
-        ret[4] = this.getPreciseArea();
-        return ret;
-    }
-
-    /**
-    * bla bla 
-    *
-    */
-    public void registerArrangement() {
-        String str = this.playBoard[0].length + ";" +
-                this.playBoard.length         + ";" +
-                this.alPieceOnBoard.size()    + ";" +
-                this.seed;
-
-        File f = new File(this.getPath() + "/maps.tetriste");
-        if (!f.exists()) {
-            try {
-                f.createNewFile();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(f, true));
-            writer.append(str);
-            writer.append('\n');
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-    * bla bla 
-    *
-    * @return   an ArrayList of String that represent the file
-    */
-    public ArrayList<String> getArrangement() {
-        ArrayList<String> alRet = new ArrayList<String>();
-        File f = new File(this.getPath() + "/maps.tetriste");
-        if ( !f.exists() ) return alRet;
-        
-        try {
-            Scanner sc = new Scanner(f);
-            while (sc.hasNext()) {
-                alRet.add(sc.nextLine());
-            }
-            sc.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return alRet;
-    }
-
-    /**
-    * bla bla 
-    * 
-    */
-    public void destroy() {
-        while (!this.alPieceOnBoard.isEmpty()) {
-            Piece p = this.alPieceOnBoard.get(0);
-            p.destroy();
-            this.alPieceOnBoard.remove(p);
-        }
-    }
-
-    // Privates
-    private String getPath() {
-        Path path = Paths.get("");
-        return path.toAbsolutePath().toString();
-    }
-
-	private void removeSelectedPiece() {
-		if (this.selectedPiece == null) return;
-
-        this.alPieceOnBoard.remove(this.getPieceById(this.selectedPiece.getInstanceId()));
-        this.alPieceOnBoard.add(this.selectedPiece);
-        this.selectedPiece = null;
-	}
-
-    private ArrayList<Piece> createPieces(int numberPiece) {
-        ArrayList<Piece> tempAl = new ArrayList<Piece>();
-        int samePieceLimit = (int) Math.ceil(numberPiece / (PieceFactory.NUMBER_PIECE * 1d));
-        
-        while (tempAl.size() < numberPiece) {
-
-            Piece p = PieceFactory.createPiece();
-
-            if (PlayBoard.checkPiece(p, tempAl, samePieceLimit)) {
-                tempAl.add(p);
-            } else {
-                p.destroy();
-            }
-        }
-        return tempAl;
-    }
-    
-    private void createPieceImage() {
-        for (Piece p : this.alPieceOnBoard) {
-            BufferedImage image = PieceRenderUtils.createCellImage();
-            this.hmPieceImage.put(p.getInstanceId(), image);
-        }
-    }
-
-    private int[][] createPlayBoard(int height, int width) {
-        int[][] tempBoard = new int[height][width];
-
-        for ( int i = 0; i < height; i++) {
-            for ( int j = 0; j < width; j++) {
-                tempBoard[i][j] = 0;
-            }
-        }
-
-        return tempBoard;
-    }
-
-    private void placePieceOnBoard() {
-        // TODO : changer ça en vrai fonction qui vérifie les possibilités avant d'ajouter, backtracking ?
-        Random rand = new Random(this.seed);
-        for ( Piece p: this.alPieceOnBoard) {
-            int x, y;
-            do {
-                x = rand.nextInt(this.playBoard[0].length - p.getWidth ());
-                y = rand.nextInt(this.playBoard.length    - p.getHeight());
-            } while( !canBeAddedToBoard(p, x, y) );
-
-            addPieceOnBoard(p, x, y);
-        }
-    }
-
-    private void addPieceOnBoard(Piece p, int x, int y) {
-
-        int[][] bounds = p.getBounds();
-        int k = 0;
-        int l = 0;
-        for (int i = y; i < y + bounds.length; i++) {
-			for (int j = x; j < x + bounds[i - y].length; j++) {
-				if (bounds[k][l] == 1) {
-					this.playBoard[i][j] = p.getInstanceId();
-				}
-				l++;
+				this.board[i][j] = EMPTY;
 			}
-			k++;
-			l = 0;
 		}
-
-        p.setX(x);
-        p.setY(y);
-    }
-
-	public void removePieceOnBoard(Piece p) {
-		int[][] bounds = p.getBounds();
-        int k = 0;
-        for (int i = p.getY(); i < p.getY() + p.getHeight(); i++) {
-            int l = 0;
-            for (int j = p.getX(); j < p.getX() + p.getWidth(); j++) {
-                if (bounds[k][l] != 0) {
-                    this.playBoard[i][j] = 0;
-                }
-                l++;
-            }
-            k++;
-        }
 	}
 
-    private boolean canBeAddedToBoard(Piece p, int x, int y) {
+	public int[][] getBoardArray() {
 
-        System.out.println("x : " + x + " y : " + y);
+		return this.board.clone();
+	}
 
-        if ( x + p.getWidth()  > this.playBoard.length   ) return false;
-        if ( y + p.getHeight() > this.playBoard[0].length) return false;
-        if ( x < 0 ) return false;
-        if ( y < 0 ) return false;
+	void randomlyPlacePiece(Piece piece) {
 
-        int[][] bounds = p.getBounds();
-        int k = 0;
-        for (int i = y; i < y + p.getHeight(); i++) {
-            int l = 0;
-            for (int j = x; j < x + p.getWidth(); j++) {
-                if ((this.playBoard[i][j] != 0 && this.playBoard[i][j] != p.getInstanceId()) && bounds[k][l] != 0) {
-                    return false;
-                }
-                l++;
-            }
-            k++;
-        }
-        return true;
-    }
+		System.out.println("Randomly placing piece: " + piece);
 
-    private int getPreciseArea() {
-        int sum = 0;
-        for ( int i = 0; i < this.playBoard.length; i++) {
-            for ( int j = 0; j < this.playBoard[i].length; j++) {
-                if ( this.playBoard[i][j] != 0 ) sum += 1; 
-            }   
-        }
+		Random random = new Random(this.seed + piecesMap.size() + 1);
+	
+		// Define constants for readability
+		final int MAX_ROTATIONS = 4;
+	
+		int nbRotations = random.nextInt(MAX_ROTATIONS);
+		
+		// Rotate the piece as many times as specified by nbRotations
+		for (int i = 0; i < nbRotations; i++) {
 
-        return sum;
-    }
+			piece.rotateLeft(); 
+		}
 
-    private int[] getArea() {
-        int x = this.playBoard[0].length;
-        int y = this.playBoard.length;
-        int xEnd = 0;
-        int yEnd = 0;
-        for (int i = 0; i < this.playBoard.length; i++) {
-            for (int j = 0; j < this.playBoard[i].length; j++) {
-                if ( this.playBoard[i][j] != 0 ) {
-                    if ( j < x ) x = j;
-                    if ( i < y ) y = i; 
-                    if ( j > xEnd ) xEnd = j; 
-                    if ( i > yEnd ) yEnd = i;  
-                }
-            }
-        }
-        
-        return new int[]{ x, y, xEnd + 1, yEnd + 1};
-    }
+		// TODO : Place the piece randomly on the board
+	
+		for (int i = 0; i < board.length; i++) {
+	
+			for (int j = 0; j < board[i].length; j++) {
+	
+				System.out.println("Trying to place piece at: " + j + ", " + i);
 
-    // Static methods
-    private static boolean checkPiece( Piece p, ArrayList<Piece> alPiece, int samePieceLimit) {
-        Class<?> c = p.getClass();
-        int numberPieceSameClass = 1;
-        for ( Piece piece: alPiece) {
-            if (piece.getClass() == c) { numberPieceSameClass += 1; } 
-        }
+				if (placePiece(j, i, piece)) {
+	
+					return;
+				}
+			}
+		}
+	}
 
-        return numberPieceSameClass <= samePieceLimit;
-    }
-    
-    public static void printMatrice(int[][] matrice) {
-        for (int i = 0; i < matrice.length; i++) {
-            System.out.println();
-            for (int j = 0; j < matrice[i].length; j++) {
-                System.out.print(matrice[i][j] + " ");
-            }
-        }
-    }
+	public int getLowerPieceXById(int pieceId) {
+
+		for (int x = 0; x < this.board[0].length; x++) {
+
+			for (int y = this.board.length - 1; y >= 0; y--) {
+
+				if (this.board[y][x] == pieceId) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("Piece not found");
+	}
+
+	public int getLowerPieceYById(int pieceId) {
+
+		for (int y = 0; y < this.board.length; y++) {
+
+			for (int x = 0; x < this.board[0].length; x++) {
+
+				if (this.board[y][x] == pieceId) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("Piece not found");
+	}
+
+	public Point getUpperLeftPieceCornerById(int pieceId) {
+
+		return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId));
+	}
+	
+	public int getWidth() {
+
+		return this.sizeX;
+	}
+
+	public int getHeight() {
+
+		return this.sizeY;
+	}
+
+	public int getPieceIdAt(int x, int y) {
+
+		return this.board[y][x];
+	}
+
+	private boolean placePiece(int x, int y, Piece piece) {
+
+		if (canBePlaced(x, y, piece)) {
+
+			int pieceId = piecesMap.size() + 1;
+			boolean[][] pieceMatrix = piece.getPiece();
+
+			for (int i = 0; i < piece.getHeight(); i++) {
+
+				for (int j = 0; j < piece.getWidth(); j++) {
+
+					if (pieceMatrix[i][j]) {
+
+						this.board[y + i][x + j] = pieceId;
+					}
+				}
+			}
+
+			registerPiece(pieceId, piece);
+
+			return true;
+		}
+		else {
+
+			return false;
+		}
+	}
+
+	void removePiceFromBoard(Piece piece) {
+
+		int pieceId = this.getPieceId(piece);
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				if (this.board[i][j] == pieceId) {
+
+					this.board[i][j] = EMPTY;
+				}
+			}
+		}
+
+		unregisterPiece(pieceId);
+	}
+
+	boolean movePiece(Piece piece, int x, int y) {
+
+		if (canBePlaced(x, y, piece)) {
+
+			int pieceId = this.getPieceId(piece);
+
+			Image cell = this.piecesImagesMap.get(pieceId);
+
+			removePiceFromBoard(piece);
+			placePiece(x, y, piece);
+
+			this.piecesImagesMap.put(pieceId, cell);
+
+			return true;
+		}
+		else {
+
+			return false;
+		}
+	}
+
+	private int getPieceId(Piece piece) {
+
+		return this.piecesMap.entrySet().stream()
+			.filter(entry -> entry.getValue().equals(piece))
+			.map(Map.Entry::getKey)
+			.findFirst()
+			.orElseThrow(() -> new IllegalStateException("Piece is not on board"));
+	}
+
+	public Piece getPieceCloneById(int pieceId) {
+
+		return Piece.clone(this.piecesMap.get(pieceId));
+	}
+
+	private boolean canBePlaced(int x, int y, Piece piece) {
+
+		boolean[][] pieceMatrix = piece.getPiece();
+
+		boolean canBePlaced = true;
+		for (int i = 0; i < piece.getHeight(); i++) {
+
+			for (int j = 0; j < piece.getWidth(); j++) {
+
+				if (pieceMatrix[i][j] == false) {
+
+					continue;
+				}
+
+				if ((y + i < this.board.length && x + j < this.board[0].length && this.board[y + i][x + j] == EMPTY) == false) {
+
+					canBePlaced = false;
+					break;
+				}
+			}
+
+			if (canBePlaced == false) {
+
+				break;
+			}
+		}
+
+		return canBePlaced;
+	}
+
+	private void registerPiece(int pieceId, Piece piece) {
+
+		this.piecesMap.put(pieceId, piece);
+		this.piecesImagesMap.put(pieceId, PieceRenderUtils.createCellImage(this.seed + pieceId));
+	}
+
+	private void unregisterPiece(int pieceId) {
+
+		this.piecesMap.remove(pieceId);
+		this.piecesImagesMap.remove(pieceId);
+	}
+
+	public Image getCellImageByPieceId(int pieceId) {
+
+		return this.piecesImagesMap.get(pieceId);
+	}
+
+	public int getBoardWidth() {
+
+		return this.board[0].length;
+	}
+
+	public int getBoardHeight() {
+
+		return this.board.length;
+	}
+
+	@Override
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				sb.append((this.board[i][j] == EMPTY) ? "  " : this.board[i][j] + " ");
+				sb.append(" ");
+			}
+
+			sb.append("\n");
+		}
+
+		return sb.toString();
+	}
+
+	public static int getSizeXBySeedAndDifficulty(long seed, Difficulty difficulty) {
+
+		return new Random(seed).nextInt(difficulty.getMaxSizeX() - difficulty.getMinSizeX() + 1) + difficulty.getMinSizeX();
+	}
+
+	public static int getSizeYBySeedAndDifficulty(long seed, Difficulty difficulty) {
+
+		return new Random(seed + 1).nextInt(difficulty.getMaxSizeY() - difficulty.getMinSizeY() + 1) + difficulty.getMinSizeY();
+	}
+
+	public static int getPiecesCountBySeedAndDifficulty(long seed, Difficulty difficulty) {
+
+		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1) + difficulty.getMinNbPieces();
+	}
+
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces, Difficulty difficulty) {
+
+		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
+		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
+
+		Random random = new Random(seed + 3);
+
+		for (int i = 0; i < nbPieces; i++) {
+
+			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
+			Piece piece = pieceFactory.createPiece(0);
+
+			playBoard.randomlyPlacePiece(piece);
+		}
+
+		return playBoard;
+	}
+
+	public static PlayBoard constructEmptyPlayBoard(long seed, int sizeX, int sizeY) {
+
+		return new PlayBoard(seed, sizeX, sizeY);
+	}
+
+	private static List<PieceFactory> getPossiblePieceFactorys() {
+
+		List<PieceFactory> pieceFactorys = new ArrayList<>();
+
+		pieceFactorys.add(new HFactory());
+		pieceFactorys.add(new IFactory());
+		pieceFactorys.add(new LFactory());
+		pieceFactorys.add(new OFactory());
+		pieceFactorys.add(new TFactory());
+		pieceFactorys.add(new ZFactory());
+
+		return pieceFactorys;
+	}
 }

@@ -15,9 +15,9 @@ public class MainScreen extends JPanel {
     
     private final MainFrame mainFrame;
 
-    public MainScreen() {
+    public MainScreen(MainFrame mainFrame) {
 
-        this.mainFrame = MainFrame.getInstance();
+        this.mainFrame = mainFrame;
 
         JButton btnSolo    = new JButton("SOLO");
         JButton btnMulti   = new JButton("MULTIJOUEUR");
@@ -51,7 +51,7 @@ public class MainScreen extends JPanel {
 
         btnSolo.addActionListener(e -> {
 
-            MainScreen.this.mainFrame.setContentPane(new SoloGameCreation());
+            MainScreen.this.mainFrame.setContentPane(new SoloGameCreation(mainFrame));
         });
     }
 }

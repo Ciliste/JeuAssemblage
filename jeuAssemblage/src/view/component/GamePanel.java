@@ -4,6 +4,8 @@ import static view.utils.SwingUtils.*;
 
 import javax.swing.JPanel;
 
+import model.PlayBoard;
+import view.MainFrame;
 import view.component.board.Finish;
 import view.component.board.Grid;
 import view.component.board.PieceBoard;
@@ -17,14 +19,15 @@ public class GamePanel extends JPanel {
 	private final PieceBoard pieceBoard;
 	private final Finish finish;
 
-	public GamePanel() {
+	public GamePanel(MainFrame mainFrame, PlayBoard playBoard) {
+
 		super();
+
 		this.setLayout(null);
 
-
-		this.grid = new Grid();
-		this.pieceBoard = new PieceBoard();
-		this.finish = new Finish();
+		this.grid = new Grid(playBoard);
+		this.pieceBoard = new PieceBoard(playBoard, this.grid);
+		this.finish = new Finish(mainFrame, playBoard);
 
 		this.add(this.grid);
 		this.add(this.pieceBoard);

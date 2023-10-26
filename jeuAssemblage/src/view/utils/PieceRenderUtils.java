@@ -1,25 +1,29 @@
 package view.utils;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.Buffer;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 
-import pieces.PieceFactory;
+import factory.PieceFactory;
 
 public final class PieceRenderUtils {
 	
-	private static final int CELL_PIXEL_SIZE = 50;
+	public static final int CELL_PIXEL_SIZE = 50;
 	private static final int CENTER_PART_OFFSET = 9;
 
 	private PieceRenderUtils() {}
 	
-	public static BufferedImage createCellImage() {
+	public static BufferedImage createCellImage(long seed) {
 		
-		return createCellImage(getRandomColor());
+		return createCellImage(getRandomColor(seed));
 	}
 
 	public static BufferedImage createCellImage(Color color) {
@@ -69,53 +73,77 @@ public final class PieceRenderUtils {
         return new Color(Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
     }
 
-	private static Color getRandomColor() {
+	private static Color getRandomColor(long seed) {
 
 		return new Color((int) (Math.random() * 0x1000000));
 	}
 
-	public static BufferedImage createPieceImage(int[][] piece, Color color) {
-
-		// TODO NE PAS DESSINER LES LIGNES OU COLLONNES VIDES
-
+	public static BufferedImage createSurrondingPieceImage(boolean[][] piece, Color color) {
 		
 		// Create a new image
-		BufferedImage image = new BufferedImage(CELL_PIXEL_SIZE * piece.length, CELL_PIXEL_SIZE * piece[0].length, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(CELL_PIXEL_SIZE * piece[0].length, CELL_PIXEL_SIZE * piece.length, BufferedImage.TYPE_INT_ARGB);
 
 		// Get the graphics of the image
-		java.awt.Graphics g = image.getGraphics();
-
-		BufferedImage cellImage = createCellImage(color);
+		Graphics g = image.getGraphics();
 
 		for (int i = 0; i < piece.length; i++) {
 
 			for (int j = 0; j < piece[i].length; j++) {
 
-				if (piece[i][j] == 1) {
-					g.drawImage(cellImage, j * CELL_PIXEL_SIZE, i * CELL_PIXEL_SIZE, null);
+				if (piece[i][j]) {
+
+					if (i == 0 || !piece[i - 1][j]) {
+
+						g.setColor(color);
+						g.fillRect(j * CELL_PIXEL_SIZE, i * CELL_PIXEL_SIZE, CELL_PIXEL_SIZE, 2);
+					}
+
+					if (j == 0 || !piece[i][j - 1]) {
+
+						g.setColor(color);
+						g.fillRect(j * CELL_PIXEL_SIZE, i * CELL_PIXEL_SIZE, 2, CELL_PIXEL_SIZE);
+					}
+
+					if (i == piece.length - 1 || !piece[i + 1][j]) {
+
+						g.setColor(color);
+						g.fillRect(j * CELL_PIXEL_SIZE, (i + 1) * CELL_PIXEL_SIZE - 2, CELL_PIXEL_SIZE, 2);
+					}
+
+					if (j == piece[i].length - 1 || !piece[i][j + 1]) {
+
+						g.setColor(color);
+						g.fillRect((j + 1) * CELL_PIXEL_SIZE - 2, i * CELL_PIXEL_SIZE, 2, CELL_PIXEL_SIZE);
+					}
+
+					Logger.getGlobal().info("i: " + i + " j: " + j);
 				}
 			}
+		}
+
+		// Register image plz
+		// fdp ?
+		try {
+			File output = new File("output.png");
+			ImageIO.write(image, "png", output);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return image;
 	}
 
-	public static BufferedImage createPieceImage(int[][] piece) {
-
-		return createPieceImage(piece, getRandomColor());
-	}
-
-	public static void main(String[] args) {
+	// public static void main(String[] args) {
 		
-		int[][] piece = PieceFactory.createPieceT().getBounds();
+	// 	int[][] piece = PieceFactory.createPieceT().getBounds();
 
-		BufferedImage image = createPieceImage(piece, new Color(0xfa8d12));
+	// 	BufferedImage image = createPieceImage(piece, new Color(0xfa8d12));
 
-		try {
-            File output = new File("output.png");
-            ImageIO.write(image, "png", output);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-	}
+	// 	try {
+    //         File output = new File("output.png");
+    //         ImageIO.write(image, "png", output);
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //     }
+	// }
 }
