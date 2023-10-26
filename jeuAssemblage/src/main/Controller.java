@@ -2,12 +2,11 @@ package main;
 
 import java.awt.*;
 
-import main.listener.EventListener;
 import java.util.*;
 
-import main.event.EventManager;
 import model.PlayBoard;
 import pieces.Piece;
+import utils.Difficulty;
 import view.MainFrame;
 
 public class Controller {
@@ -19,7 +18,7 @@ public class Controller {
             instance = new Controller();
 			instance.model = new PlayBoard();
 			instance.view = MainFrame.getInstance();
-			instance.eventManager = new EventManager();
+			//instance.eventManager = new EventManager();
         }
 
         return instance;
@@ -27,17 +26,12 @@ public class Controller {
 
 	private PlayBoard model;
 	private MainFrame view;
-	private EventManager eventManager;
 
 
 	private Controller() {}
-	
-	public void addListener(EventListener e) {
-		this.eventManager.addListener(e);
-	}
 
 	public void finishGame() {
-		this.eventManager = new EventManager();
+		//this.eventManager = new EventManager();
 		this.model.destroy();
 		this.model = new PlayBoard();
 	}
@@ -106,6 +100,6 @@ public class Controller {
 	public void addPieceOnBoard(int x, int y) {
 		this.model.addSelectedPiece(x, y);
 		this.view.repaint();
-		this.eventManager.fireEvent();
+		//this.eventManager.fireEvent();
 	}
 }

@@ -9,12 +9,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import main.Controller;
-import main.listener.EventListener;
+import observer.interfaces.Listener;
 import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
-public class Finish extends JPanel implements EventListener{
+public class Finish extends JPanel implements Listener{
 
     private final Controller controller;
 
@@ -26,7 +26,7 @@ public class Finish extends JPanel implements EventListener{
 
     public Finish() {
         this.controller = Controller.getInstance();
-        this.controller.addListener(this);
+        //this.controller.addListener(this);
 
         this.setLayout(null);
 
