@@ -9,12 +9,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import model.PlayBoard;
-import observer.interfaces.Listener;
 import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
-public class Finish extends JPanel implements Listener {
+public class Finish extends JPanel {
 
     private final JLabel lblPreciseArea = new JLabel();
     private final JLabel lblArea        = new JLabel();
@@ -34,8 +33,6 @@ public class Finish extends JPanel implements Listener {
 
         this.setLayout(null);
 
-        this.update();
-
         this.btnFinish.addActionListener(e -> {
             mainFrame.setContentPane(new SoloGameFinishScreen(playBoard));
         });
@@ -45,13 +42,6 @@ public class Finish extends JPanel implements Listener {
         this.add(this.btnFinish);
 
         this.setVisible(true);
-    }
-
-    @Override
-    public void update() {
-        //int[] areaInfo = this.controller.areaInfomartion();
-        //lblPreciseArea.setText("Nombre de carrés : " + areaInfo[4]);
-        //lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
     }
 
     @Override
