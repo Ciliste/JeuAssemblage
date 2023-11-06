@@ -75,6 +75,24 @@ public class Piece {
 		return new Piece(piece.piece.clone());
 	}
 
+	@Override
+	public String toString() {
+
+		String str = "";
+
+		for (int i = 0; i < piece.length; i++) {
+
+			for (int j = 0; j < piece[0].length; j++) {
+
+				str += (piece[i][j] ? "█" : " ");
+			}
+
+			str += "\n";
+		}
+
+		return str;
+	}
+
 	public static void main(String[] args) {
 		
 		System.out.println("Piece.java");

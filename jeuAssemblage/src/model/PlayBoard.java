@@ -2,11 +2,15 @@ package model;
 
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Color;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import factory.HFactory;
 import factory.IFactory;
@@ -15,10 +19,12 @@ import factory.OFactory;
 import factory.PieceFactory;
 import factory.TFactory;
 import factory.ZFactory;
+import model.listener.IPlayBoardListenable;
+import model.listener.IPlayBoardListener;
 import piece.Piece;
 import view.utils.PieceRenderUtils;
 
-public class PlayBoard {
+public class PlayBoard implements IPlayBoardListenable {
 
 	private static final int EMPTY = 0;
 
@@ -64,31 +70,127 @@ public class PlayBoard {
 
 		Random random = new Random(this.seed + piecesMap.size() + 1);
 	
-		// Define constants for readability
 		final int MAX_ROTATIONS = 4;
-	
 		int nbRotations = random.nextInt(MAX_ROTATIONS);
-		
-		// Rotate the piece as many times as specified by nbRotations
 		for (int i = 0; i < nbRotations; i++) {
 
 			piece.rotateLeft(); 
 		}
 
-		// TODO : Place the piece randomly on the board
-	
-		for (int i = 0; i < board.length; i++) {
-	
-			for (int j = 0; j < board[i].length; j++) {
-	
-				System.out.println("Trying to place piece at: " + j + ", " + i);
+		final int MAX_FLIPS = 2;
+		int nbReverse = random.nextInt(MAX_FLIPS);
+		for (int i = 0; i < nbReverse; i++) {
 
-				if (placePiece(j, i, piece)) {
+			piece.reverse();
+		}
 	
-					return;
+		final int MAX_ITERATIONS = 100;
+		int iteration = 0;
+
+		do {
+
+			int x = random.nextInt(this.board[0].length - piece.getWidth() + 1);
+			int y = random.nextInt(this.board.length - piece.getHeight() + 1);
+
+			System.out.println("Trying to place piece at: " + x + ", " + y);
+
+			if (placePiece(x, y, piece)) {
+
+				return;
+			}
+
+			iteration++;
+
+		} while (iteration < MAX_ITERATIONS);
+
+		// for (int i = 0; i < board.length; i++) {
+	
+		// 	for (int j = 0; j < board[i].length; j++) {
+	
+		// 		System.out.println("Trying to place piece at: " + j + ", " + i);
+
+		// 		if (placePiece(j, i, piece)) {
+	
+		// 			return;
+		// 		}
+		// 	}
+		// }
+	}
+
+	public int getLowerPieceX() {
+
+		for (int x = 0; x < this.board[0].length; x++) {
+
+			for (int y = this.board.length - 1; y >= 0; y--) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return x;
 				}
 			}
 		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getLowerPieceY() {
+
+		for (int y = 0; y < this.board.length; y++) {
+
+			for (int x = 0; x < this.board[0].length; x++) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public Point getUpperLeftPieceCorner() {
+
+		System.out.println("getUpperLeftPieceCorner() " + getLowerPieceX() + ", " + getLowerPieceY());
+
+		return new Point(getLowerPieceX(), getLowerPieceY());
+	}
+
+	public int getUpperPieceX() {
+
+		for (int x = this.board[0].length - 1; x >= 0; x--) {
+
+			for (int y = 0; y < this.board.length; y++) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getUpperPieceY() {
+
+		for (int y = this.board.length - 1; y >= 0; y--) {
+
+			for (int x = this.board[0].length - 1; x >= 0; x--) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public Point getLowerRightPieceCorner() {
+
+		return new Point(getUpperPieceX(), getUpperPieceY());
 	}
 
 	public int getLowerPieceXById(int pieceId) {
@@ -143,11 +245,28 @@ public class PlayBoard {
 		return this.board[y][x];
 	}
 
-	private boolean placePiece(int x, int y, Piece piece) {
+	public boolean placePiece(int x, int y, Piece piece) {
+
+		int pieceId = piecesMap.size() + 1;
+
+		if (placePieceWithoutRegistration(x, y, piece, pieceId)) {
+
+			registerPiece(pieceId, piece);
+
+			firePieceAdded(this, pieceId);
+
+			return true;
+		}
+		else {
+
+			return false;
+		}
+	}
+
+	public boolean placePieceWithoutRegistration(int x, int y, Piece piece, int pieceId) {
 
 		if (canBePlaced(x, y, piece)) {
 
-			int pieceId = piecesMap.size() + 1;
 			boolean[][] pieceMatrix = piece.getPiece();
 
 			for (int i = 0; i < piece.getHeight(); i++) {
@@ -161,7 +280,7 @@ public class PlayBoard {
 				}
 			}
 
-			registerPiece(pieceId, piece);
+			piecesMap.put(pieceId, piece);
 
 			return true;
 		}
@@ -171,9 +290,16 @@ public class PlayBoard {
 		}
 	}
 
-	void removePiceFromBoard(Piece piece) {
+	private void removePiceFromBoard(Piece piece) {
 
 		int pieceId = this.getPieceId(piece);
+
+		removePiceFromBoardWithoutUnregistration(pieceId);
+
+		unregisterPiece(pieceId);
+	}
+
+	public void removePiceFromBoardWithoutUnregistration(int pieceId) {
 
 		for (int i = 0; i < this.board.length; i++) {
 
@@ -185,11 +311,14 @@ public class PlayBoard {
 				}
 			}
 		}
-
-		unregisterPiece(pieceId);
 	}
 
-	boolean movePiece(Piece piece, int x, int y) {
+	public void removePieceFromBoard(int pieceId) {
+
+		removePiceFromBoard(this.piecesMap.get(pieceId));
+	}
+
+	private boolean movePiece(Piece piece, int x, int y) {
 
 		if (canBePlaced(x, y, piece)) {
 
@@ -197,8 +326,8 @@ public class PlayBoard {
 
 			Image cell = this.piecesImagesMap.get(pieceId);
 
-			removePiceFromBoard(piece);
-			placePiece(x, y, piece);
+			removePiceFromBoardWithoutUnregistration(pieceId);
+			placePieceWithoutRegistration(x, y, piece, pieceId);
 
 			this.piecesImagesMap.put(pieceId, cell);
 
@@ -208,6 +337,11 @@ public class PlayBoard {
 
 			return false;
 		}
+	}
+
+	public boolean movePiece(int pieceId, int x, int y) {
+
+		return movePiece(this.piecesMap.get(pieceId), x, y);
 	}
 
 	private int getPieceId(Piece piece) {
@@ -224,7 +358,7 @@ public class PlayBoard {
 		return Piece.clone(this.piecesMap.get(pieceId));
 	}
 
-	private boolean canBePlaced(int x, int y, Piece piece) {
+	public boolean canBePlaced(int x, int y, Piece piece) {
 
 		boolean[][] pieceMatrix = piece.getPiece();
 
@@ -319,6 +453,7 @@ public class PlayBoard {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
+		List<Color> colorList = getDefaultColorList();
 
 		Random random = new Random(seed + 3);
 
@@ -326,8 +461,17 @@ public class PlayBoard {
 
 			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
 			Piece piece = pieceFactory.createPiece(0);
+			
+			Color color = null;
+			if (true == colorList.isEmpty()) {
+
+				colorList = getDefaultColorList();
+			}
+
+			color = colorList.remove(random.nextInt(colorList.size()));
 
 			playBoard.randomlyPlacePiece(piece);
+			playBoard.piecesImagesMap.put(playBoard.getPieceId(piece), PieceRenderUtils.createCellImage(color));
 		}
 
 		return playBoard;
@@ -350,5 +494,57 @@ public class PlayBoard {
 		pieceFactorys.add(new ZFactory());
 
 		return pieceFactorys;
+	}
+
+	private static List<Color> getDefaultColorList() {
+
+		List<Color> colorList = new ArrayList<>();
+
+		colorList.add(Color.RED);
+		colorList.add(Color.BLUE);
+		colorList.add(Color.GREEN);
+		colorList.add(Color.YELLOW);
+		colorList.add(Color.CYAN);
+		colorList.add(Color.MAGENTA);
+
+		return colorList;
+	}
+
+	private Set<IPlayBoardListener> playBoardListeners = new HashSet<>();
+
+	@Override
+	public void addPlayBoardListener(IPlayBoardListener listener) {
+		
+		this.playBoardListeners.add(listener);
+	}
+
+	@Override
+	public void removePlayBoardListener(IPlayBoardListener listener) {
+		
+		this.playBoardListeners.remove(listener);
+	}
+
+	private void firePieceAdded(Object source, int pieceId) {
+
+		for (IPlayBoardListener listener : this.playBoardListeners) {
+
+			listener.pieceAdded(source, pieceId);
+		}
+	}
+
+	private void firePieceRemoved(Object source, int pieceId) {
+
+		for (IPlayBoardListener listener : this.playBoardListeners) {
+
+			listener.pieceRemoved(source, pieceId);
+		}
+	}
+
+	private void firePieceMoved(Object source, int pieceId) {
+
+		for (IPlayBoardListener listener : this.playBoardListeners) {
+
+			listener.pieceMoved(source, pieceId);
+		}
 	}
 }

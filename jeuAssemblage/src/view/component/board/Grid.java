@@ -3,9 +3,10 @@ package view.component.board;
 import static view.utils.SwingUtils.*;
 
 import model.PlayBoard;
+import model.listener.PlayBoardAdapter;
 import piece.Piece;
-import view.component.board.listener.IPieceClickedListenable;
-import view.component.board.listener.IPieceClickedListener;
+import view.component.board.listener.IPieceManipulationComponent;
+import view.utils.KeyboardManager;
 import view.utils.PieceRenderUtils;
 import view.utils.SwingUtils;
 
@@ -23,7 +24,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
-public class Grid extends JPanel implements IPieceClickedListenable {
+public class Grid extends JPanel {
 
 	private final PlayBoard playBoard;
 
@@ -33,11 +34,23 @@ public class Grid extends JPanel implements IPieceClickedListenable {
 	private int xGridFin = 0;
 	private int yGridFin = 0;
 
+	private Piece selectedPiece = null;
+	private int selectedPieceId = -1;
+	private int xClickOriginSelectedPiece = -1;
+	private int yClickOriginSelectedPiece = -1;
+
 	private Image selectedPieceSurrondingImage = null;
 	private int xSelectedPieceSurrondingImage = 0;
 	private int ySelectedPieceSurrondingImage = 0;
 
-    public Grid(PlayBoard playBoard) {
+	private final boolean isPreview;
+
+	public Grid(PlayBoard playBoard) {
+
+		this(playBoard, false);
+	}
+
+    public Grid(PlayBoard playBoard, boolean isPreview) {
         
 		this.playBoard = playBoard;
 
@@ -45,24 +58,155 @@ public class Grid extends JPanel implements IPieceClickedListenable {
 
         this.setVisible(true);
 
+		this.isPreview = isPreview;
+		if (isPreview) return;
+
 		this.addMouseListener(new GridClickListener());
 		this.addMouseMotionListener(new GridMouseMotionListener());
 
-		this.addPieceClickedListener((Object source, int pieceId) -> {
+		playBoard.addPlayBoardListener(new PlayBoardAdapter() {
 
-			Piece piece = playBoard.getPieceCloneById(pieceId);
+			@Override
+			public void pieceAdded(Object source, int pieceId) {
 
-			selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(piece.getPiece(), Color.CYAN);
+				repaint();
+			}
 
-			Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
-			xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
-			ySelectedPieceSurrondingImage = upperLeftPieceCorner.y;
+			@Override
+			public void pieceRemoved(Object source, int pieceId) {
 
-			repaint();
+				repaint();
+			}
 
-			Logger.getGlobal().info("Piece clicked: " + pieceId);
-			Logger.getGlobal().info("Piece clicked x: " + xSelectedPieceSurrondingImage);
-			Logger.getGlobal().info("Piece clicked y: " + ySelectedPieceSurrondingImage);
+			@Override
+			public void pieceMoved(Object source, int pieceId) {
+
+				repaint();
+			}
+		});
+
+		this.addMouseMotionListener(new GridMouseMotionListener());
+
+		// Gestion des contrôles de la manipulation des pièces
+		KeyboardManager.addKeyboardListener(new KeyboardManager.KeyboardAdapter() {
+			
+			@Override
+			public void onKeyPressed(KeyboardManager.Keys key) {
+
+				if (null != selectedPiece) {
+
+					if (KeyboardManager.Keys.R == key) {
+
+						if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.SHIFT)) {
+
+							selectedPiece.rotateLeft();
+						}
+						else if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.CONTROL)) {
+
+							selectedPiece.reverse();
+						}
+						else {
+
+							selectedPiece.rotateRight();
+						}
+
+						repaint();
+					}
+				}
+			}
+		});
+
+		// Gestion des contrôles de la sélection des pièces
+		KeyboardManager.addKeyboardListener(new KeyboardManager.KeyboardAdapter() {
+
+			@Override
+			public void onKeyPressed(KeyboardManager.Keys key) {
+
+				if (KeyboardManager.Keys.TAB == key) {
+
+					int pieceId = (-1 == selectedPieceId) ? 1 : selectedPieceId + 1;
+
+					try {
+						
+						selectedPiece = playBoard.getPieceCloneById(pieceId);
+					} 
+					catch (Exception e) {
+
+						e.printStackTrace();
+						pieceId = 1;
+						selectedPiece = playBoard.getPieceCloneById(pieceId);
+					}
+
+					selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPiece.getPiece(), Color.CYAN);
+
+					Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
+					xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
+					ySelectedPieceSurrondingImage = upperLeftPieceCorner.y;
+
+					selectedPieceId = pieceId;
+
+					xClickOriginSelectedPiece = 0;
+					yClickOriginSelectedPiece = 0;
+
+					repaint();
+				}
+			}
+		});
+
+		// Gestion des contrôles du déplacement des pièces
+		KeyboardManager.addKeyboardListener(new KeyboardManager.KeyboardAdapter() {
+
+			@Override
+			public void onKeyPressed(KeyboardManager.Keys key) {
+
+				if (null != selectedPiece) {
+
+					switch (key) {
+						
+						case UP -> {
+
+							mousePosition.setLocation(
+								mousePosition.getX(),
+								mousePosition.getY() - 1
+							);
+
+							repaint();
+						}
+
+						case DOWN -> {
+
+							mousePosition.setLocation(
+								mousePosition.getX(),
+								mousePosition.getY() + 1
+							);
+
+							repaint();
+						}
+
+						case LEFT -> {
+
+							mousePosition.setLocation(
+								mousePosition.getX() - 1,
+								mousePosition.getY()
+							);
+
+							repaint();
+						}
+
+						case RIGHT -> {
+
+							mousePosition.setLocation(
+								mousePosition.getX() + 1,
+								mousePosition.getY()
+							);
+
+							repaint();
+						}
+
+						default -> {}
+					}
+				}
+			}
 		});
     }
 
@@ -142,42 +286,55 @@ public class Grid extends JPanel implements IPieceClickedListenable {
 			);
 		}
 
-		// if (controller.getSelectedPiece() != null) {
+		if (selectedPiece != null) {
 
-		// 	// Get the position of the mouse in the grid
-		// 	int x = (int) ((mousePosition.getX() - xGridDeb) / ((xGridFin - xGridDeb) / matrices[0].length));
-		// 	int y = (int) ((mousePosition.getY() - yGridDeb) / ((yGridFin - yGridDeb) / matrices.length));
+			System.out.println("xClickOriginSelectedPiece : " + xClickOriginSelectedPiece);
+			System.out.println("yClickOriginSelectedPiece : " + yClickOriginSelectedPiece);
 
-		// 	int[][] piece = controller.getSelectedPiece().getBounds();
-		// 	Image img = controller.getImageById(controller.getSelectedPiece().getInstanceId());
+			Image cellImage = playBoard.getCellImageByPieceId(selectedPieceId);
+			boolean[][] pieceMatrix = selectedPiece.getPiece();
 
-		// 	for (int i = 0; i < piece.length; i++) {
+			int x = mousePosition.x;
+			int y = mousePosition.y;
 
-		// 		for (int j = 0; j < piece[i].length; j++) {
+			for (int i = 0; i < selectedPiece.getHeight(); i++) {
 
-		// 			if (piece[i][j] != 0) {
+				for (int j = 0; j < selectedPiece.getWidth(); j++) {
 
-		// 				int x2 = (x + j - 1);
-		// 				int y2 = (y + i - 1);
+					if (pieceMatrix[i][j]) {
 
-		// 				if (x2 - j < 0) x2 = j;
-		// 				if (y2 - i < 0) y2 = i;
+						g2d.drawImage(
+							cellImage,
+							(x + j - xClickOriginSelectedPiece) * componentSize + (int) paddingWidth / 2 + 1,
+							(y + i - yClickOriginSelectedPiece) * componentSize + (int) paddingHeight / 2 + 1,
+							componentSize,
+							componentSize,
+							null
+						);
+					}
+				}
+			}
+		}
 
-		// 				if (x2 + (piece[i].length - j) > matrices[0].length) x2 = matrices[0].length - piece[i].length + j;
-		// 				if (y2 + (piece.length - i) > matrices.length) y2 = matrices.length - piece.length + i;
+		Point upperLeftCorner = playBoard.getUpperLeftPieceCorner();
+		Point lowerRightCorner = playBoard.getLowerRightPieceCorner();
+		
+		int width = lowerRightCorner.x - upperLeftCorner.x + 1;
+		int height = lowerRightCorner.y - upperLeftCorner.y + 1;
 
-		// 				g2d.drawImage(
-		// 					img,
-		// 					x2 * (int) componentSize + (int) paddingWidth / 2 + 1,
-		// 					y2 * (int) componentSize + (int) paddingHeight / 2 + 1,
-		// 					(int) componentSize,
-		// 					(int) componentSize,
-		// 					null
-		// 				);
-		// 			}
-		// 		}
-		// 	}
-		// }
+		Image surrondingRectangleImage = PieceRenderUtils.createSurrondingRectangleImage(width, height);
+
+		if (null != surrondingRectangleImage && false == isPreview) {
+
+			g2d.drawImage(
+				surrondingRectangleImage,
+				upperLeftCorner.x * componentSize + (int) paddingWidth / 2 + 1,
+				upperLeftCorner.y * componentSize + (int) paddingHeight / 2 + 1,
+				width * componentSize,
+				height * componentSize,
+				null
+			);
+		}
 	}
 
 	private final Point mousePosition = new Point(0, 0);
@@ -187,16 +344,66 @@ public class Grid extends JPanel implements IPieceClickedListenable {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 
-			mousePosition.setLocation(e.getX(), e.getY());
+			mousePosition.setLocation(
+				(int) ((e.getX() - xGridDeb) / ((xGridFin - xGridDeb) / playBoard.getWidth())),
+				(int) ((e.getY() - yGridDeb) / ((yGridFin - yGridDeb) / playBoard.getHeight()))
+			);
 
-			int x = (int) ((mousePosition.getX() - xGridDeb) / ((xGridFin - xGridDeb) / playBoard.getWidth()));
-			int y = (int) ((mousePosition.getY() - yGridDeb) / ((yGridFin - yGridDeb) / playBoard.getHeight()));
+			int x = mousePosition.x;
+			int y = mousePosition.y;
 
 			int pieceId = playBoard.getPieceIdAt(x, y);
 
 			if (pieceId != 0) {
 
-				Grid.this.firePieceClicked(Grid.this, pieceId);
+				System.out.println("pieceId : " + pieceId);
+
+				selectedPiece = playBoard.getPieceCloneById(pieceId);
+
+				selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPiece.getPiece(), Color.CYAN);
+
+				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
+				xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
+				ySelectedPieceSurrondingImage = upperLeftPieceCorner.y;
+
+				selectedPieceId = pieceId;
+
+				xClickOriginSelectedPiece = x - upperLeftPieceCorner.x;
+				yClickOriginSelectedPiece = y - upperLeftPieceCorner.y;
+
+				repaint();
+
+				return;
+			}
+
+			if (selectedPiece != null) {
+
+				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(selectedPieceId);
+				Piece tempPiece = playBoard.getPieceCloneById(selectedPieceId);
+				playBoard.removePiceFromBoardWithoutUnregistration(selectedPieceId);
+
+				if (playBoard.canBePlaced(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPiece)) {
+
+					playBoard.placePieceWithoutRegistration(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPiece, selectedPieceId);
+					System.out.println(playBoard);
+
+					selectedPieceId = -1;
+					xClickOriginSelectedPiece = -1;
+					yClickOriginSelectedPiece = -1;
+
+					selectedPieceSurrondingImage = null;
+					xSelectedPieceSurrondingImage = -1;
+					ySelectedPieceSurrondingImage = -1;
+
+					selectedPiece = null;
+
+					repaint();
+					return;
+				}
+				else {
+
+					playBoard.placePieceWithoutRegistration(upperLeftPieceCorner.x, upperLeftPieceCorner.y, tempPiece, selectedPieceId);
+				}
 			}
 		}
 	}
@@ -206,37 +413,15 @@ public class Grid extends JPanel implements IPieceClickedListenable {
 		@Override
 		public void mouseMoved(MouseEvent e) {
 
-			// if (controller.getSelectedPiece() != null) {
+			mousePosition.setLocation(
+				(int) ((e.getX() - xGridDeb) / ((xGridFin - xGridDeb) / playBoard.getWidth())),
+				(int) ((e.getY() - yGridDeb) / ((yGridFin - yGridDeb) / playBoard.getHeight()))
+			);
 
-			// 	mousePosition.setLocation(e.getX(), e.getY());
-			// 	repaint();
-			// }
+			if (selectedPiece != null) {
+
+				repaint();
+			}
 		}
-	}
-
-	private List<IPieceClickedListener> pieceClickedListeners = new LinkedList<>();
-
-	public void addPieceClickedListener(IPieceClickedListener listener) {
-
-		this.pieceClickedListeners.add(listener);
-	}
-
-	public void removePieceClickedListener(IPieceClickedListener listener) {
-
-		this.pieceClickedListeners.remove(listener);
-	}
-
-	private void firePieceClicked(Object source, int pieceId) {
-
-		for (IPieceClickedListener listener : this.pieceClickedListeners) {
-
-			listener.pieceClicked(source, pieceId);
-		}
-	}
-
-	public void unselectPiece() {
-
-		selectedPieceSurrondingImage = null;
-		repaint();
 	}
 }

@@ -1,7 +1,7 @@
 package view.component.board;
 
 import piece.Piece;
-import view.component.board.listener.IPieceClickedListenable;
+import view.component.board.listener.IPieceManipulationComponent;
 import view.utils.SwingUtils;
 
 import javax.swing.*;
@@ -13,7 +13,7 @@ import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-public class PieceBoard extends JPanel {
+public class PieceBoard extends JPanel implements IPieceManipulationComponent {
 
 	private final PlayBoard playBoard;
 
@@ -26,7 +26,7 @@ public class PieceBoard extends JPanel {
 	private Piece selectedPiece = null;
 	private int selectedPieceId = -1;
 
-	public PieceBoard(PlayBoard playBoard, IPieceClickedListenable pieceClickedListenable) {
+	public PieceBoard(PlayBoard playBoard) {
 
 		super();
 
@@ -61,20 +61,9 @@ public class PieceBoard extends JPanel {
 
 		btnCancel.addActionListener(e -> {
 
-			this.selectedPiece = null;
-			this.selectedPieceId = -1;
-
-			pieceClickedListenable.unselectPiece();
+			unSelectPiece();
 
 			getParent().repaint();
-		});
-
-		pieceClickedListenable.addPieceClickedListener((Object source, int pieceId) -> {
-
-			selectedPiece = playBoard.getPieceCloneById(pieceId);
-			selectedPieceId = pieceId;
-
-			repaint();
 		});
 	}
 
@@ -211,5 +200,30 @@ public class PieceBoard extends JPanel {
 				}
 			}
 		}
+	}
+
+	@Override
+	public Piece getSelectedPiece() {
+		
+		return this.selectedPiece;
+	}
+
+	@Override
+	public void unSelectPiece() {
+		
+		this.selectedPiece = null;
+		this.selectedPieceId = -1;
+
+		repaint();
+	}
+
+	@Override
+	public void selectPiece(int pieceId) {
+		
+		Piece piece = playBoard.getPieceCloneById(pieceId);
+		selectedPieceId = pieceId;
+		selectedPiece = piece;
+
+		repaint();
 	}
 }
