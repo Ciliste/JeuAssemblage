@@ -22,6 +22,7 @@ import factory.ZFactory;
 import model.listener.IPlayBoardListenable;
 import model.listener.IPlayBoardListener;
 import piece.Piece;
+import utils.EDifficulty;
 import view.utils.PieceRenderUtils;
 
 public class PlayBoard implements IPlayBoardListenable {
@@ -434,22 +435,22 @@ public class PlayBoard implements IPlayBoardListenable {
 		return sb.toString();
 	}
 
-	public static int getSizeXBySeedAndDifficulty(long seed, Difficulty difficulty) {
+	public static int getSizeXBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
 		return new Random(seed).nextInt(difficulty.getMaxSizeX() - difficulty.getMinSizeX() + 1) + difficulty.getMinSizeX();
 	}
 
-	public static int getSizeYBySeedAndDifficulty(long seed, Difficulty difficulty) {
+	public static int getSizeYBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
 		return new Random(seed + 1).nextInt(difficulty.getMaxSizeY() - difficulty.getMinSizeY() + 1) + difficulty.getMinSizeY();
 	}
 
-	public static int getPiecesCountBySeedAndDifficulty(long seed, Difficulty difficulty) {
+	public static int getPiecesCountBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
 		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1) + difficulty.getMinNbPieces();
 	}
 
-	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces, Difficulty difficulty) {
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces, EDifficulty difficulty) {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();

@@ -8,13 +8,13 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import main.listener.EventListener;
 import model.PlayBoard;
+import observer.interfaces.Listener;
 import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
-public class Finish extends JPanel implements EventListener{
+public class Finish extends JPanel implements Listener {
 
     private final JLabel lblPreciseArea = new JLabel();
     private final JLabel lblArea        = new JLabel();
@@ -49,9 +49,9 @@ public class Finish extends JPanel implements EventListener{
 
     @Override
     public void update() {
-        // int[] areaInfo = this.controller.areaInfomartion();
-        // lblPreciseArea.setText("Nombre de carrés : " + areaInfo[4]);
-        // lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
+        //int[] areaInfo = this.controller.areaInfomartion();
+        //lblPreciseArea.setText("Nombre de carrés : " + areaInfo[4]);
+        //lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
     }
 
     @Override

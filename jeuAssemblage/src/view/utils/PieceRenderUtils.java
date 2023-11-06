@@ -115,8 +115,6 @@ public final class PieceRenderUtils {
 						g.setColor(color);
 						g.fillRect((j + 1) * CELL_PIXEL_SIZE - 2, i * CELL_PIXEL_SIZE, 2, CELL_PIXEL_SIZE);
 					}
-
-					Logger.getGlobal().info("i: " + i + " j: " + j);
 				}
 			}
 		}

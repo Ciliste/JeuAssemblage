@@ -31,7 +31,6 @@ public class PieceBoard extends JPanel implements IPieceManipulationComponent {
 		super();
 
 		this.playBoard = playBoard;
-		// controller.getPlayBoard().
 
 		this.setLayout(null);
 
@@ -44,19 +43,16 @@ public class PieceBoard extends JPanel implements IPieceManipulationComponent {
 		btnTurnLeft.addActionListener(e -> {
 
 			selectedPiece.rotateLeft();
-			getParent().repaint();
 		});
 
 		btnTurnRight.addActionListener(e -> {
 
 			selectedPiece.rotateRight();
-			getParent().repaint();
 		});
 
 		btnReverse.addActionListener(e -> {
 
 			selectedPiece.reverse();
-			getParent().repaint();
 		});
 
 		btnCancel.addActionListener(e -> {
