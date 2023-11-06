@@ -1,19 +1,21 @@
 package view.component.board;
 
 import piece.Piece;
+import utils.ETypeListen;
 import view.component.board.listener.IPieceClickedListenable;
 import view.utils.SwingUtils;
 
 import javax.swing.*;
 
 import model.PlayBoard;
+import observer.interfaces.Listener;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-public class PieceBoard extends JPanel {
+public class PieceBoard extends JPanel implements Listener {
 
 	private final PlayBoard playBoard;
 
@@ -31,6 +33,7 @@ public class PieceBoard extends JPanel {
 		super();
 
 		this.playBoard = playBoard;
+		this.playBoard.addListener(ETypeListen.PIECEVIEW.typeListen, this);
 		// controller.getPlayBoard().
 
 		this.setLayout(null);
@@ -44,19 +47,16 @@ public class PieceBoard extends JPanel {
 		btnTurnLeft.addActionListener(e -> {
 
 			selectedPiece.rotateLeft();
-			getParent().repaint();
 		});
 
 		btnTurnRight.addActionListener(e -> {
 
 			selectedPiece.rotateRight();
-			getParent().repaint();
 		});
 
 		btnReverse.addActionListener(e -> {
 
 			selectedPiece.reverse();
-			getParent().repaint();
 		});
 
 		btnCancel.addActionListener(e -> {
@@ -211,5 +211,10 @@ public class PieceBoard extends JPanel {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void update() {
+		this.repaint();
 	}
 }

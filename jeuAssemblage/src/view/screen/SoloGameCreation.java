@@ -10,8 +10,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 
-import model.Difficulty;
 import model.PlayBoard;
+import utils.EDifficulty;
 import view.MainFrame;
 import view.component.Separator;
 import view.utils.DocumentAdapter;
@@ -37,7 +37,7 @@ public class SoloGameCreation extends JPanel {
     private final JSpinner nbPiecesSpinner = new JSpinner();
 
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
-	private final JList<String> difficultyList = new JList<String>(Difficulty.getDifficultysName());
+	private final JList<String> difficultyList = new JList<String>(EDifficulty.getDifficultysName());
 
     private final JButton btnPlay = new JButton("Jouer");
     
@@ -101,7 +101,7 @@ public class SoloGameCreation extends JPanel {
 				Integer.parseInt(txtSizeX.getText()),
 				Integer.parseInt(txtSizeY.getText()), 
 				(int) nbPiecesSpinner.getValue(), 
-				Difficulty.getDifficultyFromName(difficultyList.getSelectedValue())
+				EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue())
 			);
 
 			mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard));
@@ -228,7 +228,7 @@ public class SoloGameCreation extends JPanel {
 
     private void seedUpdated(long seed) {
 
-		Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+		EDifficulty difficulty = EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue());
 
         txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
         txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));

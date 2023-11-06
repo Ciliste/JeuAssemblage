@@ -3,7 +3,9 @@ package view.component.board;
 import static view.utils.SwingUtils.*;
 
 import model.PlayBoard;
+import observer.interfaces.Listener;
 import piece.Piece;
+import utils.ETypeListen;
 import view.component.board.listener.IPieceClickedListenable;
 import view.component.board.listener.IPieceClickedListener;
 import view.utils.PieceRenderUtils;
@@ -23,7 +25,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
-public class Grid extends JPanel implements IPieceClickedListenable {
+public class Grid extends JPanel implements IPieceClickedListenable, Listener {
 
 	private final PlayBoard playBoard;
 
@@ -40,6 +42,7 @@ public class Grid extends JPanel implements IPieceClickedListenable {
     public Grid(PlayBoard playBoard) {
         
 		this.playBoard = playBoard;
+		this.playBoard.addListener(ETypeListen.PLAYVIEW.typeListen, this);
 
         this.setLayout(null);
 
@@ -60,9 +63,9 @@ public class Grid extends JPanel implements IPieceClickedListenable {
 
 			repaint();
 
-			Logger.getGlobal().info("Piece clicked: " + pieceId);
-			Logger.getGlobal().info("Piece clicked x: " + xSelectedPieceSurrondingImage);
-			Logger.getGlobal().info("Piece clicked y: " + ySelectedPieceSurrondingImage);
+			// Logger.getGlobal().info("Piece clicked: " + pieceId);
+			// Logger.getGlobal().info("Piece clicked x: " + xSelectedPieceSurrondingImage);
+			// Logger.getGlobal().info("Piece clicked y: " + ySelectedPieceSurrondingImage);
 		});
     }
 
@@ -238,5 +241,10 @@ public class Grid extends JPanel implements IPieceClickedListenable {
 
 		selectedPieceSurrondingImage = null;
 		repaint();
+	}
+
+		@Override
+	public void update() {
+		this.repaint();
 	}
 }

@@ -1,6 +1,8 @@
 package piece;
 
-public class Piece {
+import observer.AbstractListenableAL;
+
+public class Piece extends AbstractListenableAL implements Cloneable {
     
 	private boolean[][] piece;
 
@@ -34,6 +36,12 @@ public class Piece {
 	}
 
 	public void rotateLeft() {
+		this.rotateLeftWithoutEvent();
+
+		this.fireAllEvents();
+	}
+
+	private void rotateLeftWithoutEvent() {
 
 		boolean[][] rotated = new boolean[piece[0].length][piece.length];
 
@@ -46,12 +54,13 @@ public class Piece {
 		}
 
 		piece = rotated;
+		
 	}
 
 	public void rotateRight() {
 
-		rotateLeft();
-		rotateLeft();
+		rotateLeftWithoutEvent();
+		rotateLeftWithoutEvent();
 		rotateLeft();
 	}
 
@@ -68,11 +77,20 @@ public class Piece {
 		}
 
 		piece = reversed;
+		
+		this.fireAllEvents();
 	}
 
 	public static Piece clone(Piece piece) {
+		try {
+			Piece p = (Piece) piece.clone();
+			p.piece = piece.piece.clone();
+			return p;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 
-		return new Piece(piece.piece.clone());
 	}
 
 	public static void main(String[] args) {

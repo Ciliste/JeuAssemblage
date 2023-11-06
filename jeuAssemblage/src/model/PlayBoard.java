@@ -2,11 +2,7 @@ package model;
 
 import java.awt.Image;
 import java.awt.Point;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import factory.HFactory;
 import factory.IFactory;
@@ -15,10 +11,14 @@ import factory.OFactory;
 import factory.PieceFactory;
 import factory.TFactory;
 import factory.ZFactory;
+import observer.AbstractListenableHM;
+import observer.interfaces.Listener;
 import piece.Piece;
+import utils.EDifficulty;
+import utils.ETypeListen;
 import view.utils.PieceRenderUtils;
 
-public class PlayBoard {
+public class PlayBoard extends AbstractListenableHM implements Listener {
 
 	private static final int EMPTY = 0;
 
@@ -60,8 +60,6 @@ public class PlayBoard {
 
 	void randomlyPlacePiece(Piece piece) {
 
-		System.out.println("Randomly placing piece: " + piece);
-
 		Random random = new Random(this.seed + piecesMap.size() + 1);
 	
 		// Define constants for readability
@@ -80,8 +78,6 @@ public class PlayBoard {
 		for (int i = 0; i < board.length; i++) {
 	
 			for (int j = 0; j < board[i].length; j++) {
-	
-				System.out.println("Trying to place piece at: " + j + ", " + i);
 
 				if (placePiece(j, i, piece)) {
 	
@@ -145,7 +141,7 @@ public class PlayBoard {
 
 	private boolean placePiece(int x, int y, Piece piece) {
 
-		if (canBePlaced(x, y, piece)) {
+		if (this.canBePlaced(x, y, piece)) {
 
 			int pieceId = piecesMap.size() + 1;
 			boolean[][] pieceMatrix = piece.getPiece();
@@ -161,7 +157,7 @@ public class PlayBoard {
 				}
 			}
 
-			registerPiece(pieceId, piece);
+			this.registerPiece(pieceId, piece);
 
 			return true;
 		}
@@ -171,7 +167,7 @@ public class PlayBoard {
 		}
 	}
 
-	void removePiceFromBoard(Piece piece) {
+	void removePieceFromBoard(Piece piece) {
 
 		int pieceId = this.getPieceId(piece);
 
@@ -186,7 +182,7 @@ public class PlayBoard {
 			}
 		}
 
-		unregisterPiece(pieceId);
+		this.unregisterPiece(pieceId);
 	}
 
 	boolean movePiece(Piece piece, int x, int y) {
@@ -197,10 +193,12 @@ public class PlayBoard {
 
 			Image cell = this.piecesImagesMap.get(pieceId);
 
-			removePiceFromBoard(piece);
-			placePiece(x, y, piece);
+			this.removePieceFromBoard(piece);
+			this.placePiece(x, y, piece);
 
 			this.piecesImagesMap.put(pieceId, cell);
+
+			this.fireAllEvents();
 
 			return true;
 		}
@@ -221,7 +219,8 @@ public class PlayBoard {
 
 	public Piece getPieceCloneById(int pieceId) {
 
-		return Piece.clone(this.piecesMap.get(pieceId));
+		Piece p = Piece.clone(this.piecesMap.get(pieceId));
+		return p;
 	}
 
 	private boolean canBePlaced(int x, int y, Piece piece) {
@@ -262,6 +261,8 @@ public class PlayBoard {
 
 	private void unregisterPiece(int pieceId) {
 
+		this.piecesMap.get(pieceId).removeListener(this);
+
 		this.piecesMap.remove(pieceId);
 		this.piecesImagesMap.remove(pieceId);
 	}
@@ -300,22 +301,27 @@ public class PlayBoard {
 		return sb.toString();
 	}
 
-	public static int getSizeXBySeedAndDifficulty(long seed, Difficulty difficulty) {
+	@Override
+	public void update() {
+		this.fireEvents(ETypeListen.PIECEVIEW.typeListen);
+	}
+
+	public static int getSizeXBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
 		return new Random(seed).nextInt(difficulty.getMaxSizeX() - difficulty.getMinSizeX() + 1) + difficulty.getMinSizeX();
 	}
 
-	public static int getSizeYBySeedAndDifficulty(long seed, Difficulty difficulty) {
+	public static int getSizeYBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
 		return new Random(seed + 1).nextInt(difficulty.getMaxSizeY() - difficulty.getMinSizeY() + 1) + difficulty.getMinSizeY();
 	}
 
-	public static int getPiecesCountBySeedAndDifficulty(long seed, Difficulty difficulty) {
+	public static int getPiecesCountBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
 		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1) + difficulty.getMinNbPieces();
 	}
 
-	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces, Difficulty difficulty) {
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces, EDifficulty difficulty) {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
@@ -326,6 +332,8 @@ public class PlayBoard {
 
 			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
 			Piece piece = pieceFactory.createPiece(0);
+			
+			piece.addListener(playBoard);
 
 			playBoard.randomlyPlacePiece(piece);
 		}
