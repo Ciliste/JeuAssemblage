@@ -166,23 +166,12 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 			return false;
 		}
 	}
+	
 
 	void removePieceFromBoard(Piece piece) {
-
-		int pieceId = this.getPieceId(piece);
-
-		for (int i = 0; i < this.board.length; i++) {
-
-			for (int j = 0; j < this.board[i].length; j++) {
-
-				if (this.board[i][j] == pieceId) {
-
-					this.board[i][j] = EMPTY;
-				}
-			}
-		}
-
-		this.unregisterPiece(pieceId);
+		removePieceFromBoardWithoutUnregister(piece);
+		
+		this.unregisterPiece(getPieceId(piece));
 	}
 
 	boolean movePiece(Piece piece, int x, int y) {
@@ -207,6 +196,23 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 			return false;
 		}
 	}
+	
+	private boolean swap(Piece p1, Piece p2) {
+		int id1 = getPieceId(p1);
+		int id2 = getPieceId(p2);
+
+		Point pointP1 = getUpperLeftPieceCornerById(id1);
+		Point pointP2 = getUpperLeftPieceCornerById(id2);
+
+		if (canBeSwapped(pointP2.x, pointP2.y, p1, id2) && canBeSwapped(pointP1.x, pointP1.y, p2, id1)) {
+			removePieceFromBoardWithoutUnregister(p1);
+			placePiece(pointP1.x, pointP1.y, p2);
+			placePiece(pointP2.x, pointP2.y, p1);
+			return true;
+		}
+
+		return false;
+	}
 
 	private int getPieceId(Piece piece) {
 
@@ -223,36 +229,48 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		return p;
 	}
 
+	private void removePieceFromBoardWithoutUnregister(Piece piece) {
+		int pieceId = this.getPieceId(piece);	
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				if (this.board[i][j] == pieceId) {
+
+					this.board[i][j] = EMPTY;
+				}
+			}
+		}
+	}
+
 	private boolean canBePlaced(int x, int y, Piece piece) {
+		return canBeSwapped(x, y, piece, EMPTY);
+	}
+
+	private boolean canBeSwapped(int x, int y, Piece piece, int ignoreId) {
 
 		boolean[][] pieceMatrix = piece.getPiece();
 
 		boolean canBePlaced = true;
-		for (int i = 0; i < piece.getHeight(); i++) {
+		for (int i = 0; i < piece.getHeight() && canBePlaced; i++) {
 
-			for (int j = 0; j < piece.getWidth(); j++) {
+			for (int j = 0; j < piece.getWidth() && canBePlaced; j++) {
 
-				if (pieceMatrix[i][j] == false) {
-
-					continue;
-				}
-
-				if ((y + i < this.board.length && x + j < this.board[0].length && this.board[y + i][x + j] == EMPTY) == false) {
-
-					canBePlaced = false;
-					break;
-				}
-			}
-
-			if (canBePlaced == false) {
-
-				break;
+				if (pieceMatrix[i][j] == true) {
+					boolean isEmpty = this.board[y + i][x + j] == EMPTY || this.board[y + i][x + j] == ignoreId;
+					canBePlaced = !(
+						y + i < this.board.length && 
+						x + j < this.board[0].length && 
+						isEmpty
+					);
+				}	
 			}
 		}
 
 		return canBePlaced;
 	}
-
+	
 	private void registerPiece(int pieceId, Piece piece) {
 
 		this.piecesMap.put(pieceId, piece);
@@ -345,6 +363,11 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 
 		return new PlayBoard(seed, sizeX, sizeY);
 	}
+
+	public static PlayBoard constructEmptyPlayBoardCopy(PlayBoard p) {
+
+		return new PlayBoard(p.seed, p.sizeX, p.sizeY);
+	}	
 
 	private static List<PieceFactory> getPossiblePieceFactorys() {
 
