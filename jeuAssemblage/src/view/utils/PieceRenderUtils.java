@@ -131,6 +131,42 @@ public final class PieceRenderUtils {
 		return image;
 	}
 
+	public static BufferedImage createSurrondingRectangleImage(int width, int height) {
+		
+		return createSurrondingRectangleImage(width, height, Color.RED);
+	}
+
+	public static BufferedImage createSurrondingRectangleImage(int width, int height, Color color) {
+
+		System.out.println("width: " + width + " height: " + height);
+
+		if (width < 1 || height < 1) {
+
+			return null;
+		}
+
+		// Create a new image
+		BufferedImage image = new BufferedImage(width * CELL_PIXEL_SIZE, height * CELL_PIXEL_SIZE, BufferedImage.TYPE_INT_ARGB);
+
+		// Get the graphics of the image
+		Graphics g = image.getGraphics();
+
+		g.setColor(color);
+		g.fillRect(0, 0, width * CELL_PIXEL_SIZE, 2);
+		g.fillRect(0, 0, 2, height * CELL_PIXEL_SIZE);
+		g.fillRect(0, height * CELL_PIXEL_SIZE - 2, width * CELL_PIXEL_SIZE, 2);
+		g.fillRect(width * CELL_PIXEL_SIZE - 2, 0, 2, height * CELL_PIXEL_SIZE);
+
+		try {
+			File output = new File("test.png");
+			ImageIO.write(image, "png", output);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return image;
+	}
+
 	// public static void main(String[] args) {
 		
 	// 	int[][] piece = PieceFactory.createPieceT().getBounds();

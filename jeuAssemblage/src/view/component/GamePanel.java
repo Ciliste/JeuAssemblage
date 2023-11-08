@@ -25,17 +25,18 @@ public class GamePanel extends JPanel {
 
 		this.setLayout(null);
 
+		this.pieceBoard = new PieceBoard(playBoard);
 		this.grid = new Grid(playBoard);
-		this.pieceBoard = new PieceBoard(playBoard, this.grid);
 		this.finish = new Finish(mainFrame, playBoard);
 
 		this.add(this.grid);
-		this.add(this.pieceBoard);
-		this.add(this.finish);
+		// this.add(this.pieceBoard);
+		// this.add(this.finish);
 	}
 
 	@Override
 	public void doLayout() {
+
 		super.doLayout();
 
 		this.grid.setBounds(
