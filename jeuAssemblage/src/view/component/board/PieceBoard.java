@@ -7,13 +7,12 @@ import view.utils.SwingUtils;
 import javax.swing.*;
 
 import model.PlayBoard;
+import observer.interfaces.Listener;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.Arrays;
-import java.util.logging.Logger;
 
-public class PieceBoard extends JPanel implements IPieceManipulationComponent {
+public class PieceBoard extends JPanel implements IPieceManipulationComponent, Listener {
 
 	private final PlayBoard playBoard;
 
@@ -215,11 +214,14 @@ public class PieceBoard extends JPanel implements IPieceManipulationComponent {
 
 	@Override
 	public void selectPiece(int pieceId) {
-		
+
 		Piece piece = playBoard.getPieceCloneById(pieceId);
 		selectedPieceId = pieceId;
 		selectedPiece = piece;
-
-		repaint();
+	}
+	
+	@Override
+	public void update() {
+		this.repaint();
 	}
 }

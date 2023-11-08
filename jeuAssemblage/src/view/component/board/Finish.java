@@ -9,11 +9,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import model.PlayBoard;
+import observer.interfaces.Listener;
+import utils.ETypeListen;
 import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
-public class Finish extends JPanel {
+public class Finish extends JPanel implements Listener{
 
     private final JLabel lblPreciseArea = new JLabel();
     private final JLabel lblArea        = new JLabel();
@@ -29,6 +31,7 @@ public class Finish extends JPanel {
 
 		this.mainFrame = mainFrame;
         this.playBoard = playBoard;
+        this.playBoard.addListener(ETypeListen.AREAVIEW.typeListen, this);
         // this.controller.addListener(this);
 
         this.setLayout(null);
@@ -78,5 +81,10 @@ public class Finish extends JPanel {
 
         SwingUtils.drawDebugBounds(this, g);
     }
+
+    @Override
+	public void update() {
+		this.repaint();
+	}
     
 }
