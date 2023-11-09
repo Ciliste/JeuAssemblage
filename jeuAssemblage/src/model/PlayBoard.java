@@ -33,7 +33,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 	private static final int EMPTY = 0;
 
-	private final int[][] board;
+	private int[][] board;
 
 	private final Map<Integer, Piece> piecesMap;
 	private final Map<Integer, Image> piecesImagesMap;
@@ -166,7 +166,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		this.unregisterPiece(piece);
 	}
 
-	public boolean movePiece(Piece piece, int x, int y) {
+	public boolean movePiece(int x, int y, Piece piece) {
 
 		if (canBePlaced(x, y, piece)) {
 
@@ -192,17 +192,30 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		int id1 = getPieceId(p1);
 		int id2 = getPieceId(p2);
 
+		System.out.println(this);
 		Point pointP1 = getUpperLeftPieceCornerById(id1);
 		Point pointP2 = getUpperLeftPieceCornerById(id2);
+
+		int[][] rollback = new int[this.board.length][this.board[0].length];
+		for(int i = 0; i < this.board.length; i++)
+    		rollback[i] = this.board[i].clone();
+
 
 		if (canBeSwapped(pointP2.x, pointP2.y, p1, id2) && canBeSwapped(pointP1.x, pointP1.y, p2, id1)) {
 
 			removePieceFromBoardWithoutRegistration(p1);
-			placePieceAsId(pointP1.x, pointP1.y, p2, id2);
-			placePieceAsId(pointP2.x, pointP2.y, p1, id1);
+			removePieceFromBoardWithoutRegistration(p2);
 
-			return true;
+			if (placePieceAsId(pointP1.x, pointP1.y, p2, id2) && placePieceAsId(pointP2.x, pointP2.y, p1, id1)) {
+				return true;
+			}
 		}
+		
+		System.out.println("pas bon");
+		System.out.println(this);
+		this.board = rollback;
+		piecesMap.put(id1, p1);
+		piecesMap.put(id2, p2);
 
 		return false;
 	}
@@ -240,11 +253,10 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			for (int j = 0; j < piece.getWidth() && canBePlaced; j++) {
 
 				if (pieceMatrix[i][j] == true) {
-					boolean isEmpty = this.board[y + i][x + j] == EMPTY || this.board[y + i][x + j] == ignoreId;
 					canBePlaced = (
 						y + i < this.board.length && 
 						x + j < this.board[0].length && 
-						isEmpty
+						(this.board[y + i][x + j] == EMPTY || this.board[y + i][x + j] == ignoreId)
 					);
 				}	
 			}
@@ -286,7 +298,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			for (int j = 0; j < this.board[i].length; j++) {
 
-				sb.append((this.board[i][j] == EMPTY) ? "0 " : this.board[i][j] + " ");
+				sb.append((this.board[i][j] == EMPTY) ? "  " : this.board[i][j] + " ");
 				sb.append(" ");
 			}
 
