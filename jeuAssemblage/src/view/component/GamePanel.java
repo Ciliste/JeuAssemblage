@@ -31,7 +31,7 @@ public class GamePanel extends JPanel {
 
 		this.add(this.grid);
 		// this.add(this.pieceBoard);
-		// this.add(this.finish);
+		this.add(this.finish);
 	}
 
 	@Override
@@ -55,11 +55,10 @@ public class GamePanel extends JPanel {
 
 		this.finish.setBounds(
 			this.grid.getWidth(),
-		 	this.getHeight() - getHeightTimesPourcent(this, .4f),
+		 	0,
 		 	getWidthTimesPourcent (this, .2f),
-		 	getHeightTimesPourcent(this, .4f)
+		 	getHeightTimesPourcent(this, 1f)
 		);
-		
 	}
 
 	@Override
