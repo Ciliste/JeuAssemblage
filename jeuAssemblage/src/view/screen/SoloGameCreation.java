@@ -121,8 +121,7 @@ public class SoloGameCreation extends JPanel {
 				Long.parseLong(txtSeed.getText()), 
 				Integer.parseInt(txtSizeX.getText()),
 				Integer.parseInt(txtSizeY.getText()), 
-				(int) nbPiecesSpinner.getValue(), 
-				EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue())
+				(int) nbPiecesSpinner.getValue()
 			);
 
 			mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard));
@@ -288,16 +287,13 @@ public class SoloGameCreation extends JPanel {
 
 	private void updateGridPreview() {
 
-		EDifficulty difficulty = EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue());
-
 		remove(gridPreview);
 
 		gridPreview = new Grid(PlayBoard.constructPlayBoard(
 			Long.parseLong(txtSeed.getText()), 
 			Integer.parseInt(txtSizeX.getText()),
 			Integer.parseInt(txtSizeY.getText()), 
-			(int) nbPiecesSpinner.getValue(), 
-			difficulty
+			(int) nbPiecesSpinner.getValue()
 		), true);
 
 		add(gridPreview);

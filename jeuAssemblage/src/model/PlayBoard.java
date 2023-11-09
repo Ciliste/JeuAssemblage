@@ -63,14 +63,10 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		}
 	}
 
-	public int[][] getBoardArray() {
-
-		return this.board.clone();
-	}
 
 	void randomlyPlacePiece(Piece piece) {
 
-		System.out.println("Randomly placing piece: " + piece);
+		//System.out.println("Randomly placing piece: " + piece);
 
 		Random random = new Random(this.seed + piecesMap.size() + 1);
 	
@@ -96,7 +92,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 			int x = random.nextInt(this.board[0].length - piece.getWidth() + 1);
 			int y = random.nextInt(this.board.length - piece.getHeight() + 1);
 
-			System.out.println("Trying to place piece at: " + x + ", " + y);
+			//System.out.println("Trying to place piece at: " + x + ", " + y);
 
 			if (placePiece(x, y, piece)) {
 
@@ -119,134 +115,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		// 		}
 		// 	}
 		// }
-	}
-
-	public int getLowerPieceX() {
-
-		for (int x = 0; x < this.board[0].length; x++) {
-
-			for (int y = this.board.length - 1; y >= 0; y--) {
-
-				if (this.board[y][x] != EMPTY) {
-
-					return x;
-				}
-			}
-		}
-
-		throw new IllegalStateException("No piece found");
-	}
-
-	public int getLowerPieceY() {
-
-		for (int y = 0; y < this.board.length; y++) {
-
-			for (int x = 0; x < this.board[0].length; x++) {
-
-				if (this.board[y][x] != EMPTY) {
-
-					return y;
-				}
-			}
-		}
-
-		throw new IllegalStateException("No piece found");
-	}
-
-	public Point getUpperLeftPieceCorner() {
-
-		System.out.println("getUpperLeftPieceCorner() " + getLowerPieceX() + ", " + getLowerPieceY());
-
-		return new Point(getLowerPieceX(), getLowerPieceY());
-	}
-
-	public int getUpperPieceX() {
-
-		for (int x = this.board[0].length - 1; x >= 0; x--) {
-
-			for (int y = 0; y < this.board.length; y++) {
-
-				if (this.board[y][x] != EMPTY) {
-
-					return x;
-				}
-			}
-		}
-
-		throw new IllegalStateException("No piece found");
-	}
-
-	public int getUpperPieceY() {
-
-		for (int y = this.board.length - 1; y >= 0; y--) {
-
-			for (int x = this.board[0].length - 1; x >= 0; x--) {
-
-				if (this.board[y][x] != EMPTY) {
-
-					return y;
-				}
-			}
-		}
-
-		throw new IllegalStateException("No piece found");
-	}
-
-	public Point getLowerRightPieceCorner() {
-
-		return new Point(getUpperPieceX(), getUpperPieceY());
-	}
-
-	public int getLowerPieceXById(int pieceId) {
-
-		for (int x = 0; x < this.board[0].length; x++) {
-
-			for (int y = this.board.length - 1; y >= 0; y--) {
-
-				if (this.board[y][x] == pieceId) {
-
-					return x;
-				}
-			}
-		}
-
-		throw new IllegalStateException("Piece not found");
-	}
-
-	public int getLowerPieceYById(int pieceId) {
-
-		for (int y = 0; y < this.board.length; y++) {
-
-			for (int x = 0; x < this.board[0].length; x++) {
-
-				if (this.board[y][x] == pieceId) {
-
-					return y;
-				}
-			}
-		}
-
-		throw new IllegalStateException("Piece not found");
-	}
-
-	public Point getUpperLeftPieceCornerById(int pieceId) {
-
-		return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId));
-	}
-	
-	public int getWidth() {
-
-		return this.sizeX;
-	}
-
-	public int getHeight() {
-
-		return this.sizeY;
-	}
-
-	public int getPieceIdAt(int x, int y) {
-
-		return this.board[y][x];
 	}
 
 	public boolean placePiece(int x, int y, Piece piece) {
@@ -336,21 +204,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		return false;
 	}
 
-	private int getPieceId(Piece piece) {
-
-		return this.piecesMap.entrySet().stream()
-			.filter(entry -> entry.getValue().equals(piece))
-			.map(Map.Entry::getKey)
-			.findFirst()
-			.orElseThrow(() -> new IllegalStateException("Piece is not on board"));
-	}
-
-	public Piece getPieceCloneById(int pieceId) {
-
-		Piece p = Piece.clone(this.piecesMap.get(pieceId));
-		return p;
-	}
-
 	public void removePieceFromBoardWithoutRegistration(int pieceId) {	
 
 		for (int i = 0; i < this.board.length; i++) {
@@ -382,7 +235,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 
 				if (pieceMatrix[i][j] == true) {
 					boolean isEmpty = this.board[y + i][x + j] == EMPTY || this.board[y + i][x + j] == ignoreId;
-					canBePlaced = !(
+					canBePlaced = (
 						y + i < this.board.length && 
 						x + j < this.board[0].length && 
 						isEmpty
@@ -411,16 +264,11 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		return this.piecesImagesMap.get(pieceId);
 	}
 
-	public int getBoardWidth() {
-
-		return this.board[0].length;
+	@Override
+	public void update() {
+		this.fireEvents(ETypeListen.PIECEVIEW.typeListen);
 	}
-
-	public int getBoardHeight() {
-
-		return this.board.length;
-	}
-
+	
 	@Override
 	public String toString() {
 
@@ -430,7 +278,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 
 			for (int j = 0; j < this.board[i].length; j++) {
 
-				sb.append((this.board[i][j] == EMPTY) ? "  " : this.board[i][j] + " ");
+				sb.append((this.board[i][j] == EMPTY) ? "0 " : this.board[i][j] + " ");
 				sb.append(" ");
 			}
 
@@ -439,6 +287,140 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 
 		return sb.toString();
 	}
+
+
+	// -----------------
+	// GET METHODS
+	// -----------------
+
+	private int getPieceId(Piece piece) {
+
+		return this.piecesMap.entrySet().stream()
+				.filter(entry -> entry.getValue().equals(piece))
+				.map(Map.Entry::getKey)
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("Piece is not on board"));
+	}
+
+
+	public int getLowerPieceX() {
+
+		for (int x = 0; x < this.board[0].length; x++) {
+
+			for (int y = this.board.length - 1; y >= 0; y--) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getLowerPieceY() {
+
+		for (int y = 0; y < this.board.length; y++) {
+
+			for (int x = 0; x < this.board[0].length; x++) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public Point getUpperLeftPieceCorner() { return new Point(getLowerPieceX(), getLowerPieceY()); }
+
+	public int getUpperPieceX() {
+
+		for (int x = this.board[0].length - 1; x >= 0; x--) {
+
+			for (int y = 0; y < this.board.length; y++) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getUpperPieceY() {
+
+		for (int y = this.board.length - 1; y >= 0; y--) {
+
+			for (int x = this.board[0].length - 1; x >= 0; x--) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getLowerPieceXById(int pieceId) {
+
+		for (int x = 0; x < this.board[0].length; x++) {
+
+			for (int y = this.board.length - 1; y >= 0; y--) {
+
+				if (this.board[y][x] == pieceId) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("Piece not found");
+	}
+
+	public int getLowerPieceYById(int pieceId) {
+
+		for (int y = 0; y < this.board.length; y++) {
+
+			for (int x = 0; x < this.board[0].length; x++) {
+
+				if (this.board[y][x] == pieceId) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("Piece not found");
+	}
+
+	public Map<Integer, Piece> getPieces() { return this.piecesMap; }
+
+	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }
+	public Point getUpperLeftPieceCornerById(int pieceId) { return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId)); }
+	
+	public int getPieceIdAt(int x, int y) { return this.board[y][x]; }
+
+	public Piece getPieceCloneById(int pieceId) { return Piece.clone(this.piecesMap.get(pieceId)); }
+
+	public int getBoardWidth() { return this.board[0].length; }
+	public int getBoardHeight() { return this.board.length; }
+	public int[][] getBoardArray() { return this.board.clone(); }
+
+
+	public int getWidth() { return this.sizeX; }
+	public int getHeight() { return this.sizeY; }
+
+	// -----------------
+	// STATIC METHODS
+	// -----------------
 
 	public static int getSizeXBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
@@ -455,7 +437,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1) + difficulty.getMinNbPieces();
 	}
 
-	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces, EDifficulty difficulty) {
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
@@ -467,7 +449,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 
 			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
 			Piece piece = pieceFactory.createPiece(0);
-			
+			/*
 			Color color = null;
 			if (true == colorList.isEmpty()) {
 
@@ -475,12 +457,18 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 			}
 
 			color = colorList.remove(random.nextInt(colorList.size()));
-
-			playBoard.randomlyPlacePiece(piece);
+			
 			playBoard.piecesImagesMap.put(playBoard.getPieceId(piece), PieceRenderUtils.createCellImage(color));
+			*/
+			playBoard.randomlyPlacePiece(piece);
 		}
 
 		return playBoard;
+	}
+
+	public static PlayBoard constructCopyPlayBoard(PlayBoard parent) {
+		
+		return constructPlayBoard(parent.seed, parent.sizeX, parent.sizeY, parent.piecesMap.size());
 	}
 
 	public static PlayBoard constructEmptyPlayBoard(long seed, int sizeX, int sizeY) {
@@ -519,10 +507,5 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		colorList.add(Color.MAGENTA);
 
 		return colorList;
-	}
-	
-	@Override
-	public void update() {
-		this.fireEvents(ETypeListen.PIECEVIEW.typeListen);
 	}
 }
