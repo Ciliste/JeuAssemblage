@@ -421,7 +421,10 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		throw new IllegalStateException("Piece not found");
 	}
 
-	public Map<Integer, Piece> getPieces() { return this.piecesMap; }
+	public Map<Integer, Piece> getPieces() { 
+
+		return new HashMap<>(piecesMap);
+	}
 
 	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }
 	public Point getUpperLeftPieceCornerById(int pieceId) { return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId)); }
@@ -529,17 +532,16 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		return colorList;
 	}
 
-	private final List<IPlayBoardListener> listeners = new ArrayList<>();
-
 	@Override
 	public void addPlayBoardListener(IPlayBoardListener listener) {
-		
-		this.listeners.add(listener);
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'addPlayBoardListener'");
 	}
+
 
 	@Override
 	public void removePlayBoardListener(IPlayBoardListener listener) {
-		
-		this.listeners.remove(listener);
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'removePlayBoardListener'");
 	}
 }

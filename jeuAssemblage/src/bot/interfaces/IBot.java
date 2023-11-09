@@ -1,5 +1,6 @@
 package bot.interfaces;
 
 public interface IBot {
-    public void setDifficulty();
+
+    public abstract void setDifficulty();
 }
