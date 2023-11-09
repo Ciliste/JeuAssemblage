@@ -21,11 +21,14 @@ import factory.TFactory;
 import factory.ZFactory;
 import model.listener.IPlayBoardListenable;
 import model.listener.IPlayBoardListener;
+import observer.AbstractListenableHM;
+import observer.interfaces.Listener;
 import piece.Piece;
 import utils.EDifficulty;
+import utils.ETypeListen;
 import view.utils.PieceRenderUtils;
 
-public class PlayBoard implements IPlayBoardListenable {
+public class PlayBoard extends AbstractListenableHM implements Listener {
 
 	private static final int EMPTY = 0;
 
@@ -60,14 +63,10 @@ public class PlayBoard implements IPlayBoardListenable {
 		}
 	}
 
-	public int[][] getBoardArray() {
-
-		return this.board.clone();
-	}
 
 	void randomlyPlacePiece(Piece piece) {
 
-		System.out.println("Randomly placing piece: " + piece);
+		//System.out.println("Randomly placing piece: " + piece);
 
 		Random random = new Random(this.seed + piecesMap.size() + 1);
 	
@@ -93,7 +92,7 @@ public class PlayBoard implements IPlayBoardListenable {
 			int x = random.nextInt(this.board[0].length - piece.getWidth() + 1);
 			int y = random.nextInt(this.board.length - piece.getHeight() + 1);
 
-			System.out.println("Trying to place piece at: " + x + ", " + y);
+			//System.out.println("Trying to place piece at: " + x + ", " + y);
 
 			if (placePiece(x, y, piece)) {
 
@@ -117,6 +116,192 @@ public class PlayBoard implements IPlayBoardListenable {
 		// 	}
 		// }
 	}
+
+	public boolean placePiece(int x, int y, Piece piece) {
+
+		int pieceId = piecesMap.size() + 1;
+
+		if (placePieceWithoutRegistration(x, y, piece, pieceId)) {
+
+			registerPiece(pieceId, piece);
+
+			return true;
+		}
+		
+		return false;
+	}
+
+	public boolean placePieceWithoutRegistration(int x, int y, Piece piece, int pieceId) {
+
+		if (canBePlaced(x, y, piece)) {
+
+			boolean[][] pieceMatrix = piece.getPiece();
+
+			for (int i = 0; i < piece.getHeight(); i++) {
+
+				for (int j = 0; j < piece.getWidth(); j++) {
+
+					if (pieceMatrix[i][j]) {
+
+						this.board[y + i][x + j] = pieceId;
+					}
+				}
+			}
+
+			piecesMap.put(pieceId, piece);
+
+			this.fireAllEvents();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	public void removePieceFromBoard(Piece piece) {
+		int pieceId = getPieceId(piece);
+		
+		removePieceFromBoardWithoutRegistration(pieceId);
+		
+		this.unregisterPiece(getPieceId(piece));
+	}
+
+	public boolean movePiece(Piece piece, int x, int y) {
+
+		if (canBePlaced(x, y, piece)) {
+
+			int pieceId = this.getPieceId(piece);
+
+			Image cell = this.piecesImagesMap.get(pieceId);
+
+			this.removePieceFromBoardWithoutRegistration(getPieceId(piece));
+			this.placePieceWithoutRegistration(x, y, piece, getPieceId(piece));
+
+			this.piecesImagesMap.put(pieceId, cell);
+
+			this.fireAllEvents();
+
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public boolean swap(Piece p1, Piece p2) {
+		int id1 = getPieceId(p1);
+		int id2 = getPieceId(p2);
+
+		Point pointP1 = getUpperLeftPieceCornerById(id1);
+		Point pointP2 = getUpperLeftPieceCornerById(id2);
+
+		if (canBeSwapped(pointP2.x, pointP2.y, p1, id2) && canBeSwapped(pointP1.x, pointP1.y, p2, id1)) {
+			removePieceFromBoardWithoutRegistration(id1);
+			placePieceWithoutRegistration(pointP1.x, pointP1.y, p2, id2);
+			placePieceWithoutRegistration(pointP2.x, pointP2.y, p1, id1);
+			return true;
+		}
+
+		return false;
+	}
+
+	public void removePieceFromBoardWithoutRegistration(int pieceId) {	
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				if (this.board[i][j] == pieceId) {
+
+					this.board[i][j] = EMPTY;
+				}
+			}
+		}
+
+		this.fireAllEvents();
+	}
+
+	public boolean canBePlaced(int x, int y, Piece piece) {
+		return canBeSwapped(x, y, piece, EMPTY);
+	}
+
+	public boolean canBeSwapped(int x, int y, Piece piece, int ignoreId) {
+
+		boolean[][] pieceMatrix = piece.getPiece();
+
+		boolean canBePlaced = true;
+		for (int i = 0; i < piece.getHeight() && canBePlaced; i++) {
+
+			for (int j = 0; j < piece.getWidth() && canBePlaced; j++) {
+
+				if (pieceMatrix[i][j] == true) {
+					boolean isEmpty = this.board[y + i][x + j] == EMPTY || this.board[y + i][x + j] == ignoreId;
+					canBePlaced = (
+						y + i < this.board.length && 
+						x + j < this.board[0].length && 
+						isEmpty
+					);
+				}	
+			}
+		}
+
+		return canBePlaced;
+	}
+
+	private void registerPiece(int pieceId, Piece piece) {
+
+		this.piecesMap.put(pieceId, piece);
+		this.piecesImagesMap.put(pieceId, PieceRenderUtils.createCellImage(this.seed + pieceId));
+	}
+
+	private void unregisterPiece(int pieceId) {
+
+		this.piecesMap.remove(pieceId);
+		this.piecesImagesMap.remove(pieceId);
+	}
+
+	public Image getCellImageByPieceId(int pieceId) {
+
+		return this.piecesImagesMap.get(pieceId);
+	}
+
+	@Override
+	public void update() {
+		this.fireEvents(ETypeListen.PIECEVIEW.typeListen);
+	}
+	
+	@Override
+	public String toString() {
+
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				sb.append((this.board[i][j] == EMPTY) ? "0 " : this.board[i][j] + " ");
+				sb.append(" ");
+			}
+
+			sb.append("\n");
+		}
+
+		return sb.toString();
+	}
+
+
+	// -----------------
+	// GET METHODS
+	// -----------------
+
+	private int getPieceId(Piece piece) {
+
+		return this.piecesMap.entrySet().stream()
+				.filter(entry -> entry.getValue().equals(piece))
+				.map(Map.Entry::getKey)
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("Piece is not on board"));
+	}
+
 
 	public int getLowerPieceX() {
 
@@ -150,12 +335,7 @@ public class PlayBoard implements IPlayBoardListenable {
 		throw new IllegalStateException("No piece found");
 	}
 
-	public Point getUpperLeftPieceCorner() {
-
-		System.out.println("getUpperLeftPieceCorner() " + getLowerPieceX() + ", " + getLowerPieceY());
-
-		return new Point(getLowerPieceX(), getLowerPieceY());
-	}
+	public Point getUpperLeftPieceCorner() { return new Point(getLowerPieceX(), getLowerPieceY()); }
 
 	public int getUpperPieceX() {
 
@@ -187,11 +367,6 @@ public class PlayBoard implements IPlayBoardListenable {
 		}
 
 		throw new IllegalStateException("No piece found");
-	}
-
-	public Point getLowerRightPieceCorner() {
-
-		return new Point(getUpperPieceX(), getUpperPieceY());
 	}
 
 	public int getLowerPieceXById(int pieceId) {
@@ -226,214 +401,26 @@ public class PlayBoard implements IPlayBoardListenable {
 		throw new IllegalStateException("Piece not found");
 	}
 
-	public Point getUpperLeftPieceCornerById(int pieceId) {
+	public Map<Integer, Piece> getPieces() { return this.piecesMap; }
 
-		return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId));
-	}
+	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }
+	public Point getUpperLeftPieceCornerById(int pieceId) { return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId)); }
 	
-	public int getWidth() {
+	public int getPieceIdAt(int x, int y) { return this.board[y][x]; }
 
-		return this.sizeX;
-	}
+	public Piece getPieceCloneById(int pieceId) { return Piece.clone(this.piecesMap.get(pieceId)); }
 
-	public int getHeight() {
+	public int getBoardWidth() { return this.board[0].length; }
+	public int getBoardHeight() { return this.board.length; }
+	public int[][] getBoardArray() { return this.board.clone(); }
 
-		return this.sizeY;
-	}
 
-	public int getPieceIdAt(int x, int y) {
+	public int getWidth() { return this.sizeX; }
+	public int getHeight() { return this.sizeY; }
 
-		return this.board[y][x];
-	}
-
-	public boolean placePiece(int x, int y, Piece piece) {
-
-		int pieceId = piecesMap.size() + 1;
-
-		if (placePieceWithoutRegistration(x, y, piece, pieceId)) {
-
-			registerPiece(pieceId, piece);
-
-			firePieceAdded(this, pieceId);
-
-			return true;
-		}
-		else {
-
-			return false;
-		}
-	}
-
-	public boolean placePieceWithoutRegistration(int x, int y, Piece piece, int pieceId) {
-
-		if (canBePlaced(x, y, piece)) {
-
-			boolean[][] pieceMatrix = piece.getPiece();
-
-			for (int i = 0; i < piece.getHeight(); i++) {
-
-				for (int j = 0; j < piece.getWidth(); j++) {
-
-					if (pieceMatrix[i][j]) {
-
-						this.board[y + i][x + j] = pieceId;
-					}
-				}
-			}
-
-			piecesMap.put(pieceId, piece);
-
-			return true;
-		}
-		else {
-
-			return false;
-		}
-	}
-
-	private void removePiceFromBoard(Piece piece) {
-
-		int pieceId = this.getPieceId(piece);
-
-		removePiceFromBoardWithoutUnregistration(pieceId);
-
-		unregisterPiece(pieceId);
-	}
-
-	public void removePiceFromBoardWithoutUnregistration(int pieceId) {
-
-		for (int i = 0; i < this.board.length; i++) {
-
-			for (int j = 0; j < this.board[i].length; j++) {
-
-				if (this.board[i][j] == pieceId) {
-
-					this.board[i][j] = EMPTY;
-				}
-			}
-		}
-	}
-
-	public void removePieceFromBoard(int pieceId) {
-
-		removePiceFromBoard(this.piecesMap.get(pieceId));
-	}
-
-	private boolean movePiece(Piece piece, int x, int y) {
-
-		if (canBePlaced(x, y, piece)) {
-
-			int pieceId = this.getPieceId(piece);
-
-			Image cell = this.piecesImagesMap.get(pieceId);
-
-			removePiceFromBoardWithoutUnregistration(pieceId);
-			placePieceWithoutRegistration(x, y, piece, pieceId);
-
-			this.piecesImagesMap.put(pieceId, cell);
-
-			return true;
-		}
-		else {
-
-			return false;
-		}
-	}
-
-	public boolean movePiece(int pieceId, int x, int y) {
-
-		return movePiece(this.piecesMap.get(pieceId), x, y);
-	}
-
-	private int getPieceId(Piece piece) {
-
-		return this.piecesMap.entrySet().stream()
-			.filter(entry -> entry.getValue().equals(piece))
-			.map(Map.Entry::getKey)
-			.findFirst()
-			.orElseThrow(() -> new IllegalStateException("Piece is not on board"));
-	}
-
-	public Piece getPieceCloneById(int pieceId) {
-
-		return Piece.clone(this.piecesMap.get(pieceId));
-	}
-
-	public boolean canBePlaced(int x, int y, Piece piece) {
-
-		boolean[][] pieceMatrix = piece.getPiece();
-
-		boolean canBePlaced = true;
-		for (int i = 0; i < piece.getHeight(); i++) {
-
-			for (int j = 0; j < piece.getWidth(); j++) {
-
-				if (pieceMatrix[i][j] == false) {
-
-					continue;
-				}
-
-				if ((y + i < this.board.length && x + j < this.board[0].length && this.board[y + i][x + j] == EMPTY) == false) {
-
-					canBePlaced = false;
-					break;
-				}
-			}
-
-			if (canBePlaced == false) {
-
-				break;
-			}
-		}
-
-		return canBePlaced;
-	}
-
-	private void registerPiece(int pieceId, Piece piece) {
-
-		this.piecesMap.put(pieceId, piece);
-		this.piecesImagesMap.put(pieceId, PieceRenderUtils.createCellImage(this.seed + pieceId));
-	}
-
-	private void unregisterPiece(int pieceId) {
-
-		this.piecesMap.remove(pieceId);
-		this.piecesImagesMap.remove(pieceId);
-	}
-
-	public Image getCellImageByPieceId(int pieceId) {
-
-		return this.piecesImagesMap.get(pieceId);
-	}
-
-	public int getBoardWidth() {
-
-		return this.board[0].length;
-	}
-
-	public int getBoardHeight() {
-
-		return this.board.length;
-	}
-
-	@Override
-	public String toString() {
-
-		StringBuilder sb = new StringBuilder();
-
-		for (int i = 0; i < this.board.length; i++) {
-
-			for (int j = 0; j < this.board[i].length; j++) {
-
-				sb.append((this.board[i][j] == EMPTY) ? "  " : this.board[i][j] + " ");
-				sb.append(" ");
-			}
-
-			sb.append("\n");
-		}
-
-		return sb.toString();
-	}
+	// -----------------
+	// STATIC METHODS
+	// -----------------
 
 	public static int getSizeXBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
@@ -450,7 +437,7 @@ public class PlayBoard implements IPlayBoardListenable {
 		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1) + difficulty.getMinNbPieces();
 	}
 
-	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces, EDifficulty difficulty) {
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
@@ -462,7 +449,7 @@ public class PlayBoard implements IPlayBoardListenable {
 
 			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
 			Piece piece = pieceFactory.createPiece(0);
-			
+			/*
 			Color color = null;
 			if (true == colorList.isEmpty()) {
 
@@ -470,17 +457,28 @@ public class PlayBoard implements IPlayBoardListenable {
 			}
 
 			color = colorList.remove(random.nextInt(colorList.size()));
-
-			playBoard.randomlyPlacePiece(piece);
+			
 			playBoard.piecesImagesMap.put(playBoard.getPieceId(piece), PieceRenderUtils.createCellImage(color));
+			*/
+			playBoard.randomlyPlacePiece(piece);
 		}
 
 		return playBoard;
 	}
 
+	public static PlayBoard constructCopyPlayBoard(PlayBoard parent) {
+		
+		return constructPlayBoard(parent.seed, parent.sizeX, parent.sizeY, parent.piecesMap.size());
+	}
+
 	public static PlayBoard constructEmptyPlayBoard(long seed, int sizeX, int sizeY) {
 
 		return new PlayBoard(seed, sizeX, sizeY);
+	}
+
+	public static PlayBoard constructEmptyPlayBoardCopy(PlayBoard toClone) {
+
+		return constructEmptyPlayBoard(toClone.seed, toClone.sizeX, toClone.sizeY);
 	}
 
 	private static List<PieceFactory> getPossiblePieceFactorys() {
@@ -509,43 +507,5 @@ public class PlayBoard implements IPlayBoardListenable {
 		colorList.add(Color.MAGENTA);
 
 		return colorList;
-	}
-
-	private Set<IPlayBoardListener> playBoardListeners = new HashSet<>();
-
-	@Override
-	public void addPlayBoardListener(IPlayBoardListener listener) {
-		
-		this.playBoardListeners.add(listener);
-	}
-
-	@Override
-	public void removePlayBoardListener(IPlayBoardListener listener) {
-		
-		this.playBoardListeners.remove(listener);
-	}
-
-	private void firePieceAdded(Object source, int pieceId) {
-
-		for (IPlayBoardListener listener : this.playBoardListeners) {
-
-			listener.pieceAdded(source, pieceId);
-		}
-	}
-
-	private void firePieceRemoved(Object source, int pieceId) {
-
-		for (IPlayBoardListener listener : this.playBoardListeners) {
-
-			listener.pieceRemoved(source, pieceId);
-		}
-	}
-
-	private void firePieceMoved(Object source, int pieceId) {
-
-		for (IPlayBoardListener listener : this.playBoardListeners) {
-
-			listener.pieceMoved(source, pieceId);
-		}
 	}
 }

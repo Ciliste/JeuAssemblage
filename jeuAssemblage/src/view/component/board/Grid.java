@@ -4,7 +4,9 @@ import static view.utils.SwingUtils.*;
 
 import model.PlayBoard;
 import model.listener.PlayBoardAdapter;
+import observer.interfaces.Listener;
 import piece.Piece;
+import utils.ETypeListen;
 import view.component.board.listener.IPieceManipulationComponent;
 import view.utils.KeyboardManager;
 import view.utils.PieceRenderUtils;
@@ -24,7 +26,7 @@ import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 
-public class Grid extends JPanel {
+public class Grid extends JPanel implements Listener{
 
 	private final PlayBoard playBoard;
 
@@ -53,6 +55,7 @@ public class Grid extends JPanel {
     public Grid(PlayBoard playBoard, boolean isPreview) {
         
 		this.playBoard = playBoard;
+		this.playBoard.addListener(ETypeListen.PLAYVIEW.typeListen, this);
 
         this.setLayout(null);
 
@@ -63,27 +66,6 @@ public class Grid extends JPanel {
 
 		this.addMouseListener(new GridClickListener());
 		this.addMouseMotionListener(new GridMouseMotionListener());
-
-		playBoard.addPlayBoardListener(new PlayBoardAdapter() {
-
-			@Override
-			public void pieceAdded(Object source, int pieceId) {
-
-				repaint();
-			}
-
-			@Override
-			public void pieceRemoved(Object source, int pieceId) {
-
-				repaint();
-			}
-
-			@Override
-			public void pieceMoved(Object source, int pieceId) {
-
-				repaint();
-			}
-		});
 
 		this.addMouseMotionListener(new GridMouseMotionListener());
 
@@ -380,8 +362,9 @@ public class Grid extends JPanel {
 
 				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(selectedPieceId);
 				Piece tempPiece = playBoard.getPieceCloneById(selectedPieceId);
-				playBoard.removePiceFromBoardWithoutUnregistration(selectedPieceId);
-
+				playBoard.removePieceFromBoardWithoutRegistration(selectedPieceId);
+				
+				//TODO REFACTO POUR ESSAyEZR DE PLACER JUSTE FLEMME
 				if (playBoard.canBePlaced(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPiece)) {
 
 					playBoard.placePieceWithoutRegistration(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPiece, selectedPieceId);
@@ -423,5 +406,10 @@ public class Grid extends JPanel {
 				repaint();
 			}
 		}
+	}
+
+	@Override
+	public void update() {
+		this.repaint();
 	}
 }

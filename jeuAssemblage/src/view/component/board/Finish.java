@@ -16,7 +16,7 @@ import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
-public class Finish extends JPanel {
+public class Finish extends JPanel implements Listener{
 
     private final JLabel lblPreciseArea = new JLabel();
     private final JLabel lblArea        = new JLabel();
@@ -104,6 +104,11 @@ public class Finish extends JPanel {
 
         SwingUtils.drawDebugBounds(this, g);
     }
+
+    // @Override
+	// public void update() {
+	// 	this.repaint();
+	// }
     
 	public void update() {
 
