@@ -6,6 +6,8 @@ jeuAssemblage/build/*
 jeuAssemblage/dist/*
 jeuAssemblage/jeuAssemblage.iml
 jeuAssemblage/dist/*.jar
+jeuAssemblage/log.txt
+
 
 piece_puzzle/build/*
 piece_puzzle/dist/*
