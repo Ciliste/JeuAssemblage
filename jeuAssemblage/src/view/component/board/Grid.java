@@ -37,6 +37,7 @@ public class Grid extends JPanel implements Listener{
 	private int yGridFin = 0;
 
 	private Piece selectedPiece = null;
+	private Piece selectedPieceClone = null;
 	private int selectedPieceId = -1;
 	private int xClickOriginSelectedPiece = -1;
 	private int yClickOriginSelectedPiece = -1;
@@ -75,21 +76,21 @@ public class Grid extends JPanel implements Listener{
 			@Override
 			public void onKeyPressed(KeyboardManager.Keys key) {
 
-				if (null != selectedPiece) {
+				if (null != selectedPieceClone) {
 
 					if (KeyboardManager.Keys.R == key) {
 
 						if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.SHIFT)) {
 
-							selectedPiece.rotateLeft();
+							selectedPieceClone.rotateLeft();
 						}
 						else if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.CONTROL)) {
 
-							selectedPiece.reverse();
+							selectedPieceClone.reverse();
 						}
 						else {
 
-							selectedPiece.rotateRight();
+							selectedPieceClone.rotateRight();
 						}
 
 						repaint();
@@ -110,16 +111,18 @@ public class Grid extends JPanel implements Listener{
 
 					try {
 						
-						selectedPiece = playBoard.getPieceCloneById(pieceId);
+						selectedPiece = playBoard.getPieceById(pieceId);
+						selectedPieceClone = Piece.clone(selectedPiece);
 					} 
 					catch (Exception e) {
 
 						e.printStackTrace();
 						pieceId = 1;
-						selectedPiece = playBoard.getPieceCloneById(pieceId);
+						selectedPiece = playBoard.getPieceById(pieceId);
+						selectedPieceClone = Piece.clone(selectedPiece);
 					}
 
-					selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPiece.getPiece(), Color.CYAN);
+					selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPieceClone.getPiece(), Color.CYAN);
 
 					Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
 					xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
@@ -141,11 +144,11 @@ public class Grid extends JPanel implements Listener{
 			@Override
 			public void onKeyPressed(KeyboardManager.Keys key) {
 
-				if (null != selectedPiece) {
+				if (null != selectedPieceClone) {
 
 					switch (key) {
 						
-						case UP -> {
+						case UP : {
 
 							mousePosition.setLocation(
 								mousePosition.getX(),
@@ -153,9 +156,11 @@ public class Grid extends JPanel implements Listener{
 							);
 
 							repaint();
+
+							break;
 						}
 
-						case DOWN -> {
+						case DOWN : {
 
 							mousePosition.setLocation(
 								mousePosition.getX(),
@@ -163,9 +168,11 @@ public class Grid extends JPanel implements Listener{
 							);
 
 							repaint();
+
+							break;
 						}
 
-						case LEFT -> {
+						case LEFT : {
 
 							mousePosition.setLocation(
 								mousePosition.getX() - 1,
@@ -173,9 +180,11 @@ public class Grid extends JPanel implements Listener{
 							);
 
 							repaint();
+
+							break;
 						}
 
-						case RIGHT -> {
+						case RIGHT : {
 
 							mousePosition.setLocation(
 								mousePosition.getX() + 1,
@@ -183,9 +192,11 @@ public class Grid extends JPanel implements Listener{
 							);
 
 							repaint();
+
+							break;
 						}
 
-						default -> {}
+						default : {}
 					}
 				}
 			}
@@ -268,20 +279,20 @@ public class Grid extends JPanel implements Listener{
 			);
 		}
 
-		if (selectedPiece != null) {
+		if (selectedPieceClone != null) {
 
 			System.out.println("xClickOriginSelectedPiece : " + xClickOriginSelectedPiece);
 			System.out.println("yClickOriginSelectedPiece : " + yClickOriginSelectedPiece);
 
 			Image cellImage = playBoard.getCellImageByPieceId(selectedPieceId);
-			boolean[][] pieceMatrix = selectedPiece.getPiece();
+			boolean[][] pieceMatrix = selectedPieceClone.getPiece();
 
 			int x = mousePosition.x;
 			int y = mousePosition.y;
 
-			for (int i = 0; i < selectedPiece.getHeight(); i++) {
+			for (int i = 0; i < selectedPieceClone.getHeight(); i++) {
 
-				for (int j = 0; j < selectedPiece.getWidth(); j++) {
+				for (int j = 0; j < selectedPieceClone.getWidth(); j++) {
 
 					if (pieceMatrix[i][j]) {
 
@@ -340,9 +351,10 @@ public class Grid extends JPanel implements Listener{
 
 				System.out.println("pieceId : " + pieceId);
 
-				selectedPiece = playBoard.getPieceCloneById(pieceId);
+				selectedPiece = playBoard.getPieceById(pieceId);
+				selectedPieceClone = Piece.clone(selectedPiece);
 
-				selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPiece.getPiece(), Color.CYAN);
+				selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPieceClone.getPiece(), Color.CYAN);
 
 				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
 				xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
@@ -358,16 +370,16 @@ public class Grid extends JPanel implements Listener{
 				return;
 			}
 
-			if (selectedPiece != null) {
+			if (selectedPieceClone != null) {
 
 				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(selectedPieceId);
-				Piece tempPiece = playBoard.getPieceCloneById(selectedPieceId);
-				playBoard.removePieceFromBoardWithoutRegistration(selectedPieceId);
+				Piece tempPiece = playBoard.getPieceById(selectedPieceId);
+				playBoard.removePieceFromBoardWithoutRegistration(selectedPiece);
 				
 				//TODO REFACTO POUR ESSAyEZR DE PLACER JUSTE FLEMME
 				if (playBoard.canBePlaced(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPiece)) {
 
-					playBoard.placePieceWithoutRegistration(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPiece, selectedPieceId);
+					playBoard.placePieceAsId(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPieceClone, selectedPieceId);
 					System.out.println(playBoard);
 
 					selectedPieceId = -1;
@@ -379,13 +391,14 @@ public class Grid extends JPanel implements Listener{
 					ySelectedPieceSurrondingImage = -1;
 
 					selectedPiece = null;
+					selectedPieceClone = null;
 
 					repaint();
 					return;
 				}
 				else {
 
-					playBoard.placePieceWithoutRegistration(upperLeftPieceCorner.x, upperLeftPieceCorner.y, tempPiece, selectedPieceId);
+					playBoard.placePieceAsId(upperLeftPieceCorner.x, upperLeftPieceCorner.y, tempPiece, selectedPieceId);
 				}
 			}
 		}

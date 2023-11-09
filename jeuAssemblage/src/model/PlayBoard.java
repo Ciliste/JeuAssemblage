@@ -28,7 +28,7 @@ import utils.EDifficulty;
 import utils.ETypeListen;
 import view.utils.PieceRenderUtils;
 
-public class PlayBoard extends AbstractListenableHM implements Listener {
+public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBoardListenable {
 
 	private static final int EMPTY = 0;
 
@@ -121,7 +121,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 
 		int pieceId = piecesMap.size() + 1;
 
-		if (placePieceWithoutRegistration(x, y, piece, pieceId)) {
+		if (placePieceAsId(x, y, piece, pieceId)) {
 
 			registerPiece(pieceId, piece);
 
@@ -131,7 +131,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		return false;
 	}
 
-	public boolean placePieceWithoutRegistration(int x, int y, Piece piece, int pieceId) {
+	public boolean placePieceAsId(int x, int y, Piece piece, int pieceId) {
 
 		if (canBePlaced(x, y, piece)) {
 
@@ -159,11 +159,10 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 	}
 
 	public void removePieceFromBoard(Piece piece) {
-		int pieceId = getPieceId(piece);
 		
-		removePieceFromBoardWithoutRegistration(pieceId);
+		removePieceFromBoardWithoutRegistration(piece);
 		
-		this.unregisterPiece(getPieceId(piece));
+		this.unregisterPiece(piece);
 	}
 
 	public boolean movePiece(Piece piece, int x, int y) {
@@ -174,8 +173,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 
 			Image cell = this.piecesImagesMap.get(pieceId);
 
-			this.removePieceFromBoardWithoutRegistration(getPieceId(piece));
-			this.placePieceWithoutRegistration(x, y, piece, getPieceId(piece));
+			this.removePieceFromBoardWithoutRegistration(piece);
+			this.placePieceAsId(x, y, piece, pieceId);
 
 			this.piecesImagesMap.put(pieceId, cell);
 
@@ -188,6 +187,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 	}
 	
 	public boolean swap(Piece p1, Piece p2) {
+
 		int id1 = getPieceId(p1);
 		int id2 = getPieceId(p2);
 
@@ -195,16 +195,18 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		Point pointP2 = getUpperLeftPieceCornerById(id2);
 
 		if (canBeSwapped(pointP2.x, pointP2.y, p1, id2) && canBeSwapped(pointP1.x, pointP1.y, p2, id1)) {
-			removePieceFromBoardWithoutRegistration(id1);
-			placePieceWithoutRegistration(pointP1.x, pointP1.y, p2, id2);
-			placePieceWithoutRegistration(pointP2.x, pointP2.y, p1, id1);
+			removePieceFromBoardWithoutRegistration(p1);
+			placePieceAsId(pointP1.x, pointP1.y, p2, id2);
+			placePieceAsId(pointP2.x, pointP2.y, p1, id1);
 			return true;
 		}
 
 		return false;
 	}
 
-	public void removePieceFromBoardWithoutRegistration(int pieceId) {	
+	public void removePieceFromBoardWithoutRegistration(Piece piece) {	
+
+		int pieceId = getPieceId(piece);
 
 		for (int i = 0; i < this.board.length; i++) {
 
@@ -221,6 +223,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 	}
 
 	public boolean canBePlaced(int x, int y, Piece piece) {
+
 		return canBeSwapped(x, y, piece, EMPTY);
 	}
 
@@ -253,7 +256,9 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		this.piecesImagesMap.put(pieceId, PieceRenderUtils.createCellImage(this.seed + pieceId));
 	}
 
-	private void unregisterPiece(int pieceId) {
+	private void unregisterPiece(Piece piece) {
+
+		int pieceId = this.getPieceId(piece);
 
 		this.piecesMap.remove(pieceId);
 		this.piecesImagesMap.remove(pieceId);
@@ -408,7 +413,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 	
 	public int getPieceIdAt(int x, int y) { return this.board[y][x]; }
 
-	public Piece getPieceCloneById(int pieceId) { return Piece.clone(this.piecesMap.get(pieceId)); }
+	public Piece getPieceById(int pieceId) { return this.piecesMap.get(pieceId); }
 
 	public int getBoardWidth() { return this.board[0].length; }
 	public int getBoardHeight() { return this.board.length; }
@@ -507,5 +512,19 @@ public class PlayBoard extends AbstractListenableHM implements Listener {
 		colorList.add(Color.MAGENTA);
 
 		return colorList;
+	}
+
+	private final List<IPlayBoardListener> listeners = new ArrayList<>();
+
+	@Override
+	public void addPlayBoardListener(IPlayBoardListener listener) {
+		
+		this.listeners.add(listener);
+	}
+
+	@Override
+	public void removePlayBoardListener(IPlayBoardListener listener) {
+		
+		this.listeners.remove(listener);
 	}
 }

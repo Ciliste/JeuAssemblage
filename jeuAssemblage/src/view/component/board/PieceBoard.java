@@ -215,7 +215,7 @@ public class PieceBoard extends JPanel implements IPieceManipulationComponent, L
 	@Override
 	public void selectPiece(int pieceId) {
 
-		Piece piece = playBoard.getPieceCloneById(pieceId);
+		Piece piece = playBoard.getPieceById(pieceId);
 		selectedPieceId = pieceId;
 		selectedPiece = piece;
 	}
