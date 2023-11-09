@@ -6,10 +6,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Collections;
+
 
 import bot.interfaces.IStrategyBot;
 import bot.Move;
 import model.PlayBoard;
+import model.SeedUtils;
 import piece.Piece;
 
 public class AbstractStrategyAI implements IStrategyBot {
@@ -21,12 +24,14 @@ public class AbstractStrategyAI implements IStrategyBot {
     protected long seed;
     
     public AbstractStrategyAI(PlayBoard model) {
-        this(model, generateRandomSeed());
+        this(model, SeedUtils.generateRandomSeed());
     }
 
     protected AbstractStrategyAI(PlayBoard model, long seed) {
         this.model = model;
         System.out.println(model);
+        System.out.println(model.getArea());
+
         this.moves = getMoves();
         this.seed = seed;
     }
@@ -40,6 +45,10 @@ public class AbstractStrategyAI implements IStrategyBot {
         for (int i = 0; i < 10; i++) {
             population = mutation(population, rand, 1d);
         }
+
+        System.out.println(population.get(0));
+        System.out.println(population.get(0).getArea());
+
 
         return ret;
     }
@@ -55,6 +64,10 @@ public class AbstractStrategyAI implements IStrategyBot {
             }
         }
 
+        Collections.sort(postMutation);
+
+        postMutation = postMutation.subList(0, POP_SIZE);
+
         return postMutation;
     }
     
@@ -64,8 +77,6 @@ public class AbstractStrategyAI implements IStrategyBot {
         
         Map<Integer, Piece> piecesParent1 = parent1.getPieces();
 
-        System.out.println("PAREZNTTTTTTTTTTTTTTTTTTTTT");
-        System.out.println(parent1);
         for (int cpt = 0; cpt < piecesParent1.size(); cpt++) {
             int toSwapId = cpt;
             while (toSwapId == cpt) {
@@ -97,14 +108,8 @@ public class AbstractStrategyAI implements IStrategyBot {
         return population;
     }
 
-    // REFACTO FAIRE UNE CLASSE SEED AVEC TOUQ LES TRUCS SUR LES SEEDS
-    public static long generateRandomSeed() {
-
-        return (long) (Math.random() * Long.MAX_VALUE);
-    }
-
     public static void main(String args) {
-        new AbstractStrategyAI(PlayBoard.constructPlayBoard(generateRandomSeed(), 8, 8, 4));
+        new AbstractStrategyAI(PlayBoard.constructPlayBoard(SeedUtils.generateRandomSeed(), 8, 8, 4));
     }
     
 }

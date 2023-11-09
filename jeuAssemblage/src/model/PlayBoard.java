@@ -29,7 +29,7 @@ import utils.EDifficulty;
 import utils.ETypeListen;
 import view.utils.PieceRenderUtils;
 
-public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBoardListenable {
+public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBoardListenable, Comparable<PlayBoard> {
 
 	private static final int EMPTY = 0;
 
@@ -192,7 +192,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		int id1 = getPieceId(p1);
 		int id2 = getPieceId(p2);
 
-		System.out.println(this);
 		Point pointP1 = getUpperLeftPieceCornerById(id1);
 		Point pointP2 = getUpperLeftPieceCornerById(id2);
 
@@ -211,8 +210,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			}
 		}
 		
-		System.out.println("pas bon");
-		System.out.println(this);
 		this.board = rollback;
 		piecesMap.put(id1, p1);
 		piecesMap.put(id2, p2);
@@ -298,7 +295,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			for (int j = 0; j < this.board[i].length; j++) {
 
-				sb.append((this.board[i][j] == EMPTY) ? "  " : this.board[i][j] + " ");
+				sb.append((this.board[i][j] == EMPTY) ? "0 " : this.board[i][j] + " ");
 				sb.append(" ");
 			}
 
@@ -354,8 +351,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 		throw new IllegalStateException("No piece found");
 	}
-
-	public Point getUpperLeftPieceCorner() { return new Point(getLowerPieceX(), getLowerPieceY()); }
 
 	public int getUpperPieceX() {
 
@@ -421,12 +416,15 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		throw new IllegalStateException("Piece not found");
 	}
 
-	public Map<Integer, Piece> getPieces() { 
-
-		return new HashMap<>(piecesMap);
+	public int getArea() {
+		return (getLowerPieceX() - getUpperPieceX()) * (getLowerPieceY() - getUpperPieceY());
 	}
 
-	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }
+	public Map<Integer, Piece> getPieces() { return new HashMap<>(piecesMap); }
+
+	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }		
+	public Point getUpperLeftPieceCorner() { return new Point(getLowerPieceX(), getLowerPieceY()); }
+
 	public Point getUpperLeftPieceCornerById(int pieceId) { return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId)); }
 	
 	public int getPieceIdAt(int x, int y) { return this.board[y][x]; }
@@ -439,7 +437,19 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 
 	public int getWidth() { return this.sizeX; }
+
 	public int getHeight() { return this.sizeY; }
+	
+	
+	// -----------------
+	// STATIC METHODS
+	// -----------------
+	
+	@Override
+	public int compareTo(PlayBoard o) {
+		return this.getArea() - o.getArea();
+	}
+
 
 	// -----------------
 	// STATIC METHODS
