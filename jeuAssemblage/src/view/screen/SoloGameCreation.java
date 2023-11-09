@@ -13,6 +13,7 @@ import javax.swing.JCheckBox;
 import javax.swing.SpinnerNumberModel;
 
 import model.PlayBoard;
+import model.SeedUtils;
 import utils.EDifficulty;
 import view.MainFrame;
 import view.component.Separator;
@@ -302,16 +303,11 @@ public class SoloGameCreation extends JPanel {
 		repaint();
 	}
 
-    private static long generateRandomSeed() {
-
-        return (long) (Math.random() * Long.MAX_VALUE);
-    }
-
     private static Runnable createRandomSeedCallback(SoloGameCreation soloGameCreation) {
 
         return () -> {
 
-            final long seed = generateRandomSeed();
+            final long seed = SeedUtils.generateRandomSeed();
             soloGameCreation.seedUpdated(seed);
             soloGameCreation.txtSeed.setText(String.valueOf(seed));
         };

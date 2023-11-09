@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.Color;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -195,9 +196,11 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		Point pointP2 = getUpperLeftPieceCornerById(id2);
 
 		if (canBeSwapped(pointP2.x, pointP2.y, p1, id2) && canBeSwapped(pointP1.x, pointP1.y, p2, id1)) {
+
 			removePieceFromBoardWithoutRegistration(p1);
 			placePieceAsId(pointP1.x, pointP1.y, p2, id2);
 			placePieceAsId(pointP2.x, pointP2.y, p1, id1);
+
 			return true;
 		}
 
@@ -406,7 +409,10 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		throw new IllegalStateException("Piece not found");
 	}
 
-	public Map<Integer, Piece> getPieces() { return this.piecesMap; }
+	public Map<Integer, Piece> getPieces() { 
+
+		return new HashMap<>(piecesMap);
+	}
 
 	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }
 	public Point getUpperLeftPieceCornerById(int pieceId) { return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId)); }
@@ -514,17 +520,16 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		return colorList;
 	}
 
-	private final List<IPlayBoardListener> listeners = new ArrayList<>();
-
 	@Override
 	public void addPlayBoardListener(IPlayBoardListener listener) {
-		
-		this.listeners.add(listener);
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'addPlayBoardListener'");
 	}
+
 
 	@Override
 	public void removePlayBoardListener(IPlayBoardListener listener) {
-		
-		this.listeners.remove(listener);
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'removePlayBoardListener'");
 	}
 }

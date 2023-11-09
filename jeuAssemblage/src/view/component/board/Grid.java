@@ -112,6 +112,13 @@ public class Grid extends JPanel implements Listener{
 					try {
 						
 						selectedPiece = playBoard.getPieceById(pieceId);
+
+						if (null == selectedPiece) {
+
+							pieceId = 1;
+							selectedPiece = playBoard.getPieceById(pieceId);
+						}
+
 						selectedPieceClone = Piece.clone(selectedPiece);
 					} 
 					catch (Exception e) {
@@ -132,6 +139,21 @@ public class Grid extends JPanel implements Listener{
 
 					xClickOriginSelectedPiece = 0;
 					yClickOriginSelectedPiece = 0;
+
+					repaint();
+				}
+				else if (KeyboardManager.Keys.ESCAPE == key) {
+
+					selectedPieceId = -1;
+					xClickOriginSelectedPiece = -1;
+					yClickOriginSelectedPiece = -1;
+
+					selectedPieceSurrondingImage = null;
+					xSelectedPieceSurrondingImage = -1;
+					ySelectedPieceSurrondingImage = -1;
+
+					selectedPiece = null;
+					selectedPieceClone = null;
 
 					repaint();
 				}
