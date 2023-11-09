@@ -9,6 +9,9 @@ import view.MainFrame;
 import view.component.board.Finish;
 import view.component.board.Grid;
 import view.component.board.PieceBoard;
+import view.component.board.TimerPanel;
+import view.component.board.TimerPanel.Timer;
+import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;
@@ -16,20 +19,30 @@ import java.awt.Graphics;
 public class GamePanel extends JPanel {
 	
 	private final Grid grid;
+	private final TimerPanel timerPanel;
 	private final PieceBoard pieceBoard;
 	private final Finish finish;
 
-	public GamePanel(MainFrame mainFrame, PlayBoard playBoard) {
+	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, Timer timer) {
 
 		super();
 
 		this.setLayout(null);
 
+		this.timerPanel = new TimerPanel(timer, new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				mainFrame.setContentPane(new SoloGameFinishScreen(playBoard));
+			}
+		});
 		this.pieceBoard = new PieceBoard(playBoard);
 		this.grid = new Grid(playBoard);
 		this.finish = new Finish(mainFrame, playBoard);
 
 		this.add(this.grid);
+		this.add(this.timerPanel);
 		// this.add(this.pieceBoard);
 		this.add(this.finish);
 	}
@@ -46,7 +59,7 @@ public class GamePanel extends JPanel {
 		 	this.getHeight()
 		);
 
-		this.pieceBoard.setBounds(
+		this.timerPanel.setBounds(
 			this.grid.getWidth(),
 		 	0,
 		 	getWidthTimesPourcent (this, .2f),

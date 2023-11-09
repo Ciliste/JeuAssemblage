@@ -18,6 +18,7 @@ import utils.EDifficulty;
 import view.MainFrame;
 import view.component.Separator;
 import view.component.board.Grid;
+import view.component.board.TimerPanel.Timer;
 import view.utils.DocumentAdapter;
 
 public class SoloGameCreation extends JPanel {
@@ -43,8 +44,8 @@ public class SoloGameCreation extends JPanel {
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
 	private final JList<String> difficultyList = new JList<String>(EDifficulty.getDifficultysName());
 
-	private final JSpinner nbMinutesSpinner = new JSpinner();
-	private final JSpinner nbSecondsSpinner = new JSpinner();
+	private final JSpinner nbMinutesSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+	private final JSpinner nbSecondsSpinner = new JSpinner(new SpinnerNumberModel(0, -1, 60, 1));
 	private final JCheckBox timeLimitCheckBox = new JCheckBox("Temps limité");
 
 	private JPanel gridPreview = new JPanel();
@@ -125,7 +126,39 @@ public class SoloGameCreation extends JPanel {
 				(int) nbPiecesSpinner.getValue()
 			);
 
-			mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard));
+			Timer timer = null;
+			if (timeLimitCheckBox.isSelected()) {
+
+				timer = new Timer((int) nbMinutesSpinner.getValue(), (int) nbSecondsSpinner.getValue());
+			}
+			else {
+
+				timer = Timer.NO_TIMER;
+			}
+
+			mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, timer));
+		});
+
+		nbMinutesSpinner.setEnabled(timeLimitCheckBox.isSelected());
+		nbSecondsSpinner.setEnabled(timeLimitCheckBox.isSelected());
+
+		timeLimitCheckBox.addActionListener(e -> {
+			nbMinutesSpinner.setEnabled(timeLimitCheckBox.isSelected());
+			nbSecondsSpinner.setEnabled(timeLimitCheckBox.isSelected());
+		});
+
+		nbSecondsSpinner.addChangeListener(e -> {
+
+			if ((int) nbSecondsSpinner.getValue() == 60) {
+
+				nbSecondsSpinner.setValue(0);
+				nbMinutesSpinner.setValue((int) nbMinutesSpinner.getValue() + 1);
+			}
+			else if ((int) nbSecondsSpinner.getValue() == -1) {
+
+				nbSecondsSpinner.setValue(59);
+				nbMinutesSpinner.setValue((int) nbMinutesSpinner.getValue() - 1);
+			}
 		});
 
 		updateGridPreview();
@@ -288,19 +321,27 @@ public class SoloGameCreation extends JPanel {
 
 	private void updateGridPreview() {
 
-		remove(gridPreview);
+		JPanel temp = null;
+		try {
+			
+			temp = new Grid(PlayBoard.constructPlayBoard(
+				Long.parseLong(txtSeed.getText()), 
+				Integer.parseInt(txtSizeX.getText()),
+				Integer.parseInt(txtSizeY.getText()), 
+				(int) nbPiecesSpinner.getValue()
+			), true);	
+		} 
+		catch (Exception ignored) {}
 
-		gridPreview = new Grid(PlayBoard.constructPlayBoard(
-			Long.parseLong(txtSeed.getText()), 
-			Integer.parseInt(txtSizeX.getText()),
-			Integer.parseInt(txtSizeY.getText()), 
-			(int) nbPiecesSpinner.getValue()
-		), true);
+		if (temp != null) {
 
-		add(gridPreview);
+			remove(gridPreview);
+			gridPreview = temp;
+			add(gridPreview);
 
-		revalidate();
-		repaint();
+			revalidate();
+			repaint();
+		}
 	}
 
     private static Runnable createRandomSeedCallback(SoloGameCreation soloGameCreation) {
