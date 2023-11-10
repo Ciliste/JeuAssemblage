@@ -43,8 +43,9 @@ public class AbstractStrategyAI implements IStrategyBot {
         
         Random rand = new Random(this.seed);
         List<PlayBoard> population = createPopulation(this.model, POP_SIZE, rand);
+        population.add(model);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             population = mutation(population, rand, 1d);
         }
 
@@ -66,16 +67,9 @@ public class AbstractStrategyAI implements IStrategyBot {
             double nextRand = rand.nextDouble(1);
             if ( nextRand < mutationRate) {
 
-                if (nextRand < mutationRate / 3) {
-                    postMutation.add(individualMutationSwapping(parent, rand));
-                }
-                else if ( nextRand < (2 * mutationRate) / 3) {
-                    postMutation.add(individualMutationRotation(parent, rand));
-                }
-                else { 
-                    postMutation.add(individualMutationSwapping(parent, rand));
-                }
-
+                postMutation.add(individualMutationSwapping(parent, rand));
+                //postMutation.add(individualMutationRotation(parent, rand));
+                //postMutation.add(individualMutationSwapping(parent, rand));
             }
         }
 
@@ -97,6 +91,10 @@ public class AbstractStrategyAI implements IStrategyBot {
             while (toSwapId == cpt) {
                 toSwapId = rand.nextInt(piecesParent1.size());
             }
+
+            System.out.println((cpt + 1) + "/" + (toSwapId + 1));
+            System.out.println(son.getPieces().size());
+            System.out.println(son);
 
             son.swap(son.getPieceById(cpt + 1), son.getPieceById(toSwapId + 1));
         }
@@ -150,6 +148,7 @@ public class AbstractStrategyAI implements IStrategyBot {
         List<PlayBoard> population = new ArrayList<PlayBoard>();
 
         int pieceCount = model.getPieces().size();
+        System.out.println(model.getPieces().size());
         for (int i = 0; i < size; i++) {
 
             population.add(PlayBoard.constructPlayBoard(rand.nextLong(), model.getBoardWidth(), model.getBoardHeight(),
