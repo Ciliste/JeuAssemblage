@@ -152,6 +152,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			piecesMap.put(pieceId, piece);
 
 			this.fireAllEvents();
+			firePieceAdded(this, pieceId);
 
 			return true;
 		}
@@ -162,7 +163,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	public void removePieceFromBoard(Piece piece) {
 		
 		removePieceFromBoardWithoutRegistration(piece);
-		
+
 		this.unregisterPiece(piece);
 	}
 
@@ -180,6 +181,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			this.piecesImagesMap.put(pieceId, cell);
 
 			this.fireAllEvents();
+
+			firePieceRemoved(this, pieceId);
 
 			return true;
 		}
@@ -542,16 +545,41 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		return colorList;
 	}
 
+	private final Set<IPlayBoardListener> listeners = new HashSet<>();
+
 	@Override
 	public void addPlayBoardListener(IPlayBoardListener listener) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'addPlayBoardListener'");
+		
+		this.listeners.add(listener);
 	}
-
 
 	@Override
 	public void removePlayBoardListener(IPlayBoardListener listener) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'removePlayBoardListener'");
+		
+		this.listeners.remove(listener);
+	}
+
+	private void firePieceAdded(Object source, int pieceId) {
+		
+		for (IPlayBoardListener listener : this.listeners) {
+			
+			listener.pieceAdded(source, pieceId);
+		}
+	}
+
+	private void firePieceRemoved(Object source, int pieceId) {
+		
+		for (IPlayBoardListener listener : this.listeners) {
+			
+			listener.pieceRemoved(source, pieceId);
+		}
+	}
+
+	private void firePieceMoved(Object source, int pieceId) {
+		
+		for (IPlayBoardListener listener : this.listeners) {
+			
+			listener.pieceMoved(source, pieceId);
+		}
 	}
 }
