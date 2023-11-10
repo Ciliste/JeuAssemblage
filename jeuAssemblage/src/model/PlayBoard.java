@@ -485,7 +485,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
 			Piece piece = pieceFactory.createPiece(0);
-			/*
+			
 			Color color = null;
 			if (true == colorList.isEmpty()) {
 
@@ -493,10 +493,11 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			}
 
 			color = colorList.remove(random.nextInt(colorList.size()));
-			
-			playBoard.piecesImagesMap.put(playBoard.getPieceId(piece), PieceRenderUtils.createCellImage(color));
-			*/
+
 			playBoard.randomlyPlacePiece(piece);
+			playBoard.piecesImagesMap.put(playBoard.getPieceId(piece), PieceRenderUtils.createCellImage(color));
+
+			// TODO: REFAIRE CETTE MERDE
 		}
 
 		return playBoard;

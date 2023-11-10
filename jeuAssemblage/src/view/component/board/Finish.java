@@ -58,7 +58,7 @@ public class Finish extends JPanel {
 
         this.btnFinish.addActionListener(e -> {
 
-            mainFrame.setContentPane(new SoloGameFinishScreen(playBoard));
+            mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard));
         });
 
         this.add(this.lblPreciseArea);

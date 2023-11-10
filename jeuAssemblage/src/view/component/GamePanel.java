@@ -29,12 +29,12 @@ public class GamePanel extends JPanel {
 
 		this.setLayout(null);
 
-		this.timerPanel = new TimerPanel(timer, new Runnable() {
+		this.timerPanel = new TimerPanel(mainFrame, timer, new Runnable() {
 			
 			@Override
 			public void run() {
 				
-				mainFrame.setContentPane(new SoloGameFinishScreen(playBoard));
+				mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard));
 			}
 		});
 		this.pieceBoard = new PieceBoard(playBoard);

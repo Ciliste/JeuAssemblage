@@ -24,7 +24,7 @@ public class SoloGameFinishScreen extends JPanel {
 
 	private final PlayBoard playBoard;
 
-    public SoloGameFinishScreen(PlayBoard playBoard) {
+    public SoloGameFinishScreen(MainFrame mainFrame, PlayBoard playBoard) {
 
 		this.playBoard = playBoard;
 
@@ -35,26 +35,27 @@ public class SoloGameFinishScreen extends JPanel {
         // int[] areaInfo = controller.areaInfomartion();
         // this.lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
 
-        // this.btnSolo.addActionListener(e -> {
-        //     Controller.getInstance().finishGame();
-        //     MainFrame.getInstance().setContentPane(new SoloGameCreation());
-        // });
+        this.btnSolo.addActionListener(e -> {
 
-        // this.btnMenu.addActionListener(e -> {
-        //     Controller.getInstance().finishGame();
-        //     MainFrame.getInstance().setContentPane(new MainScreen());
-        // });
+            mainFrame.setContentPane(new SoloGameCreation(mainFrame));
+        });
 
-        // this.add(this.gameSummary);
-        // this.add(this.lblArea);
-        // this.add(this.btnMenu);
-        // this.add(this.btnSolo);
+        this.btnMenu.addActionListener(e -> {
+            
+            mainFrame.setContentPane(new MainScreen(mainFrame));
+        });
 
-        // super.doLayout();
+        this.add(this.gameSummary);
+        this.add(this.lblArea);
+        this.add(this.btnMenu);
+        this.add(this.btnSolo);
+
+        super.doLayout();
     }
     
     @Override
     public void doLayout() {
+
         super.doLayout();
 
         final int PADDING_LEFT = getWidthTimesPourcent (this, .05f);
