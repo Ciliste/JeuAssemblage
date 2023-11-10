@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Collections;
 
+import java.awt.Point;
+
 
 import bot.interfaces.IStrategyBot;
 import bot.Move;
@@ -56,11 +58,24 @@ public class AbstractStrategyAI implements IStrategyBot {
     private List<PlayBoard> mutation(List<PlayBoard> toMutate, Random rand, double mutationRate) {
 
         List<PlayBoard> postMutation = new ArrayList<PlayBoard>();
+
         for (PlayBoard parent : toMutate) {
+
             postMutation.add(parent);
 
-            if (rand.nextDouble(1) < mutationRate) {
-                postMutation.add(individualMutation(parent, rand));
+            double nextRand = rand.nextDouble(1);
+            if ( nextRand < mutationRate) {
+
+                if (nextRand < mutationRate / 3) {
+                    postMutation.add(individualMutationSwapping(parent, rand));
+                }
+                else if ( nextRand < (2 * mutationRate) / 3) {
+                    postMutation.add(individualMutationRotation(parent, rand));
+                }
+                else { 
+                    postMutation.add(individualMutationSwapping(parent, rand));
+                }
+
             }
         }
 
@@ -71,10 +86,10 @@ public class AbstractStrategyAI implements IStrategyBot {
         return postMutation;
     }
     
-    private PlayBoard individualMutation(PlayBoard parent1, Random rand) {
-        
+    private PlayBoard individualMutationSwapping(PlayBoard parent1, Random rand) {
+
         PlayBoard son = PlayBoard.constructCopyPlayBoard(parent1);
-        
+
         Map<Integer, Piece> piecesParent1 = parent1.getPieces();
 
         for (int cpt = 0; cpt < piecesParent1.size(); cpt++) {
@@ -83,7 +98,43 @@ public class AbstractStrategyAI implements IStrategyBot {
                 toSwapId = rand.nextInt(piecesParent1.size());
             }
 
-            son.swap(son.getPieceById(cpt+1), son.getPieceById(toSwapId + 1));
+            son.swap(son.getPieceById(cpt + 1), son.getPieceById(toSwapId + 1));
+        }
+
+        return son;
+    }
+    
+    private PlayBoard individualMutationRotation(PlayBoard parent1, Random rand) {
+        
+        double mutationRate = 0.33;
+
+        PlayBoard son = PlayBoard.constructCopyPlayBoard(parent1);
+        
+        Map<Integer, Piece> piecesParent1 = parent1.getPieces();
+
+        for (int cpt = 1; cpt < piecesParent1.size() + 1; cpt++) {
+
+            if (rand.nextDouble(1) <= mutationRate) {
+
+                Piece pieceClone = Piece.clone(son.getPieceById(cpt));
+
+                final int MAX_ROTATIONS = 4;
+                int nbRotations = rand.nextInt(MAX_ROTATIONS);
+                for (int i = 0; i < nbRotations; i++) {
+
+                    pieceClone.rotateLeft();
+                }
+
+                final int MAX_FLIPS = 2;
+                int nbReverse = rand.nextInt(MAX_FLIPS);
+                for (int i = 0; i < nbReverse; i++) {
+
+                    pieceClone.reverse();
+                }
+
+                Point p = son.getUpperLeftPieceCornerById(cpt);
+                son.placePieceAsId(p.x, p.y, pieceClone, cpt);
+            }
         }
 
         return son;
