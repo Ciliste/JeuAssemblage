@@ -475,7 +475,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 				+ difficulty.getMinNbPieces();
 	}
 
-	private static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
