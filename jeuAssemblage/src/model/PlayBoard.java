@@ -65,7 +65,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	}
 
 
-	void randomlyPlacePiece(Piece piece) {
+	boolean randomlyPlacePiece(Piece piece) {
 
 		//System.out.println("Randomly placing piece: " + piece);
 
@@ -97,13 +97,14 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			if (placePiece(x, y, piece)) {
 
-				return;
+				return true;
 			}
 
 			iteration++;
 
 		} while (iteration < MAX_ITERATIONS);
 
+		return false;
 		// for (int i = 0; i < board.length; i++) {
 	
 		// 	for (int j = 0; j < board[i].length; j++) {
@@ -467,10 +468,11 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 	public static int getPiecesCountBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
-		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1) + difficulty.getMinNbPieces();
+		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1)
+				+ difficulty.getMinNbPieces();
 	}
 
-	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
+	private static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
