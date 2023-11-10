@@ -33,7 +33,6 @@ public class Finish extends JPanel {
 		this.mainFrame = mainFrame;
         this.playBoard = playBoard;
 
-        /*
 		this.playBoard.addPlayBoardListener(new IPlayBoardListener() {
 			
 			@Override
@@ -53,7 +52,7 @@ public class Finish extends JPanel {
 				
 				update();
 			}
-		}); */
+		});
 
         this.setLayout(null);
 

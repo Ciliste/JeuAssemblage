@@ -68,9 +68,9 @@ public class GamePanel extends JPanel {
 
 		this.finish.setBounds(
 			this.grid.getWidth(),
-		 	0,
+		 	this.timerPanel.getHeight(),
 		 	getWidthTimesPourcent (this, .2f),
-		 	getHeightTimesPourcent(this, 1f)
+		 	getHeightTimesPourcent(this, .6f)
 		);
 	}
 
