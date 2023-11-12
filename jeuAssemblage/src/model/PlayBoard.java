@@ -87,7 +87,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	
 		final int MAX_ITERATIONS = 100;
 		int iteration = 0;
-
+		
+		//TODO: y'a des beugs
 		do {
 
 			int x = random.nextInt(this.board[0].length - piece.getWidth() + 1);
@@ -187,7 +188,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			return true;
 		}
-		
+
 		return false;
 	}
 	
@@ -247,6 +248,12 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	public boolean canBeSwapped(int x, int y, Piece piece, int ignoreId) {
 
 		boolean[][] pieceMatrix = piece.getPiece();
+		int pieceId;
+		try {
+			pieceId = this.getPieceId(piece);
+		} catch (Exception e) {
+			pieceId = EMPTY;
+		} 
 
 		boolean canBePlaced = true;
 		for (int i = 0; i < piece.getHeight() && canBePlaced; i++) {
@@ -257,7 +264,11 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 					canBePlaced = (
 						y + i < this.board.length && 
 						x + j < this.board[0].length && 
-						(this.board[y + i][x + j] == EMPTY || this.board[y + i][x + j] == ignoreId)
+						(
+							this.board[y + i][x + j] == EMPTY ||
+							this.board[y + i][x + j] == ignoreId ||
+							this.board[y + i][x + j] == pieceId
+						)
 					);
 				}	
 			}
@@ -291,6 +302,22 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	}
 	
 	@Override
+	public boolean equals(Object p) {
+		PlayBoard pBoard = (PlayBoard) p;
+		if (this.seed != pBoard.seed) return false;
+		if (this.sizeX != pBoard.sizeX) return false;
+		if (this.sizeY != pBoard.sizeY) return false;
+		if (this.piecesMap.size() != pBoard.piecesMap.size()) return false;
+
+		for (int i = 0; i < this.board.length; i++) {
+			if (!Arrays.deepEquals(this.board, pBoard.board))
+				return false; 
+		}
+
+		return true;
+	}
+
+	@Override
 	public String toString() {
 
 		StringBuilder sb = new StringBuilder();
@@ -299,7 +326,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			for (int j = 0; j < this.board[i].length; j++) {
 
-				sb.append((this.board[i][j] == EMPTY) ? "0 " : this.board[i][j] + " ");
+				sb.append((this.board[i][j] == EMPTY) ? "░ " : this.board[i][j] + " ");
 				sb.append(" ");
 			}
 

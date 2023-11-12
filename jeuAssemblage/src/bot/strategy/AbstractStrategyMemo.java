@@ -1,6 +1,5 @@
 package bot.strategy;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import bot.interfaces.IStrategyBot;
@@ -12,7 +11,7 @@ public class AbstractStrategyMemo implements IStrategyBot{
     protected LinkedList<Move> moves;
     protected PlayBoard model;
     
-    protected AbstractStrategyMemo(PlayBoard model) {
+    public AbstractStrategyMemo(PlayBoard model) {
         this.deep = -1;
         this.moves = new LinkedList<Move>();
         this.model = model;

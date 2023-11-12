@@ -1,15 +1,10 @@
 package main;
 
-import java.io.File;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import bot.strategy.AbstractStrategyAI;
-import model.PlayBoard;
-import model.SeedUtils;
 import view.MainFrame;
 
 public class App {
@@ -18,6 +13,9 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
+        //PlayBoard p = PlayBoard.constructPlayBoard(Long.parseLong("2392006401451300864"), 10, 11, 5);
+        //new AIStrategy(p);
+        
         SwingUtilities.invokeLater(() -> {
             
             frame = new MainFrame();
