@@ -44,7 +44,7 @@ public class SoloGameCreation extends JPanel {
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
 	private final JList<String> difficultyList = new JList<String>(EDifficulty.getDifficultysName());
 
-	private final JSpinner nbMinutesSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+	protected final JSpinner nbMinutesSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 	private final JSpinner nbSecondsSpinner = new JSpinner(new SpinnerNumberModel(0, -1, 60, 1));
 	private final JCheckBox timeLimitCheckBox = new JCheckBox("Temps limité");
 
@@ -136,7 +136,7 @@ public class SoloGameCreation extends JPanel {
 				timer = Timer.NO_TIMER;
 			}
 
-			mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, timer));
+			startGame(playBoard, timer);
 		});
 
 		nbMinutesSpinner.setEnabled(timeLimitCheckBox.isSelected());
@@ -166,11 +166,15 @@ public class SoloGameCreation extends JPanel {
 		revalidate();
     }
 
+	protected void startGame(PlayBoard playBoard, Timer timer) {
+
+		mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, timer));
+	}
+
 	@Override
 	public void doLayout() {
 
 		final int PADDING_LEFT = getWidthTimesPourcent(this, .05f);
-
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
 
 		final int BTN_CANCEL_WIDTH = Math.max(getWidthTimesPourcent(this, .03f), getHeightTimesPourcent(this, .03f));

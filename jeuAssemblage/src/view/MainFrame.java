@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 
+import main.App;
 import view.screen.MainScreen;
 
 public class MainFrame extends JFrame {
@@ -30,7 +31,7 @@ public class MainFrame extends JFrame {
 
 		try {
 
-			InputStream stream = MainFrame.class.getResourceAsStream("/assets/icon.png");
+			InputStream stream = MainFrame.class.getResourceAsStream(App.RESSOURCES_PATH + "icon.png");
 
 			Image image = ImageIO.read(stream).getScaledInstance(25, 25, Image.SCALE_SMOOTH);
 

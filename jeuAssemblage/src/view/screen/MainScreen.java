@@ -53,5 +53,15 @@ public class MainScreen extends JPanel {
 
             MainScreen.this.mainFrame.setContentPane(new SoloGameCreation(mainFrame));
         });
+
+		btnMulti.addActionListener(e -> {
+
+			MainScreen.this.mainFrame.setContentPane(new MultiplayerSelectScreen(mainFrame));
+		});
+
+		btnQuitter.addActionListener(e -> {
+
+			System.exit(0);
+		});
     }
 }

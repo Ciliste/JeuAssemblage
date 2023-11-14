@@ -9,6 +9,8 @@ import view.MainFrame;
 
 public class App {
 
+	public static final String RESSOURCES_PATH = "/assets/";
+
     private static JFrame frame = null;
 
     public static void main(String[] args) throws Exception {
