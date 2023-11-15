@@ -2,18 +2,12 @@ package view.screen;
 
 import static view.utils.SwingUtils.*;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
-import javax.swing.JCheckBox;
-import javax.swing.SpinnerNumberModel;
 
 import model.PlayBoard;
 import model.SeedUtils;
+import model.arrangement.ArrangementList;
 import utils.EDifficulty;
 import view.MainFrame;
 import view.component.Separator;
@@ -43,6 +37,10 @@ public class SoloGameCreation extends JPanel {
 
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
 	private final JList<String> difficultyList = new JList<String>(EDifficulty.getDifficultysName());
+
+	private final JLabel lblArrangement = new JLabel("Parties Enregistrées :");
+	private final JTable tableArrangement = new JTable(new ArrangementList());
+	private final JScrollPane scrollArrangement = new JScrollPane(tableArrangement);
 
 	protected final JSpinner nbMinutesSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
 	private final JSpinner nbSecondsSpinner = new JSpinner(new SpinnerNumberModel(0, -1, 60, 1));
@@ -87,6 +85,9 @@ public class SoloGameCreation extends JPanel {
 		this.add(nbMinutesSpinner);
 		this.add(nbSecondsSpinner);
 		this.add(timeLimitCheckBox);
+
+		this.add(lblArrangement);
+		this.add(scrollArrangement);
 
 		this.add(gridPreview);
 
@@ -159,6 +160,11 @@ public class SoloGameCreation extends JPanel {
 				nbSecondsSpinner.setValue(59);
 				nbMinutesSpinner.setValue((int) nbMinutesSpinner.getValue() - 1);
 			}
+		});
+
+		tableArrangement.getSelectionModel().addListSelectionListener(e->{
+			if (e.getValueIsAdjusting()) return;
+			SoloGameCreation.this.setParams(tableArrangement.getSelectedRow());
 		});
 
 		updateGridPreview();
@@ -275,6 +281,20 @@ public class SoloGameCreation extends JPanel {
 			BTN_CANCEL_HEIGHT * 3
 		);
 
+		lblArrangement.setBounds(
+			PADDING_LEFT,
+			difficultyList.getY() + difficultyList.getHeight() + BTN_CANCEL_HEIGHT,
+			LBL_WIDTH,
+			BTN_CANCEL_HEIGHT
+		);
+
+		scrollArrangement.setBounds(
+			PADDING_LEFT,
+			difficultyList.getY() + difficultyList.getHeight() + BTN_CANCEL_HEIGHT * 2,
+			getWidthTimesPourcent(this, .35f),
+			BTN_CANCEL_HEIGHT * 3
+		);
+
 		nbMinutesSpinner.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .3f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 7,
@@ -288,7 +308,7 @@ public class SoloGameCreation extends JPanel {
 			getWidthTimesPourcent(this, .1f),
 			BTN_CANCEL_HEIGHT
 		);
-
+		
 		timeLimitCheckBox.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .3f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
@@ -314,14 +334,27 @@ public class SoloGameCreation extends JPanel {
 		);
 	}
 
-    private void seedUpdated(long seed) {
+	private void seedUpdated(long seed) {
 
 		EDifficulty difficulty = EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue());
 
-        txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
-        txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));
-        nbPiecesSpinner.setValue(PlayBoard.getPiecesCountBySeedAndDifficulty(seed, difficulty));
-    }
+		txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
+		txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));
+		nbPiecesSpinner.setValue(PlayBoard.getPiecesCountBySeedAndDifficulty(seed, difficulty));
+	}
+	
+	private void setParams(int index) {
+
+		int sizeX = (Integer) this.tableArrangement.getValueAt(index, 0);
+		int sizeY = (Integer) this.tableArrangement.getValueAt(index, 1);
+		int pieceCount = (Integer) this.tableArrangement.getValueAt(index, 2);
+		long seed = (Long) this.tableArrangement.getValueAt(index, 3);
+
+		this.txtSeed.setText(seed + "");
+		this.txtSizeX.setText(sizeX + "");
+		this.txtSizeY.setText(sizeY + "");
+		this.nbPiecesSpinner.setValue(pieceCount);
+	}
 
 	private void updateGridPreview() {
 
