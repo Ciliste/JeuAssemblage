@@ -5,10 +5,13 @@ import static view.utils.SwingUtils.getWidthTimesPourcent;
 
 import java.util.ArrayList;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import model.ProfileUtils;
 import view.MainFrame;
@@ -45,6 +48,25 @@ public class AIGameCreation extends SoloGameCreation {
 
 			bots.setListData(botDescriptors);
 		});
+
+		// Change list component renderer
+		bots.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
+
+			JPanel panel = new JPanel();
+
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+
+			JLabel label = new JLabel(value.getName());
+			label.setAlignmentX(LEFT_ALIGNMENT);
+			panel.add(label);
+
+			JLabel label2 = new JLabel(" (" + value.getDifficulty() + ")");
+			label2.setAlignmentX(LEFT_ALIGNMENT);
+			panel.add(label2);
+
+			return panel;
+
+		});
 	}
 
 	@Override
@@ -73,7 +95,7 @@ public class AIGameCreation extends SoloGameCreation {
 		);
 	}
 
-	private static class BotDescriptor {
+	public static class BotDescriptor {
 
 		private String name;
 		private int difficulty;
