@@ -1,0 +1,14 @@
+/out/
+/.idea/
+
+jeuAssemblage/bin/*
+jeuAssemblage/build/*
+jeuAssemblage/dist/*
+jeuAssemblage/jeuAssemblage.iml
+jeuAssemblage/dist/*.jar
+
+piece_puzzle/build/*
+piece_puzzle/dist/*
+piece_puzzle/piece_puzzle.iml
+
+*.class
