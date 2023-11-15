@@ -1,10 +1,11 @@
 package model.arrangement;
 
 public class Arrangement {
-    private int sizeX;
-    private int sizeY;
-    private int pieceCount;
-    private long seed;
+
+    protected int sizeX;
+    protected int sizeY;
+    protected int pieceCount;
+    protected long seed;
     
     protected String username;
     protected int score;

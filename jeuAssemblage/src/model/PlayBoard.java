@@ -458,6 +458,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	}
 
 	public Map<Integer, Piece> getPieces() { return new HashMap<>(piecesMap); }
+	public int getPiecesCount() { return this.piecesMap.size(); }
 
 	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }		
 	public Point getUpperLeftPieceCorner() { return new Point(getLowerPieceX(), getLowerPieceY()); }
@@ -472,11 +473,11 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	public int getBoardHeight() { return this.board.length; }
 	public int[][] getBoardArray() { return this.board.clone(); }
 
-
 	public int getWidth() { return this.sizeX; }
-
 	public int getHeight() { return this.sizeY; }
 	
+	public long getSeed() { return this.seed; }
+
 	
 	// -----------------
 	// STATIC METHODS

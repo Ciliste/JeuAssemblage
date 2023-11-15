@@ -1,5 +1,13 @@
 package model.arrangement;
 
+
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
+
+import model.PlayBoard;
+
+import javax.swing.table.AbstractTableModel;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -9,15 +17,98 @@ import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ArrangementList {
+public class ArrangementList implements TableModel {
 
     private static List<Arrangement> arrangements;
+    private static String[] headersName;
 
-    static {
+    static 
+    {
+        arrangements = ArrangementList.getArrangementList();
+        headersName = new String[] {
+            "X",
+            "Y",
+            "NB PIECE",
+            "SEED",
+            "USERNAME",
+            "SCORE"
+        };
+    }
+    
+    private List<TableModelListener> listeners;
+    
+    public ArrangementList() {
 
-        ArrangementList.arrangements = ArrangementList.getArrangementList();
+        this.listeners = new ArrayList<TableModelListener>();
     }
 
+
+    // tableModel Methods
+    @Override
+    public int getRowCount() {
+        return ArrangementList.arrangements.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+
+        return headersName.length;
+    }
+
+    @Override
+    public String getColumnName(int columnIndex) {
+        return headersName[columnIndex];
+    }
+
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        if (this.getRowCount() == 0) return Object.class;
+
+        return this.getValueAt(0, columnIndex).getClass();
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+
+        return false;
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+
+        Object val = "No";
+        Arrangement selected = arrangements.get(rowIndex);
+
+        switch (columnIndex) {
+            case 0 -> val = selected.sizeX;
+            case 1 -> val = selected.sizeY;
+            case 2 -> val = selected.pieceCount;
+            case 3 -> val = selected.seed;
+            case 4 -> val = selected.username;
+            case 5 -> val = selected.score;
+        }
+        
+        return val;
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        
+        throw new IllegalStateException("Impossible");
+    }
+
+    @Override
+    public void addTableModelListener(TableModelListener l) {
+        this.listeners.add(l);
+    }
+
+    @Override
+    public void removeTableModelListener(TableModelListener l) {
+        this.listeners.remove(l);
+    }
+
+
+    // Static methods
     public static List<Arrangement> getArrangements() {
 
         return ArrangementList.arrangements;
@@ -38,7 +129,20 @@ public class ArrangementList {
         }
 
         ArrangementList.registerArrangement();
-        
+
+    }
+
+    public static void addArrangement(PlayBoard playboard, String name) {
+        addArrangement(
+            new Arrangement(
+                playboard.getBoardWidth(),
+                playboard.getBoardHeight(),
+                playboard.getPiecesCount(),
+                playboard.getSeed(),
+                name,
+                playboard.getArea()
+            )
+         );
     }
     
     private static Arrangement exist(Arrangement arrangement) {
