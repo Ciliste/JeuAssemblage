@@ -1,17 +1,20 @@
 package view.component.board;
 
-import main.Controller;
-import pieces.Piece;
+import piece.Piece;
+import view.component.board.listener.IPieceManipulationComponent;
 import view.utils.SwingUtils;
 
 import javax.swing.*;
+
+import model.PlayBoard;
+import observer.interfaces.Listener;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.Arrays;
 
-public class PieceBoard extends JPanel {
+public class PieceBoard extends JPanel implements IPieceManipulationComponent, Listener {
 
-	private final Controller controller = Controller.getInstance();
+	private final PlayBoard playBoard;
 
 	private final JButton btnTurnLeft  = new JButton("<-");
 	private final JButton btnTurnRight = new JButton("->");
@@ -19,9 +22,14 @@ public class PieceBoard extends JPanel {
 
 	private final JButton btnCancel = new JButton("X");
 
-	public PieceBoard() {
+	private Piece selectedPiece = null;
+	private int selectedPieceId = -1;
 
-		// controller.getPlayBoard().
+	public PieceBoard(PlayBoard playBoard) {
+
+		super();
+
+		this.playBoard = playBoard;
 
 		this.setLayout(null);
 
@@ -33,28 +41,23 @@ public class PieceBoard extends JPanel {
 
 		btnTurnLeft.addActionListener(e -> {
 
-			controller.getSelectedPiece().rotate(Piece.LEFT);
-			System.out.println(Arrays.deepToString(controller.getSelectedPiece().getBounds()));
-			getParent().repaint();
+			selectedPiece.rotateLeft();
 		});
 
 		btnTurnRight.addActionListener(e -> {
 
-			controller.getSelectedPiece().rotate(Piece.RIGHT);
-			System.out.println(Arrays.deepToString(controller.getSelectedPiece().getBounds()));
-			getParent().repaint();
+			selectedPiece.rotateRight();
 		});
 
 		btnReverse.addActionListener(e -> {
 
-			controller.getSelectedPiece().reverse();
-			System.out.println(Arrays.deepToString(controller.getSelectedPiece().getBounds()));
-			getParent().repaint();
+			selectedPiece.reverse();
 		});
 
 		btnCancel.addActionListener(e -> {
 
-			controller.setPieceSelected(null);
+			unSelectPiece();
+
 			getParent().repaint();
 		});
 	}
@@ -112,17 +115,16 @@ public class PieceBoard extends JPanel {
 
         SwingUtils.drawDebugBounds(this, g);
 
-		boolean hasSelectedPiece = controller.getSelectedPiece() != null;
+		boolean hasSelectedPiece = this.selectedPiece != null;
 		btnTurnLeft.setVisible(hasSelectedPiece);
 		btnTurnRight.setVisible(hasSelectedPiece);
 		btnReverse.setVisible(hasSelectedPiece);
 		btnCancel.setVisible(hasSelectedPiece);
 
-		final Piece p = this.controller.getSelectedPiece();
-		if (p == null) return;
+		if (selectedPiece == null) return;
 
-		final int PIECE_SIZE_X = p.getWidth();
-		final int PIECE_SIZE_Y = p.getHeight();
+		final int PIECE_SIZE_X = selectedPiece.getWidth();
+		final int PIECE_SIZE_Y = selectedPiece.getHeight();
 
 		final int PIECE_MARGIN = SwingUtils.getWidthTimesPourcent(this, 0.05f);
 		
@@ -141,7 +143,7 @@ public class PieceBoard extends JPanel {
 
 		final int PIECE_MARGIN_LEFT = (getWidth() - PIECE_WIDTH) / 2;
 
-		Image img = controller.getImageById(p.getInstanceId());
+		Image img = playBoard.getCellImageByPieceId(selectedPieceId);
 		img = img.getScaledInstance(PIECE_WIDTH, PIECE_HEIGHT, Image.SCALE_SMOOTH);
 
 		AffineTransform at = new AffineTransform();
@@ -162,7 +164,7 @@ public class PieceBoard extends JPanel {
 		if (g instanceof Graphics2D) {
 
 			Graphics2D g2d = (Graphics2D) g;
-			int[][] bounds = p.getBounds();
+			boolean[][] bounds = selectedPiece.getPiece();
 
 			final int CELL_SIZE;
 
@@ -179,7 +181,7 @@ public class PieceBoard extends JPanel {
 
 				for (int j = 0; j < bounds[i].length; j++) {
 
-					if (bounds[i][j] != 0) {
+					if (bounds[i][j]) {
 
 						g2d.drawImage(
 							img,
@@ -193,5 +195,33 @@ public class PieceBoard extends JPanel {
 				}
 			}
 		}
+	}
+
+	@Override
+	public Piece getSelectedPiece() {
+		
+		return this.selectedPiece;
+	}
+
+	@Override
+	public void unSelectPiece() {
+		
+		this.selectedPiece = null;
+		this.selectedPieceId = -1;
+
+		repaint();
+	}
+
+	@Override
+	public void selectPiece(int pieceId) {
+
+		Piece piece = playBoard.getPieceById(pieceId);
+		selectedPieceId = pieceId;
+		selectedPiece = piece;
+	}
+	
+	@Override
+	public void update() {
+		this.repaint();
 	}
 }

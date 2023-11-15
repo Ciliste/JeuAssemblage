@@ -4,9 +4,14 @@ import static view.utils.SwingUtils.*;
 
 import javax.swing.JPanel;
 
+import model.PlayBoard;
+import view.MainFrame;
 import view.component.board.Finish;
 import view.component.board.Grid;
 import view.component.board.PieceBoard;
+import view.component.board.TimerPanel;
+import view.component.board.TimerPanel.Timer;
+import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;
@@ -14,25 +19,37 @@ import java.awt.Graphics;
 public class GamePanel extends JPanel {
 	
 	private final Grid grid;
+	private final TimerPanel timerPanel;
 	private final PieceBoard pieceBoard;
 	private final Finish finish;
 
-	public GamePanel() {
+	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, Timer timer) {
+
 		super();
+
 		this.setLayout(null);
 
-
-		this.grid = new Grid();
-		this.pieceBoard = new PieceBoard();
-		this.finish = new Finish();
+		this.timerPanel = new TimerPanel(mainFrame, timer, new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard));
+			}
+		});
+		this.pieceBoard = new PieceBoard(playBoard);
+		this.grid = new Grid(playBoard);
+		this.finish = new Finish(mainFrame, playBoard);
 
 		this.add(this.grid);
-		this.add(this.pieceBoard);
+		this.add(this.timerPanel);
+		// this.add(this.pieceBoard);
 		this.add(this.finish);
 	}
 
 	@Override
 	public void doLayout() {
+
 		super.doLayout();
 
 		this.grid.setBounds(
@@ -42,7 +59,7 @@ public class GamePanel extends JPanel {
 		 	this.getHeight()
 		);
 
-		this.pieceBoard.setBounds(
+		this.timerPanel.setBounds(
 			this.grid.getWidth(),
 		 	0,
 		 	getWidthTimesPourcent (this, .2f),
@@ -51,11 +68,10 @@ public class GamePanel extends JPanel {
 
 		this.finish.setBounds(
 			this.grid.getWidth(),
-		 	this.getHeight() - getHeightTimesPourcent(this, .4f),
+		 	this.timerPanel.getHeight(),
 		 	getWidthTimesPourcent (this, .2f),
-		 	getHeightTimesPourcent(this, .4f)
+		 	getHeightTimesPourcent(this, .6f)
 		);
-		
 	}
 
 	@Override

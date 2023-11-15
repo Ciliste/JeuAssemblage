@@ -3,37 +3,62 @@ package view.component.board;
 import static view.utils.SwingUtils.*;
 
 import java.awt.Graphics;
+import java.awt.Point;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import main.Controller;
-import main.listener.EventListener;
+import model.PlayBoard;
+import model.listener.IPlayBoardListener;
 import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
 
-public class Finish extends JPanel implements EventListener{
-
-    private final Controller controller;
+public class Finish extends JPanel {
 
     private final JLabel lblPreciseArea = new JLabel();
     private final JLabel lblArea        = new JLabel();
     
     private final JButton btnFinish     = new JButton("Finir");
 
+	private final MainFrame mainFrame;
+    private final PlayBoard playBoard;
 
-    public Finish() {
-        this.controller = Controller.getInstance();
-        this.controller.addListener(this);
+    public Finish(MainFrame mainFrame, PlayBoard playBoard) {
+
+		super();
+
+		this.mainFrame = mainFrame;
+        this.playBoard = playBoard;
+
+		this.playBoard.addPlayBoardListener(new IPlayBoardListener() {
+			
+			@Override
+			public void pieceAdded(Object source, int pieceId) {
+				
+				update();
+			}
+
+			@Override
+			public void pieceRemoved(Object source, int pieceId) {
+				
+				update();
+			}
+
+			@Override
+			public void pieceMoved(Object source, int pieceId) {
+				
+				update();
+			}
+		});
 
         this.setLayout(null);
 
-        this.update();
-
         this.btnFinish.addActionListener(e -> {
-            MainFrame.getInstance().setContentPane(new SoloGameFinishScreen());
+
+            mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard));
         });
 
         this.add(this.lblPreciseArea);
@@ -44,14 +69,8 @@ public class Finish extends JPanel implements EventListener{
     }
 
     @Override
-    public void update() {
-        int[] areaInfo = this.controller.areaInfomartion();
-        lblPreciseArea.setText("Nombre de carrés : " + areaInfo[4]);
-        lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
-    }
-
-    @Override
     public void doLayout() {
+
         final int PADDING = getWidthTimesPourcent(this, .05f);
 
         this.lblArea.setBounds(
@@ -80,9 +99,30 @@ public class Finish extends JPanel implements EventListener{
 
     @Override
     public void paintComponent(Graphics g) {
+
         super.paintComponent(g);
 
         SwingUtils.drawDebugBounds(this, g);
     }
+
+    // @Override
+	// public void update() {
+	// 	this.repaint();
+	// }
     
+	public void update() {
+
+		Logger.getGlobal().info("Update finish component");
+
+		Point upperLeft = playBoard.getUpperLeftPieceCorner();
+		Point lowerRight = playBoard.getLowerRightPieceCorner();
+
+		int area = (lowerRight.x - upperLeft.x) * (lowerRight.y - upperLeft.y);
+
+		lblArea.setText("Aire : " + area);
+
+        //int[] areaInfo = this.controller.areaInfomartion();
+        //lblPreciseArea.setText("Nombre de carrés : " + areaInfo[4]);
+        //lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
+    }
 }

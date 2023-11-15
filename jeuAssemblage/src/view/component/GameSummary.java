@@ -4,25 +4,29 @@ import static view.utils.SwingUtils.*;
 
 import javax.swing.JPanel;
 
-import pieces.Piece;
+import model.PlayBoard;
+import piece.Piece;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.geom.Rectangle2D;
-
-import main.Controller;
 import java.util.ArrayList;
 import java.awt.Color;
 
 
 public class GameSummary extends JPanel {
 
-    private final Controller controller = Controller.getInstance(); 
+    private final PlayBoard playBoard;
 
-    public GameSummary() {
+    public GameSummary(PlayBoard playBoard) {
+
         super();
+
+		this.playBoard = playBoard;
+
         this.setLayout(null);
     }
 
@@ -33,12 +37,13 @@ public class GameSummary extends JPanel {
 
         SwingUtils.drawDebugBounds(this, g);
 
-        int[] areaInformation = this.controller.areaInfomartion();
+        Point upperLeftCorner = playBoard.getUpperLeftPieceCorner();
+        Point lowerRightCorner = playBoard.getLowerRightPieceCorner();
 
-        int xBegin = areaInformation[0];
-        int yBegin = areaInformation[1];
-        int xEnd   = areaInformation[2];
-        int yEnd   = areaInformation[3];
+        int xBegin = upperLeftCorner.x;
+        int yBegin = upperLeftCorner.y;
+        int xEnd   = lowerRightCorner.x + 1;
+        int yEnd   = lowerRightCorner.y + 1;
 
         int componentSize = (int) Math.min(
                 getHeightTimesPourcent(this, 0.95f) / ((yEnd - yBegin) * 1d),
@@ -50,7 +55,7 @@ public class GameSummary extends JPanel {
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.setColor(Color.WHITE);
-        int[][] matrices = this.controller.getPlayBoard();
+        int[][] matrices = playBoard.getBoardArray();
 
         for ( int i = yBegin; i < yEnd; i++) {
 
@@ -63,17 +68,17 @@ public class GameSummary extends JPanel {
 
                 if (matrices[i][j] != 0) {
 
-                    Piece p = this.controller.getPieceById(matrices[i][j]);
+                    Piece p = playBoard.getPieceById(matrices[i][j]);
 
-					Image img = this.controller.getImageById(p.getInstanceId());
+					Image img = playBoard.getCellImageByPieceId(matrices[i][j]);
 
-					g2d.drawImage(
-						img,
-						x + 1,
-						y + 1,
-						componentSize,
-						componentSize,
-						null
+		 			g2d.drawImage(
+		 				img,
+		 				x + 1,
+		 				y + 1,
+		 				componentSize,
+		 				componentSize,
+		 				null
 					);
                 } 
 				else {

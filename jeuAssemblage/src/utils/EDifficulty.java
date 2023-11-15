@@ -1,9 +1,9 @@
-package main;
+package utils;
 
 /**
  * Difficulty
  */
-public enum Difficulty {
+public enum EDifficulty {
 
 	// TODO: Faire en sorte que les difficultés soient chargées depuis un fichier de configuration
 	EASY(1, "Facile", 6, 6, 10, 10, 4, 5),
@@ -22,7 +22,7 @@ public enum Difficulty {
 	private final int minNbPieces;
 	private final int maxNbPieces;
 
-	private Difficulty(int value, String name, int minSizeX, int minSizeY, int maxSizeX, int maxSizeY, int minNbPieces, int maxNbPieces) {
+	private EDifficulty(int value, String name, int minSizeX, int minSizeY, int maxSizeX, int maxSizeY, int minNbPieces, int maxNbPieces) {
 
 		this.value = value;
 		this.name = name;
@@ -79,19 +79,19 @@ public enum Difficulty {
 
 	public static String[] getDifficultysName() {
 
-		String[] names = new String[Difficulty.values().length];
+		String[] names = new String[EDifficulty.values().length];
 
-		for (int i = 0; i < Difficulty.values().length; i++) {
+		for (int i = 0; i < EDifficulty.values().length; i++) {
 
-			names[i] = Difficulty.values()[i].getName();
+			names[i] = EDifficulty.values()[i].getName();
 		}
 
 		return names;
 	}
 
-	public static Difficulty getDifficultyFromName(String name) {
+	public static EDifficulty getDifficultyFromName(String name) {
 
-		for (Difficulty difficulty : Difficulty.values()) {
+		for (EDifficulty difficulty : EDifficulty.values()) {
 
 			if (difficulty.getName().equals(name)) {
 

@@ -63,7 +63,7 @@
 		<!-- Create application JAR file -->
 		<jar jarfile="${dist.home}/${app.fullname}.jar" basedir="${build.home}">
 			<manifest>
-				<attribute name="Main-Class" value="pieces.Piece"/>
+				<attribute name="Main-Class" value="piece.Piece"/>
 			</manifest>
 		</jar>
 		<!--

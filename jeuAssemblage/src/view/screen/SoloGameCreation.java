@@ -2,21 +2,17 @@ package view.screen;
 
 import static view.utils.SwingUtils.*;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 
-import main.Controller;
-import main.Difficulty;
+import model.PlayBoard;
+import model.SeedUtils;
+import model.arrangement.ArrangementList;
+import utils.EDifficulty;
 import view.MainFrame;
-import view.component.JTableArrangement;
 import view.component.Separator;
+import view.component.board.Grid;
+import view.component.board.TimerPanel.Timer;
 import view.utils.DocumentAdapter;
 
 public class SoloGameCreation extends JPanel {
@@ -37,19 +33,30 @@ public class SoloGameCreation extends JPanel {
     private final JTextField txtSizeY = new JTextField();
 
     private final JLabel lblNbPieces = new JLabel("Nb pièces :");
-    private final JSpinner nbPiecesSpinner = new JSpinner();
+    private final JSpinner nbPiecesSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
 
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
-	private final JList<String> difficultyList = new JList<String>(Difficulty.getDifficultysName());
+	private final JList<String> difficultyList = new JList<String>(EDifficulty.getDifficultysName());
 
-	private final JButton btnPlay = new JButton("Jouer");
-	
-	private final JTable      tableArrangement = JTableArrangement.getJTable();
+	private final JLabel lblArrangement = new JLabel("Parties Enregistrées :");
+	private final JTable tableArrangement = new JTable(new ArrangementList());
 	private final JScrollPane scrollArrangement = new JScrollPane(tableArrangement);
-    
-    private final Controller controller = Controller.getInstance();
 
-    public SoloGameCreation() {
+	protected final JSpinner nbMinutesSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
+	private final JSpinner nbSecondsSpinner = new JSpinner(new SpinnerNumberModel(0, -1, 60, 1));
+	private final JCheckBox timeLimitCheckBox = new JCheckBox("Temps limité");
+
+	private JPanel gridPreview = new JPanel();
+
+    private final JButton btnPlay = new JButton("Jouer");
+    
+	private final MainFrame mainFrame;
+
+    public SoloGameCreation(MainFrame mainFrame) {
+
+		super();
+
+		this.mainFrame = mainFrame;
 
         this.setLayout(null);
 
@@ -75,7 +82,14 @@ public class SoloGameCreation extends JPanel {
 		this.add(difficultyList);
 		difficultyList.setSelectedIndex(1);
 
+		this.add(nbMinutesSpinner);
+		this.add(nbSecondsSpinner);
+		this.add(timeLimitCheckBox);
+
+		this.add(lblArrangement);
 		this.add(scrollArrangement);
+
+		this.add(gridPreview);
 
 		this.add(btnPlay);
 
@@ -84,7 +98,7 @@ public class SoloGameCreation extends JPanel {
 		// ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
         // this.addComponentListener(resizeListener);
 
-        btnCancel.addActionListener(e -> MainFrame.getInstance().setContentPane(new MainScreen()));
+        btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
 
         final Runnable randomSeedCallback = createRandomSeedCallback(this);
         btnRandomSeed.addActionListener(e -> randomSeedCallback.run());
@@ -92,20 +106,60 @@ public class SoloGameCreation extends JPanel {
 
         txtSeed.getDocument().addDocumentListener(new SeedDocumentListener());
 
+		txtSizeX.getDocument().addDocumentListener(new SizeDocumentListener());
+		txtSizeY.getDocument().addDocumentListener(new SizeDocumentListener());
+
 		difficultyList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
-                updateSeed(Long.parseLong(txtSeed.getText()));
+                seedUpdated(Long.parseLong(txtSeed.getText()));
+				updateGridPreview();
             }
         });
 
+		nbPiecesSpinner.addChangeListener(e -> updateGridPreview());
+
 		btnPlay.addActionListener(e -> {
 
-			if (initPlayBoard()) {
-				MainFrame.getInstance().setContentPane(new SoloGameScreen());
-			} else {
-				System.out.println("Impossible mon ga");
+			PlayBoard playBoard = PlayBoard.constructPlayBoard(
+				Long.parseLong(txtSeed.getText()), 
+				Integer.parseInt(txtSizeX.getText()),
+				Integer.parseInt(txtSizeY.getText()), 
+				(int) nbPiecesSpinner.getValue()
+			);
+
+			Timer timer = null;
+			if (timeLimitCheckBox.isSelected()) {
+
+				timer = new Timer((int) nbMinutesSpinner.getValue(), (int) nbSecondsSpinner.getValue());
+			}
+			else {
+
+				timer = Timer.NO_TIMER;
 			}
 
+			startGame(playBoard, timer);
+		});
+
+		nbMinutesSpinner.setEnabled(timeLimitCheckBox.isSelected());
+		nbSecondsSpinner.setEnabled(timeLimitCheckBox.isSelected());
+
+		timeLimitCheckBox.addActionListener(e -> {
+			nbMinutesSpinner.setEnabled(timeLimitCheckBox.isSelected());
+			nbSecondsSpinner.setEnabled(timeLimitCheckBox.isSelected());
+		});
+
+		nbSecondsSpinner.addChangeListener(e -> {
+
+			if ((int) nbSecondsSpinner.getValue() == 60) {
+
+				nbSecondsSpinner.setValue(0);
+				nbMinutesSpinner.setValue((int) nbMinutesSpinner.getValue() + 1);
+			}
+			else if ((int) nbSecondsSpinner.getValue() == -1) {
+
+				nbSecondsSpinner.setValue(59);
+				nbMinutesSpinner.setValue((int) nbMinutesSpinner.getValue() - 1);
+			}
 		});
 
 		tableArrangement.getSelectionModel().addListSelectionListener(e->{
@@ -113,14 +167,20 @@ public class SoloGameCreation extends JPanel {
 			SoloGameCreation.this.setParams(tableArrangement.getSelectedRow());
 		});
 
+		updateGridPreview();
+
 		revalidate();
     }
+
+	protected void startGame(PlayBoard playBoard, Timer timer) {
+
+		mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, timer));
+	}
 
 	@Override
 	public void doLayout() {
 
 		final int PADDING_LEFT = getWidthTimesPourcent(this, .05f);
-
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
 
 		final int BTN_CANCEL_WIDTH = Math.max(getWidthTimesPourcent(this, .03f), getHeightTimesPourcent(this, .03f));
@@ -154,7 +214,7 @@ public class SoloGameCreation extends JPanel {
 		btnRandomSeed.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .2f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT,
-			BTN_CANCEL_WIDTH * 2,
+			BTN_CANCEL_WIDTH,
 			BTN_CANCEL_HEIGHT 
 		);
 
@@ -221,15 +281,50 @@ public class SoloGameCreation extends JPanel {
 			BTN_CANCEL_HEIGHT * 3
 		);
 
+		lblArrangement.setBounds(
+			PADDING_LEFT,
+			difficultyList.getY() + difficultyList.getHeight() + BTN_CANCEL_HEIGHT,
+			LBL_WIDTH,
+			BTN_CANCEL_HEIGHT
+		);
+
 		scrollArrangement.setBounds(
+			PADDING_LEFT,
+			difficultyList.getY() + difficultyList.getHeight() + BTN_CANCEL_HEIGHT * 2,
+			getWidthTimesPourcent(this, .35f),
+			BTN_CANCEL_HEIGHT * 3
+		);
+
+		nbMinutesSpinner.setBounds(
+			PADDING_LEFT + getWidthTimesPourcent(this, .3f),
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 7,
+			getWidthTimesPourcent(this, .1f),
+			BTN_CANCEL_HEIGHT
+		);
+
+		nbSecondsSpinner.setBounds(
+			PADDING_LEFT + getWidthTimesPourcent(this, .3f) + getWidthTimesPourcent(this, .1f),
+			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 7,
+			getWidthTimesPourcent(this, .1f),
+			BTN_CANCEL_HEIGHT
+		);
+		
+		timeLimitCheckBox.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .3f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT * 8,
-			getWidthTimesPourcent(this, .4f),
-			BTN_CANCEL_HEIGHT * 3
+			getWidthTimesPourcent(this, .2f),
+			BTN_CANCEL_HEIGHT
 		);
 
 		final int PADDING_RIGHT = PADDING_LEFT;
 		final int PADDING_BOTTOM = PADDING_TOP;
+
+		gridPreview.setBounds(
+			getWidth() - PADDING_RIGHT - getWidthTimesPourcent(this, .3f),
+			getHeightTimesPourcent(this, .33f),
+			getWidthTimesPourcent(this, .3f),
+			getWidthTimesPourcent(this, .3f)
+		);
 
 		btnPlay.setBounds(
 			getWidth() - PADDING_RIGHT - BTN_CANCEL_WIDTH * 5,
@@ -239,55 +334,59 @@ public class SoloGameCreation extends JPanel {
 		);
 	}
 
-	private boolean initPlayBoard() {
+	private void seedUpdated(long seed) {
 
-		long seed = Long.parseLong(txtSeed.getText());
-		int sizeX = Integer.parseInt(txtSizeX.getText());
-		int sizeY = Integer.parseInt(txtSizeY.getText());
-		int nbPieces = (int) nbPiecesSpinner.getValue();
+		EDifficulty difficulty = EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue());
 
-		if (!this.controller.difficultyPossible(sizeX, sizeY, nbPieces)) {
-			return false;
-		}
-
-		this.controller.setPlayBoard(sizeX, sizeY, nbPieces, seed);
-		
-		return true;
-    }
-
-    private void updateSeed(long seed) {
-
-		Difficulty difficulty = Difficulty.getDifficultyFromName(difficultyList.getSelectedValue());
-
-        txtSizeX.setText(String.valueOf(Controller.getInstance().getSizeXBySeed(seed, difficulty)));
-        txtSizeY.setText(String.valueOf(Controller.getInstance().getSizeYBySeed(seed, difficulty)));
-        nbPiecesSpinner.setValue(Controller.getInstance().getPiecesCountBySeed(seed, difficulty));
-    }
-
+		txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
+		txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));
+		nbPiecesSpinner.setValue(PlayBoard.getPiecesCountBySeedAndDifficulty(seed, difficulty));
+	}
+	
 	private void setParams(int index) {
 
-		String sizeX = (String) this.tableArrangement.getValueAt(index, 0);
-		String sizeY = (String) this.tableArrangement.getValueAt(index, 1);
-		int pieceCount = Integer.parseInt((String) this.tableArrangement.getValueAt(index, 2));
-		String seed = (String) this.tableArrangement.getValueAt(index, 3);
+		int sizeX = (Integer) this.tableArrangement.getValueAt(index, 0);
+		int sizeY = (Integer) this.tableArrangement.getValueAt(index, 1);
+		int pieceCount = (Integer) this.tableArrangement.getValueAt(index, 2);
+		long seed = (Long) this.tableArrangement.getValueAt(index, 3);
 
-		this.txtSeed.setText(seed);
-		this.txtSizeX.setText(sizeX);
-		this.txtSizeY.setText(sizeY);
+		this.txtSeed.setText(seed + "");
+		this.txtSizeX.setText(sizeX + "");
+		this.txtSizeY.setText(sizeY + "");
 		this.nbPiecesSpinner.setValue(pieceCount);
 	}
 
-    private static long generateRandomSeed() {
+	private void updateGridPreview() {
 
-        return (long) (Math.random() * Long.MAX_VALUE);
-    }
+		JPanel temp = null;
+		try {
+			
+			temp = new Grid(PlayBoard.constructPlayBoard(
+				Long.parseLong(txtSeed.getText()), 
+				Integer.parseInt(txtSizeX.getText()),
+				Integer.parseInt(txtSizeY.getText()), 
+				(int) nbPiecesSpinner.getValue()
+			), true);	
+		} 
+		catch (Exception ignored) {}
+
+		if (temp != null) {
+
+			remove(gridPreview);
+			gridPreview = temp;
+			add(gridPreview);
+
+			revalidate();
+			repaint();
+		}
+	}
 
     private static Runnable createRandomSeedCallback(SoloGameCreation soloGameCreation) {
 
         return () -> {
 
-            final long seed = generateRandomSeed();
-            soloGameCreation.updateSeed(seed);
+            final long seed = SeedUtils.generateRandomSeed();
+            soloGameCreation.seedUpdated(seed);
             soloGameCreation.txtSeed.setText(String.valueOf(seed));
         };
     }
@@ -308,14 +407,40 @@ public class SoloGameCreation extends JPanel {
 
         private void callback(DocumentEvent e) {
 
-            String text = txtSeed.getText();
-
             try {
 
+				String text = txtSeed.getText();
                 long seed = Long.parseLong(text);
-                updateSeed(seed);
+                seedUpdated(seed);
             } 
             catch (NumberFormatException ignored) {}
         }
     }
+
+	private class SizeDocumentListener extends DocumentAdapter {
+
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+
+			callback(e);
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+
+			callback(e);
+		}
+
+		private void callback(DocumentEvent e) {
+
+			try {
+
+				Integer.parseInt(txtSizeX.getText());
+				Integer.parseInt(txtSizeY.getText());
+				
+				updateGridPreview();
+			} 
+			catch (NumberFormatException ignored) {}
+		}
+	}
 }

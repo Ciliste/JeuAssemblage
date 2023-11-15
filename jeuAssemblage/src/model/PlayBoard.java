@@ -1,360 +1,622 @@
 package model;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.Color;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
-import java.util.*;
-
-import pieces.Piece;
-import pieces.PieceFactory;
+import factory.HFactory;
+import factory.IFactory;
+import factory.LFactory;
+import factory.OFactory;
+import factory.PieceFactory;
+import factory.TFactory;
+import factory.ZFactory;
+import model.arrangement.Arrangement;
+import model.listener.IPlayBoardListenable;
+import model.listener.IPlayBoardListener;
+import observer.AbstractListenableHM;
+import observer.interfaces.Listener;
+import piece.Piece;
+import utils.EDifficulty;
+import utils.ETypeListen;
 import view.utils.PieceRenderUtils;
 
-public class PlayBoard {
+public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBoardListenable, Comparable<PlayBoard> {
 
-    private ArrayList<Piece>        alPieceOnBoard;
-    private Piece                   selectedPiece;
-    
-    private HashMap<Integer, Image> hmPieceImage;
-    private int[][]                 playBoard;
-    
-    private Long                    seed;
+	private static final int EMPTY = 0;
+
+	private int[][] board;
+
+	private final Map<Integer, Piece> piecesMap;
+	private final Map<Integer, Image> piecesImagesMap;
+
+	private final int sizeX;
+	private final int sizeY;
+
+	private final long seed;
+
+	public PlayBoard(long seed, int sizeX, int sizeY) {
+
+		this.board = new int[sizeY][sizeX];
+
+		this.sizeX = sizeX;
+		this.sizeY = sizeY;
+
+		this.seed = seed;
+
+		this.piecesMap = new HashMap<>();
+		this.piecesImagesMap = new HashMap<>();
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				this.board[i][j] = EMPTY;
+			}
+		}
+	}
 
 
-    public PlayBoard() {
-        this.hmPieceImage = new HashMap<Integer, Image>();
-        
-        this.alPieceOnBoard = null;
-        this.playBoard      = null;
-        this.selectedPiece  = null;
-        this.seed           = null;
-    }
+	boolean randomlyPlacePiece(Piece piece) {
 
-    public void initSeed(long seed) {
-        this.seed = seed;
-        PieceFactory.setSeed(seed);
-    }
-    
-    public void initSizePB(int height, int width) {
-        this.playBoard = createPlayBoard(height, width);
-        this.placePieceOnBoard();
-    }
+		//System.out.println("Randomly placing piece: " + piece);
 
-    public void initNumberPiece(int numberPiece) {
-        this.alPieceOnBoard = createPieces(numberPiece);
-        this.createPieceImage();
-    }
+		Random random = new Random(this.seed + piecesMap.size() + 1);
+	
+		final int MAX_ROTATIONS = 4;
+		int nbRotations = random.nextInt(MAX_ROTATIONS);
+		for (int i = 0; i < nbRotations; i++) {
 
-    // Getters
-    public int[][]          getPlayBoard     () { return this.playBoard; }
-    public ArrayList<Piece> getPieces        () { return this.alPieceOnBoard; }
-    public Piece            getSelectedPiece () { return this.selectedPiece; }
-    public Long             getSeed          () { return this.seed; }
+			piece.rotateLeft(); 
+		}
 
-    public Image getImageById (int id) { return this.hmPieceImage.get(id); }
+		final int MAX_FLIPS = 2;
+		int nbReverse = random.nextInt(MAX_FLIPS);
+		for (int i = 0; i < nbReverse; i++) {
 
-    public Piece getPieceById(int id) {
-        for (Piece p : this.alPieceOnBoard) {
-            if (p.getInstanceId() == id) {
-                return p;
-            }
-        }
-        return null;
-    }
-    
-    // Setters
-    public void setPieceSelected(Piece p) { 
+			piece.reverse();
+		}
+	
+		final int MAX_ITERATIONS = 100;
+		int iteration = 0;
+		
+		//TODO: y'a des beugs
+		do {
 
-		if (p == null) {
-			this.selectedPiece = null;
-			return;
+			int x = random.nextInt(this.board[0].length - piece.getWidth() + 1);
+			int y = random.nextInt(this.board.length - piece.getHeight() + 1);
+
+			//System.out.println("Trying to place piece at: " + x + ", " + y);
+
+			if (placePiece(x, y, piece)) {
+
+				return true;
+			}
+
+			iteration++;
+
+		} while (iteration < MAX_ITERATIONS);
+
+		return false;
+		// for (int i = 0; i < board.length; i++) {
+	
+		// 	for (int j = 0; j < board[i].length; j++) {
+	
+		// 		System.out.println("Trying to place piece at: " + j + ", " + i);
+
+		// 		if (placePiece(j, i, piece)) {
+	
+		// 			return;
+		// 		}
+		// 	}
+		// }
+	}
+
+	public boolean placePiece(int x, int y, Piece piece) {
+
+		int pieceId = piecesMap.size() + 1;
+
+		if (placePieceAsId(x, y, piece, pieceId)) {
+
+			registerPiece(pieceId, piece);
+
+			return true;
 		}
 		
-        this.selectedPiece = (Piece) p.clone();
-	}
-    
-    // Public 
-    /**
-    * bla bla 
-    * <p>
-    * bla bla
-    * @param  x     int that represent of top left matrices
-    * @param  y     int that represent of top left matrices
-    * @see          Piece
-    */
-    public void addSelectedPiece(int x, int y) {
-
-        if (this.selectedPiece == null) return;
-
-        this.removePieceOnBoard(this.getPieceById(this.selectedPiece.getInstanceId()));
-        this.addPieceOnBoard(this.selectedPiece, x - 1, y - 1);
-        this.removeSelectedPiece();
-    }
-
-    /**
-    * @param  x         int that represent of top left matrices
-    * @param  y         int that represent of top left matrices
-    * @return           True if the selected piece can be added on the board else False
-    */
-    public boolean selectedPieceCanBeAddedToBoard(int x, int y) {
-        if (this.selectedPiece == null) return false;
-
-        return this.canBeAddedToBoard(this.selectedPiece, x - 1, y - 1);
-    }
-
-    /**
-    * bla bla 
-    *
-    * @return   a int[], last one is a int whose the number of piece cube in the area and the 4 others 
-    *           are representation of an rectangle,  contains respectively x, y, width, height 
-    */
-    public int[] rectangleArea() {
-        int[] temp = this.getArea();
-        int[] ret = new int[temp.length + 1];
-        for (int i = 0; i < temp.length; i++) {
-            ret[i] = temp[i];
-        }
-        ret[4] = this.getPreciseArea();
-        return ret;
-    }
-
-    /**
-    * bla bla 
-    *
-    */
-    public void registerArrangement() {
-        String str = this.playBoard[0].length + ";" +
-                this.playBoard.length         + ";" +
-                this.alPieceOnBoard.size()    + ";" +
-                this.seed;
-
-        File f = new File(this.getPath() + "/maps.tetriste");
-        if (!f.exists()) {
-            try {
-                f.createNewFile();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(f, true));
-            writer.append(str);
-            writer.append('\n');
-            writer.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-    * bla bla 
-    *
-    * @return   an ArrayList of String that represent the file
-    */
-    public ArrayList<String> getArrangement() {
-        ArrayList<String> alRet = new ArrayList<String>();
-        File f = new File(this.getPath() + "/maps.tetriste");
-        if ( !f.exists() ) return alRet;
-        
-        try {
-            Scanner sc = new Scanner(f);
-            while (sc.hasNext()) {
-                alRet.add(sc.nextLine());
-            }
-            sc.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return alRet;
-    }
-
-    /**
-    * bla bla 
-    * 
-    */
-    public void destroy() {
-        while (!this.alPieceOnBoard.isEmpty()) {
-            Piece p = this.alPieceOnBoard.get(0);
-            p.destroy();
-            this.alPieceOnBoard.remove(p);
-        }
-    }
-
-    // Privates
-    private String getPath() {
-        Path path = Paths.get("");
-        return path.toAbsolutePath().toString();
-    }
-
-	private void removeSelectedPiece() {
-		if (this.selectedPiece == null) return;
-
-        this.alPieceOnBoard.remove(this.getPieceById(this.selectedPiece.getInstanceId()));
-        this.alPieceOnBoard.add(this.selectedPiece);
-        this.selectedPiece = null;
+		return false;
 	}
 
-    private ArrayList<Piece> createPieces(int numberPiece) {
-        ArrayList<Piece> tempAl = new ArrayList<Piece>();
-        int samePieceLimit = (int) Math.ceil(numberPiece / (PieceFactory.NUMBER_PIECE * 1d));
-        
-        while (tempAl.size() < numberPiece) {
+	public boolean placePieceAsId(int x, int y, Piece piece, int pieceId) {
 
-            Piece p = PieceFactory.createPiece();
+		if (canBePlaced(x, y, piece)) {
 
-            if (PlayBoard.checkPiece(p, tempAl, samePieceLimit)) {
-                tempAl.add(p);
-            } else {
-                p.destroy();
-            }
-        }
-        return tempAl;
-    }
-    
-    private void createPieceImage() {
-        for (Piece p : this.alPieceOnBoard) {
-            BufferedImage image = PieceRenderUtils.createCellImage();
-            this.hmPieceImage.put(p.getInstanceId(), image);
-        }
-    }
+			boolean[][] pieceMatrix = piece.getPiece();
 
-    private int[][] createPlayBoard(int height, int width) {
-        int[][] tempBoard = new int[height][width];
+			for (int i = 0; i < piece.getHeight(); i++) {
 
-        for ( int i = 0; i < height; i++) {
-            for ( int j = 0; j < width; j++) {
-                tempBoard[i][j] = 0;
-            }
-        }
+				for (int j = 0; j < piece.getWidth(); j++) {
 
-        return tempBoard;
-    }
+					if (pieceMatrix[i][j]) {
 
-    private void placePieceOnBoard() {
-        // TODO : changer ça en vrai fonction qui vérifie les possibilités avant d'ajouter, backtracking ?
-        Random rand = new Random(this.seed);
-        for ( Piece p: this.alPieceOnBoard) {
-            int x, y;
-            do {
-                x = rand.nextInt(this.playBoard[0].length - p.getWidth ());
-                y = rand.nextInt(this.playBoard.length    - p.getHeight());
-            } while( !canBeAddedToBoard(p, x, y) );
-
-            addPieceOnBoard(p, x, y);
-        }
-    }
-
-    private void addPieceOnBoard(Piece p, int x, int y) {
-
-        int[][] bounds = p.getBounds();
-        int k = 0;
-        int l = 0;
-        for (int i = y; i < y + bounds.length; i++) {
-			for (int j = x; j < x + bounds[i - y].length; j++) {
-				if (bounds[k][l] == 1) {
-					this.playBoard[i][j] = p.getInstanceId();
+						this.board[y + i][x + j] = pieceId;
+					}
 				}
-				l++;
 			}
-			k++;
-			l = 0;
+
+			piecesMap.put(pieceId, piece);
+
+			this.fireAllEvents();
+			firePieceAdded(this, pieceId);
+
+			return true;
 		}
 
-        p.setX(x);
-        p.setY(y);
-    }
-
-	public void removePieceOnBoard(Piece p) {
-		int[][] bounds = p.getBounds();
-        int k = 0;
-        for (int i = p.getY(); i < p.getY() + p.getHeight(); i++) {
-            int l = 0;
-            for (int j = p.getX(); j < p.getX() + p.getWidth(); j++) {
-                if (bounds[k][l] != 0) {
-                    this.playBoard[i][j] = 0;
-                }
-                l++;
-            }
-            k++;
-        }
+		return false;
 	}
 
-    private boolean canBeAddedToBoard(Piece p, int x, int y) {
+	public void removePieceFromBoard(Piece piece) {
+		
+		removePieceFromBoardWithoutRegistration(piece);
 
-        System.out.println("x : " + x + " y : " + y);
+		this.unregisterPiece(piece);
+	}
 
-        if ( x + p.getWidth()  > this.playBoard.length   ) return false;
-        if ( y + p.getHeight() > this.playBoard[0].length) return false;
-        if ( x < 0 ) return false;
-        if ( y < 0 ) return false;
+	public boolean movePiece(int x, int y, Piece piece) {
 
-        int[][] bounds = p.getBounds();
-        int k = 0;
-        for (int i = y; i < y + p.getHeight(); i++) {
-            int l = 0;
-            for (int j = x; j < x + p.getWidth(); j++) {
-                if ((this.playBoard[i][j] != 0 && this.playBoard[i][j] != p.getInstanceId()) && bounds[k][l] != 0) {
-                    return false;
-                }
-                l++;
-            }
-            k++;
+		if (canBePlaced(x, y, piece)) {
+
+			int pieceId = this.getPieceId(piece);
+
+			Image cell = this.piecesImagesMap.get(pieceId);
+
+			this.removePieceFromBoardWithoutRegistration(piece);
+			this.placePieceAsId(x, y, piece, pieceId);
+
+			this.piecesImagesMap.put(pieceId, cell);
+
+			this.fireAllEvents();
+
+			firePieceRemoved(this, pieceId);
+
+			return true;
+		}
+
+		return false;
+	}
+	
+	public boolean swap(Piece p1, Piece p2) {
+
+		int id1 = getPieceId(p1);
+		int id2 = getPieceId(p2);
+
+		Point pointP1 = getUpperLeftPieceCornerById(id1);
+		Point pointP2 = getUpperLeftPieceCornerById(id2);
+
+		int[][] rollback = new int[this.board.length][this.board[0].length];
+		for(int i = 0; i < this.board.length; i++)
+    		rollback[i] = this.board[i].clone();
+
+
+		if (canBeSwapped(pointP2.x, pointP2.y, p1, id2) && canBeSwapped(pointP1.x, pointP1.y, p2, id1)) {
+
+			removePieceFromBoardWithoutRegistration(p1);
+			removePieceFromBoardWithoutRegistration(p2);
+
+			if (placePieceAsId(pointP1.x, pointP1.y, p2, id2) && placePieceAsId(pointP2.x, pointP2.y, p1, id1)) {
+				return true;
+			}
+		}
+		
+		this.board = rollback;
+		piecesMap.put(id1, p1);
+		piecesMap.put(id2, p2);
+
+		return false;
+	}
+
+	public void removePieceFromBoardWithoutRegistration(Piece piece) {	
+
+		int pieceId = getPieceId(piece);
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				if (this.board[i][j] == pieceId) {
+
+					this.board[i][j] = EMPTY;
+				}
+			}
+		}
+
+		this.fireAllEvents();
+	}
+
+	public boolean canBePlaced(int x, int y, Piece piece) {
+
+		return canBeSwapped(x, y, piece, EMPTY);
+	}
+
+	public boolean canBeSwapped(int x, int y, Piece piece, int ignoreId) {
+
+		boolean[][] pieceMatrix = piece.getPiece();
+		int pieceId;
+		try {
+			pieceId = this.getPieceId(piece);
+		} catch (Exception e) {
+			pieceId = EMPTY;
+		} 
+
+		boolean canBePlaced = true;
+		for (int i = 0; i < piece.getHeight() && canBePlaced; i++) {
+
+			for (int j = 0; j < piece.getWidth() && canBePlaced; j++) {
+
+				if (pieceMatrix[i][j] == true) {
+					canBePlaced = (
+						y + i < this.board.length && 
+						x + j < this.board[0].length && 
+						(
+							this.board[y + i][x + j] == EMPTY ||
+							this.board[y + i][x + j] == ignoreId ||
+							this.board[y + i][x + j] == pieceId
+						)
+					);
+				}	
+			}
+		}
+
+		return canBePlaced;
+	}
+
+	private void registerPiece(int pieceId, Piece piece) {
+
+		this.piecesMap.put(pieceId, piece);
+		this.piecesImagesMap.put(pieceId, PieceRenderUtils.createCellImage(this.seed + pieceId));
+	}
+
+	private void unregisterPiece(Piece piece) {
+
+		int pieceId = this.getPieceId(piece);
+
+		this.piecesMap.remove(pieceId);
+		this.piecesImagesMap.remove(pieceId);
+	}
+
+	public Image getCellImageByPieceId(int pieceId) {
+
+		return this.piecesImagesMap.get(pieceId);
+	}
+
+	@Override
+	public void update() {
+		this.fireEvents(ETypeListen.PIECEVIEW.typeListen);
+	}
+	
+	@Override
+	public boolean equals(Object p) {
+		if (!(p instanceof PlayBoard) || p == null) {
+            return false;
         }
-        return true;
-    }
 
-    private int getPreciseArea() {
-        int sum = 0;
-        for ( int i = 0; i < this.playBoard.length; i++) {
-            for ( int j = 0; j < this.playBoard[i].length; j++) {
-                if ( this.playBoard[i][j] != 0 ) sum += 1; 
-            }   
-        }
+		PlayBoard pBoard = (PlayBoard) p;
+		
+		if (this.seed != pBoard.seed) return false;
+		if (this.sizeX != pBoard.sizeX) return false;
+		if (this.sizeY != pBoard.sizeY) return false;
+		if (this.piecesMap.size() != pBoard.piecesMap.size()) return false;
 
-        return sum;
-    }
+		for (int i = 0; i < this.board.length; i++) {
+			if (!Arrays.deepEquals(this.board, pBoard.board))
+				return false; 
+		}
 
-    private int[] getArea() {
-        int x = this.playBoard[0].length;
-        int y = this.playBoard.length;
-        int xEnd = 0;
-        int yEnd = 0;
-        for (int i = 0; i < this.playBoard.length; i++) {
-            for (int j = 0; j < this.playBoard[i].length; j++) {
-                if ( this.playBoard[i][j] != 0 ) {
-                    if ( j < x ) x = j;
-                    if ( i < y ) y = i; 
-                    if ( j > xEnd ) xEnd = j; 
-                    if ( i > yEnd ) yEnd = i;  
-                }
-            }
-        }
-        
-        return new int[]{ x, y, xEnd + 1, yEnd + 1};
-    }
+		return true;
+	}
 
-    // Static methods
-    private static boolean checkPiece( Piece p, ArrayList<Piece> alPiece, int samePieceLimit) {
-        Class<?> c = p.getClass();
-        int numberPieceSameClass = 1;
-        for ( Piece piece: alPiece) {
-            if (piece.getClass() == c) { numberPieceSameClass += 1; } 
-        }
+	@Override
+	public String toString() {
 
-        return numberPieceSameClass <= samePieceLimit;
-    }
-    
-    public static void printMatrice(int[][] matrice) {
-        for (int i = 0; i < matrice.length; i++) {
-            System.out.println();
-            for (int j = 0; j < matrice[i].length; j++) {
-                System.out.print(matrice[i][j] + " ");
-            }
-        }
-    }
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < this.board.length; i++) {
+
+			for (int j = 0; j < this.board[i].length; j++) {
+
+				sb.append((this.board[i][j] == EMPTY) ? "░ " : this.board[i][j] + " ");
+				sb.append(" ");
+			}
+
+			sb.append("\n");
+		}
+
+		return sb.toString();
+	}
+
+
+	// -----------------
+	// GET METHODS
+	// -----------------
+
+	private int getPieceId(Piece piece) {
+
+		return this.piecesMap.entrySet().stream()
+				.filter(entry -> entry.getValue().equals(piece))
+				.map(Map.Entry::getKey)
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("Piece is not on board"));
+	}
+
+
+	public int getLowerPieceX() {
+
+		for (int x = 0; x < this.board[0].length; x++) {
+
+			for (int y = this.board.length - 1; y >= 0; y--) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getLowerPieceY() {
+
+		for (int y = 0; y < this.board.length; y++) {
+
+			for (int x = 0; x < this.board[0].length; x++) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getUpperPieceX() {
+
+		for (int x = this.board[0].length - 1; x >= 0; x--) {
+
+			for (int y = 0; y < this.board.length; y++) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getUpperPieceY() {
+
+		for (int y = this.board.length - 1; y >= 0; y--) {
+
+			for (int x = this.board[0].length - 1; x >= 0; x--) {
+
+				if (this.board[y][x] != EMPTY) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("No piece found");
+	}
+
+	public int getLowerPieceXById(int pieceId) {
+
+		for (int x = 0; x < this.board[0].length; x++) {
+
+			for (int y = this.board.length - 1; y >= 0; y--) {
+
+				if (this.board[y][x] == pieceId) {
+
+					return x;
+				}
+			}
+		}
+
+		throw new IllegalStateException("Piece not found");
+	}
+
+	public int getLowerPieceYById(int pieceId) {
+
+		for (int y = 0; y < this.board.length; y++) {
+
+			for (int x = 0; x < this.board[0].length; x++) {
+
+				if (this.board[y][x] == pieceId) {
+
+					return y;
+				}
+			}
+		}
+
+		throw new IllegalStateException("Piece not found");
+	}
+
+	public int getArea() {
+		return (getLowerPieceX() - getUpperPieceX()) * (getLowerPieceY() - getUpperPieceY());
+	}
+
+	public Map<Integer, Piece> getPieces() { return new HashMap<>(piecesMap); }
+	public int getPiecesCount() { return this.piecesMap.size(); }
+
+	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }		
+	public Point getUpperLeftPieceCorner() { return new Point(getLowerPieceX(), getLowerPieceY()); }
+
+	public Point getUpperLeftPieceCornerById(int pieceId) { return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId)); }
+	
+	public int getPieceIdAt(int x, int y) { return this.board[y][x]; }
+
+	public Piece getPieceById(int pieceId) { return this.piecesMap.get(pieceId); }
+
+	public int getBoardWidth() { return this.board[0].length; }
+	public int getBoardHeight() { return this.board.length; }
+	public int[][] getBoardArray() { return this.board.clone(); }
+
+	public int getWidth() { return this.sizeX; }
+	public int getHeight() { return this.sizeY; }
+	
+	public long getSeed() { return this.seed; }
+
+	
+	// -----------------
+	// STATIC METHODS
+	// -----------------
+	
+	@Override
+	public int compareTo(PlayBoard o) {
+		return this.getArea() - o.getArea();
+	}
+
+
+	// -----------------
+	// STATIC METHODS
+	// -----------------
+
+	public static int getSizeXBySeedAndDifficulty(long seed, EDifficulty difficulty) {
+
+		return new Random(seed).nextInt(difficulty.getMaxSizeX() - difficulty.getMinSizeX() + 1) + difficulty.getMinSizeX();
+	}
+
+	public static int getSizeYBySeedAndDifficulty(long seed, EDifficulty difficulty) {
+
+		return new Random(seed + 1).nextInt(difficulty.getMaxSizeY() - difficulty.getMinSizeY() + 1) + difficulty.getMinSizeY();
+	}
+
+	public static int getPiecesCountBySeedAndDifficulty(long seed, EDifficulty difficulty) {
+
+		return new Random(seed + 2).nextInt(difficulty.getMaxNbPieces() - difficulty.getMinNbPieces() + 1)
+				+ difficulty.getMinNbPieces();
+	}
+
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
+
+		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
+		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
+		List<Color> colorList = getDefaultColorList();
+
+		Random random = new Random(seed + 3);
+
+		for (int i = 0; i < nbPieces; i++) {
+
+			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
+			Piece piece = pieceFactory.createPiece(0);
+			
+			Color color = null;
+			if (true == colorList.isEmpty()) {
+
+				colorList = getDefaultColorList();
+			}
+
+			color = colorList.remove(random.nextInt(colorList.size()));
+
+			playBoard.randomlyPlacePiece(piece);
+			playBoard.piecesImagesMap.put(playBoard.getPieceId(piece), PieceRenderUtils.createCellImage(color));
+
+			// TODO: REFAIRE CETTE MERDE
+		}
+
+		return playBoard;
+	}
+
+	public static PlayBoard constructCopyPlayBoard(PlayBoard parent) {
+		
+		return constructPlayBoard(parent.seed, parent.sizeX, parent.sizeY, parent.piecesMap.size());
+	}
+
+	public static PlayBoard constructEmptyPlayBoard(long seed, int sizeX, int sizeY) {
+
+		return new PlayBoard(seed, sizeX, sizeY);
+	}
+
+	public static PlayBoard constructEmptyPlayBoardCopy(PlayBoard toClone) {
+
+		return constructEmptyPlayBoard(toClone.seed, toClone.sizeX, toClone.sizeY);
+	}
+
+	private static List<PieceFactory> getPossiblePieceFactorys() {
+
+		List<PieceFactory> pieceFactorys = new ArrayList<>();
+
+		pieceFactorys.add(new HFactory());
+		pieceFactorys.add(new IFactory());
+		pieceFactorys.add(new LFactory());
+		pieceFactorys.add(new OFactory());
+		pieceFactorys.add(new TFactory());
+		pieceFactorys.add(new ZFactory());
+
+		return pieceFactorys;
+	}
+
+	private static List<Color> getDefaultColorList() {
+
+		List<Color> colorList = new ArrayList<>();
+
+		colorList.add(Color.RED);
+		colorList.add(Color.BLUE);
+		colorList.add(Color.GREEN);
+		colorList.add(Color.YELLOW);
+		colorList.add(Color.CYAN);
+		colorList.add(Color.MAGENTA);
+
+		return colorList;
+	}
+
+	private final Set<IPlayBoardListener> listeners = new HashSet<>();
+
+	@Override
+	public void addPlayBoardListener(IPlayBoardListener listener) {
+		
+		this.listeners.add(listener);
+	}
+
+	@Override
+	public void removePlayBoardListener(IPlayBoardListener listener) {
+		
+		this.listeners.remove(listener);
+	}
+
+	private void firePieceAdded(Object source, int pieceId) {
+		
+		for (IPlayBoardListener listener : this.listeners) {
+			
+			listener.pieceAdded(source, pieceId);
+		}
+	}
+
+	private void firePieceRemoved(Object source, int pieceId) {
+		
+		for (IPlayBoardListener listener : this.listeners) {
+			
+			listener.pieceRemoved(source, pieceId);
+		}
+	}
+
+	private void firePieceMoved(Object source, int pieceId) {
+		
+		for (IPlayBoardListener listener : this.listeners) {
+			
+			listener.pieceMoved(source, pieceId);
+		}
+	}
 }

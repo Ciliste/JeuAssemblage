@@ -2,7 +2,10 @@ package view.screen;
 
 import javax.swing.JPanel;
 
+import model.PlayBoard;
+import view.MainFrame;
 import view.component.GamePanel;
+import view.component.board.TimerPanel.Timer;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;
@@ -11,11 +14,11 @@ public class SoloGameScreen extends JPanel {
 
 	private final GamePanel gamePanel;
 
-    public SoloGameScreen() {
+    public SoloGameScreen(MainFrame mainFrame, PlayBoard playboard, Timer timer) {
 
         setLayout(null);
 
-		this.gamePanel = new GamePanel();
+		this.gamePanel = new GamePanel(mainFrame, playboard, timer);
 
 		this.add(this.gamePanel);
 

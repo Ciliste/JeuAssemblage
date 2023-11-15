@@ -78,7 +78,9 @@
     </target>
     <!--  ==================== Run Target ==================================  -->
     <target name="run" depends="dist">
-        <java jar="${dist.home}/${app.fullname}.jar" fork="true"/>
+        <record name="log.txt" action="start"/> 
+            <java jar="${dist.home}/${app.fullname}.jar" fork="true"/>
+        <record name="log.txt" action="stop"/>
     </target>
     <!--  ==================== runWithoutComp Target ==================================  -->
     <target name="runWithoutComp">
