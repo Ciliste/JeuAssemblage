@@ -22,10 +22,11 @@ public class AIStrategy implements IStrategyBot {
     
     private static final int POP_SIZE = 100;
 
-    protected List<Move> moves;
+    protected List<PlayBoard> pop;
     protected PlayBoard model;
     protected long seed;
     protected int testSize;
+    private Random rand;
     
     public AIStrategy(PlayBoard model) {
         this(model, SeedUtils.generateRandomSeed(), AIStrategy.EASY);
@@ -38,26 +39,25 @@ public class AIStrategy implements IStrategyBot {
     protected AIStrategy(PlayBoard model, long seed, int testSize) {
         System.out.println(model);
         System.out.println(model.getArea());
-        
+
         this.model = model;
         this.seed = seed;
         this.testSize = testSize;
-        this.moves = getMoves();
+        this.rand = new Random(this.seed);
+
+        this.pop = createPopulation(this.model, POP_SIZE, this.rand);
+        this.pop.add(model);
     }
     
-    private List<Move> getMoves() {
-        List<Move> ret = new LinkedList<Move>();
-        
-        Random rand = new Random(this.seed);
+    @Override
+    public void tick() {
+        pop = mutation(pop, 1d);
+    }
 
-        List<PlayBoard> population = createPopulation(this.model, POP_SIZE, rand);
-        population.add(model);
+    public List<Move> getMoves() {
+        List<Move> ret = new ArrayList<Move>();
 
-        for (int i = 0; i < this.testSize; i++) {
-            population = mutation(population, rand, 1d);
-        }
-
-        PlayBoard bestSolution = population.get(0);
+        PlayBoard bestSolution = pop.get(0);
         ArrayList<Piece> pieceAl = new ArrayList<Piece>();
 
         for (int i = 0; i < bestSolution.getBoardHeight(); i++) {
@@ -79,8 +79,12 @@ public class AIStrategy implements IStrategyBot {
 
         return ret;
     }
+    
 
-    private List<PlayBoard> mutation(List<PlayBoard> toMutate, Random rand, double mutationRate) {
+    // ******************
+    // Privates methods
+    // ******************
+    private List<PlayBoard> mutation(List<PlayBoard> toMutate, double mutationRate) {
 
         List<PlayBoard> postMutation = new ArrayList<PlayBoard>();
 
@@ -91,11 +95,11 @@ public class AIStrategy implements IStrategyBot {
             if (nextRand < mutationRate) {
                 PlayBoard son;
                 if (nextRand < mutationRate / 3) {
-                    son = individualMutationSwapping(parent, rand);
+                    son = individualMutationSwapping(parent);
                 } else if (nextRand < 2 * (mutationRate / 3)) {
-                    son = individualMutationRotation(parent, rand);
+                    son = individualMutationRotation(parent);
                 } else {
-                    son = individualMutationMouvement(parent, rand);
+                    son = individualMutationMouvement(parent);
                 }
 
                 if (!parent.equals(son)) postMutation.add(son);
@@ -109,7 +113,7 @@ public class AIStrategy implements IStrategyBot {
         return postMutation;
     }
     
-    private PlayBoard individualMutationSwapping(PlayBoard parent1, Random rand) {
+    private PlayBoard individualMutationSwapping(PlayBoard parent1) {
 
         PlayBoard son = PlayBoard.constructCopyPlayBoard(parent1);
 
@@ -127,7 +131,7 @@ public class AIStrategy implements IStrategyBot {
         return son;
     }
     
-    private PlayBoard individualMutationRotation(PlayBoard parent1, Random rand) {
+    private PlayBoard individualMutationRotation(PlayBoard parent1) {
 
         PlayBoard son = PlayBoard.constructCopyPlayBoard(parent1);
 
@@ -158,7 +162,7 @@ public class AIStrategy implements IStrategyBot {
         return son;
     }
     
-    private PlayBoard individualMutationMouvement(PlayBoard parent1, Random rand) {
+    private PlayBoard individualMutationMouvement(PlayBoard parent1) {
         final int MAX_MOUVEMENT = 4;
 
         PlayBoard son = PlayBoard.constructCopyPlayBoard(parent1);
@@ -186,14 +190,9 @@ public class AIStrategy implements IStrategyBot {
 
         return son;
     }
-    
-    @Override
-    public Move nextMove() {
-        return this.moves.remove(0);
-    }
 
     private static List<PlayBoard> createPopulation(PlayBoard model, int size, Random rand) {
-        
+
         List<PlayBoard> population = new ArrayList<PlayBoard>();
 
         int pieceCount = model.getPieces().size();
@@ -204,6 +203,44 @@ public class AIStrategy implements IStrategyBot {
         }
 
         return population;
+    }
+
+    // ******************
+    // ONLY HERE FOR TESTS
+    // ******************
+    private List<Move> testAI() {
+        List<Move> ret = new LinkedList<Move>();
+
+        Random rand = new Random(this.seed);
+
+        List<PlayBoard> population = createPopulation(this.model, POP_SIZE, rand);
+        population.add(model);
+
+        for (int i = 0; i < this.testSize; i++) {
+            population = mutation(population, 1d);
+        }
+
+        PlayBoard bestSolution = population.get(0);
+        ArrayList<Piece> pieceAl = new ArrayList<Piece>();
+
+        for (int i = 0; i < bestSolution.getBoardHeight(); i++) {
+            for (int j = 0; j < bestSolution.getBoardWidth(); j++) {
+                int pieceId = bestSolution.getPieceIdAt(j, i);
+                if (pieceId != 0) {
+                    Piece p = bestSolution.getPieceById(pieceId);
+                    if (!pieceAl.contains(p)) {
+                        Point upperLeftCorner = bestSolution.getUpperLeftPieceCornerById(pieceId);
+                        ret.add(new Move(pieceId, upperLeftCorner.x, upperLeftCorner.y));
+                        pieceAl.add(p);
+                    }
+                }
+            }
+        }
+
+        System.out.println(bestSolution);
+        System.out.println(bestSolution.getArea());
+
+        return ret;
     }
 
     public static void main(String args) {

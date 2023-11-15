@@ -7,7 +7,7 @@ import bot.strategy.AIStrategy;
 import bot.strategy.AbstractStrategyMemo;
 import model.PlayBoard;
 
-public abstract class AbstractDifficulty implements IBot, IStrategyBot {
+public abstract class AbstractDifficulty implements IBot {
 
     public final int AI_STRATEGY = 0;
     public final int MEMO_STRATEGY = 1;
@@ -39,11 +39,10 @@ public abstract class AbstractDifficulty implements IBot, IStrategyBot {
         }
     }
 
-
     @Override
-    public Move nextMove() {
-        return this.strategyBot.nextMove();
+    public void tick() {
+        this.strategyBot.tick();
     }
-    
+   
     
 }

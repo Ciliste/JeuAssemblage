@@ -20,10 +20,11 @@ public class AbstractStrategyMemo implements IStrategyBot{
     private LinkedList<Move> getMoves() {
         return null;
     }
-    
+
     @Override
-    public Move nextMove() {
-        return this.moves.pop();
+    public void tick() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'tick'");
     }
     
 }
