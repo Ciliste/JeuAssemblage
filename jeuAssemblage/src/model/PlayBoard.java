@@ -20,6 +20,7 @@ import factory.OFactory;
 import factory.PieceFactory;
 import factory.TFactory;
 import factory.ZFactory;
+import model.arrangement.Arrangement;
 import model.listener.IPlayBoardListenable;
 import model.listener.IPlayBoardListener;
 import observer.AbstractListenableHM;
@@ -303,7 +304,12 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	
 	@Override
 	public boolean equals(Object p) {
+		if (!(p instanceof PlayBoard) || p == null) {
+            return false;
+        }
+
 		PlayBoard pBoard = (PlayBoard) p;
+		
 		if (this.seed != pBoard.seed) return false;
 		if (this.sizeX != pBoard.sizeX) return false;
 		if (this.sizeY != pBoard.sizeY) return false;
