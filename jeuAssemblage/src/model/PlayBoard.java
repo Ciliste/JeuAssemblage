@@ -20,7 +20,6 @@ import factory.OFactory;
 import factory.PieceFactory;
 import factory.TFactory;
 import factory.ZFactory;
-import model.arrangement.Arrangement;
 import model.listener.IPlayBoardListenable;
 import model.listener.IPlayBoardListener;
 import observer.AbstractListenableHM;
@@ -37,7 +36,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	private int[][] board;
 
 	private final Map<Integer, Piece> piecesMap;
-	private final Map<Integer, Image> piecesImagesMap;
 
 	private final int sizeX;
 	private final int sizeY;
@@ -54,7 +52,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		this.seed = seed;
 
 		this.piecesMap = new HashMap<>();
-		this.piecesImagesMap = new HashMap<>();
 
 		for (int i = 0; i < this.board.length; i++) {
 
@@ -176,12 +173,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			int pieceId = this.getPieceId(piece);
 
-			Image cell = this.piecesImagesMap.get(pieceId);
-
 			this.removePieceFromBoardWithoutRegistration(piece);
 			this.placePieceAsId(x, y, piece, pieceId);
-
-			this.piecesImagesMap.put(pieceId, cell);
 
 			this.fireAllEvents();
 
@@ -281,7 +274,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	private void registerPiece(int pieceId, Piece piece) {
 
 		this.piecesMap.put(pieceId, piece);
-		this.piecesImagesMap.put(pieceId, PieceRenderUtils.createCellImage(this.seed + pieceId));
 	}
 
 	private void unregisterPiece(Piece piece) {
@@ -289,12 +281,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		int pieceId = this.getPieceId(piece);
 
 		this.piecesMap.remove(pieceId);
-		this.piecesImagesMap.remove(pieceId);
-	}
-
-	public Image getCellImageByPieceId(int pieceId) {
-
-		return this.piecesImagesMap.get(pieceId);
 	}
 
 	@Override
@@ -513,7 +499,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
-		List<Color> colorList = getDefaultColorList();
 
 		Random random = new Random(seed + 3);
 
@@ -521,17 +506,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
 			Piece piece = pieceFactory.createPiece(0);
-			
-			Color color = null;
-			if (true == colorList.isEmpty()) {
-
-				colorList = getDefaultColorList();
-			}
-
-			color = colorList.remove(random.nextInt(colorList.size()));
 
 			playBoard.randomlyPlacePiece(piece);
-			playBoard.piecesImagesMap.put(playBoard.getPieceId(piece), PieceRenderUtils.createCellImage(color));
 
 			// TODO: REFAIRE CETTE MERDE
 		}
@@ -566,20 +542,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		pieceFactorys.add(new ZFactory());
 
 		return pieceFactorys;
-	}
-
-	private static List<Color> getDefaultColorList() {
-
-		List<Color> colorList = new ArrayList<>();
-
-		colorList.add(Color.RED);
-		colorList.add(Color.BLUE);
-		colorList.add(Color.GREEN);
-		colorList.add(Color.YELLOW);
-		colorList.add(Color.CYAN);
-		colorList.add(Color.MAGENTA);
-
-		return colorList;
 	}
 
 	private final Set<IPlayBoardListener> listeners = new HashSet<>();

@@ -28,8 +28,6 @@ public class MultiplayerGamePanel extends JPanel {
 
 		for (BotDescriptor botDescriptor : botDescriptors) {
 
-			System.out.println(botDescriptor);
-
 			Grid grid = new Grid(PlayBoard.constructCopyPlayBoard(playBoard), true);
 
 			bots.add(grid);
