@@ -1,4 +1,4 @@
-package bot;
+package bot.utils;
 
 import piece.Piece;
 

@@ -9,13 +9,13 @@ import java.util.Collections;
 
 import java.awt.Point;
 
-import bot.Move;
-import bot.interfaces.IStrategyBot;
+import bot.utils.Move;
 import model.PlayBoard;
 import model.SeedUtils;
 import piece.Piece;
 
-public class AgStrategy implements IStrategyBot {
+public class AgStrategy extends AbstractStrategy {
+
     public static final int EASY = 1;
     public static final int MEDIUM = 2; 
     public static final int HARD = 5; 
@@ -23,7 +23,6 @@ public class AgStrategy implements IStrategyBot {
     private static final int POP_SIZE = 100;
 
     protected List<PlayBoard> pop;
-    protected PlayBoard model;
     protected long seed;
     protected int testSize;
     private Random rand;
@@ -37,16 +36,18 @@ public class AgStrategy implements IStrategyBot {
     }
 
     protected AgStrategy(PlayBoard model, long seed, int testSize) {
-        System.out.println(model);
-        System.out.println(model.getArea());
 
-        this.model = model;
+        super(model);
+
         this.seed = seed;
         this.testSize = testSize;
         this.rand = new Random(this.seed);
 
         this.pop = createPopulation(this.model, POP_SIZE, this.rand);
         this.pop.add(model);
+
+        System.out.println(model);
+        System.out.println(model.getArea());
     }
     
     @Override
@@ -55,29 +56,8 @@ public class AgStrategy implements IStrategyBot {
         for (int i = 0; i < testSize; i++) {
             pop = mutation(pop, 1d);
         }
-    }
 
-    public List<Move> getMoves() {
-        List<Move> ret = new ArrayList<Move>();
-
-        PlayBoard bestSolution = pop.get(0);
-        ArrayList<Piece> pieceAl = new ArrayList<Piece>();
-
-        for (int i = 0; i < bestSolution.getBoardHeight(); i++) {
-            for (int j = 0; j < bestSolution.getBoardWidth(); j++) {
-                int pieceId = bestSolution.getPieceIdAt(j, i);
-                if (pieceId != 0) {
-                    Piece p = bestSolution.getPieceById(pieceId);
-                    if (!pieceAl.contains(p)) {
-                        Point upperLeftCorner = bestSolution.getUpperLeftPieceCornerById(pieceId);
-                        ret.add(new Move(pieceId, upperLeftCorner.x, upperLeftCorner.y));
-                        pieceAl.add(p);
-                    }
-                }
-            }
-        }
-
-        return ret;
+        this.bestSolution = pop.get(0);
     }
     
 

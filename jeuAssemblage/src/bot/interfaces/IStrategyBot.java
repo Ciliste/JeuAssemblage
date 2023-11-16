@@ -2,7 +2,7 @@ package bot.interfaces;
 
 import java.util.List;
 
-import bot.Move;
+import bot.utils.Move;
 
 public interface IStrategyBot extends ITickable{
 
