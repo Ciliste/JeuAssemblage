@@ -3,7 +3,7 @@ package bot.difficulty;
 import bot.interfaces.IBot;
 import bot.interfaces.IStrategyBot;
 import bot.strategy.AgStrategy;
-import bot.strategy.AbstractStrategyMemo;
+import bot.strategy.NoobStrategy;
 import model.PlayBoard;
 
 public abstract class AbstractDifficulty implements IBot {
@@ -30,7 +30,7 @@ public abstract class AbstractDifficulty implements IBot {
                 this.strategyBot = new AgStrategy(this.model, AIdifficulty);
             }
             case MEMO_STRATEGY -> {
-                this.strategyBot = new AbstractStrategyMemo(this.model);
+                this.strategyBot = new NoobStrategy(this.model);
             }
             default -> {
                 throw new IllegalStateException("Strategy " + strategy + " doesn't exist");
