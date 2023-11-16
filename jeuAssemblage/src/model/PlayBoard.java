@@ -1,8 +1,6 @@
 package model;
 
-import java.awt.Image;
 import java.awt.Point;
-import java.awt.Color;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +25,6 @@ import observer.interfaces.Listener;
 import piece.Piece;
 import utils.EDifficulty;
 import utils.ETypeListen;
-import view.utils.PieceRenderUtils;
 
 public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBoardListenable, Comparable<PlayBoard> {
 
@@ -51,7 +48,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 		this.seed = seed;
 
-		this.piecesMap = new HashMap<>();
+		this.piecesMap = new HashMap<Integer, Piece>();
 
 		for (int i = 0; i < this.board.length; i++) {
 
