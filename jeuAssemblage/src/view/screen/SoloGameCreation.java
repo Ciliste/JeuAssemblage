@@ -8,12 +8,14 @@ import javax.swing.event.DocumentEvent;
 import model.PlayBoard;
 import model.SeedUtils;
 import model.arrangement.ArrangementList;
+import piece.Piece;
 import utils.EDifficulty;
 import view.MainFrame;
 import view.component.Separator;
 import view.component.board.Grid;
 import view.component.board.TimerPanel.Timer;
 import view.utils.DocumentAdapter;
+import view.utils.PiecesColor;
 
 public class SoloGameCreation extends JPanel {
     
@@ -127,6 +129,8 @@ public class SoloGameCreation extends JPanel {
 				(int) nbPiecesSpinner.getValue()
 			);
 
+			PiecesColor piecesColor = new PiecesColor(playBoard);
+
 			Timer timer = null;
 			if (timeLimitCheckBox.isSelected()) {
 
@@ -137,7 +141,7 @@ public class SoloGameCreation extends JPanel {
 				timer = Timer.NO_TIMER;
 			}
 
-			startGame(playBoard, timer);
+			startGame(playBoard, piecesColor, timer);
 		});
 
 		nbMinutesSpinner.setEnabled(timeLimitCheckBox.isSelected());
@@ -172,9 +176,9 @@ public class SoloGameCreation extends JPanel {
 		revalidate();
     }
 
-	protected void startGame(PlayBoard playBoard, Timer timer) {
+	protected void startGame(PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
 
-		mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, timer));
+		mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, piecesColor, timer));
 	}
 
 	@Override
@@ -360,13 +364,13 @@ public class SoloGameCreation extends JPanel {
 
 		JPanel temp = null;
 		try {
-			
-			temp = new Grid(PlayBoard.constructPlayBoard(
+			PlayBoard p = PlayBoard.constructPlayBoard(
 				Long.parseLong(txtSeed.getText()), 
 				Integer.parseInt(txtSizeX.getText()),
 				Integer.parseInt(txtSizeY.getText()), 
-				(int) nbPiecesSpinner.getValue()
-			), true);	
+					(int) nbPiecesSpinner.getValue());
+			PiecesColor piecesColor = new PiecesColor(p);
+			temp = new Grid(p, true, piecesColor);	
 		} 
 		catch (Exception ignored) {}
 

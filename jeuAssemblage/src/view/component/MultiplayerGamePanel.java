@@ -9,6 +9,7 @@ import view.MainFrame;
 import view.component.board.Grid;
 import view.component.board.TimerPanel.Timer;
 import view.screen.AIGameCreation.BotDescriptor;
+import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 public class MultiplayerGamePanel extends JPanel {
@@ -17,18 +18,18 @@ public class MultiplayerGamePanel extends JPanel {
 
 	private final JScrollPane scrollPane = new JScrollPane();
 
-	public MultiplayerGamePanel(MainFrame mainFrame, PlayBoard playBoard, Timer timer, Iterable<BotDescriptor> botDescriptors) {
+	public MultiplayerGamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer, Iterable<BotDescriptor> botDescriptors) {
 
 		super();
 
-		this.gamePanel = new GamePanel(mainFrame, playBoard, timer);
+		this.gamePanel = new GamePanel(mainFrame, playBoard, piecesColor, timer);
 
 		JPanel bots = new JPanel();
 		bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
 
 		for (BotDescriptor botDescriptor : botDescriptors) {
 
-			Grid grid = new Grid(PlayBoard.constructCopyPlayBoard(playBoard), true);
+			Grid grid = new Grid(PlayBoard.constructCopyPlayBoard(playBoard), true, piecesColor);
 
 			bots.add(grid);
 		}

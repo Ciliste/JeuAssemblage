@@ -10,6 +10,7 @@ import utils.ETypeListen;
 import view.component.board.listener.IPieceManipulationComponent;
 import view.utils.KeyboardManager;
 import view.utils.PieceRenderUtils;
+import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 import java.awt.Color;
@@ -46,17 +47,21 @@ public class Grid extends JPanel implements Listener{
 	private int xSelectedPieceSurrondingImage = 0;
 	private int ySelectedPieceSurrondingImage = 0;
 
+	private PiecesColor piecesColor;
+
 	private final boolean isPreview;
 
-	public Grid(PlayBoard playBoard) {
+	public Grid(PlayBoard playBoard, PiecesColor piecesColor) {
 
-		this(playBoard, false);
+		this(playBoard, false, piecesColor);
 	}
 
-    public Grid(PlayBoard playBoard, boolean isPreview) {
+    public Grid(PlayBoard playBoard, boolean isPreview, PiecesColor piecesColor) {
         
 		this.playBoard = playBoard;
 		this.playBoard.addListener(ETypeListen.PLAYVIEW.typeListen, this);
+
+		this.piecesColor = piecesColor;
 
         this.setLayout(null);
 
@@ -271,7 +276,7 @@ public class Grid extends JPanel implements Listener{
 
                 if (matrices[i][j] != 0) {
 
-                    Image cell = playBoard.getCellImageByPieceId(matrices[i][j]);
+                    Image cell = piecesColor.getImageById(matrices[i][j]);
 
 					g2d.drawImage(
 						cell,
@@ -306,7 +311,7 @@ public class Grid extends JPanel implements Listener{
 			System.out.println("xClickOriginSelectedPiece : " + xClickOriginSelectedPiece);
 			System.out.println("yClickOriginSelectedPiece : " + yClickOriginSelectedPiece);
 
-			Image cellImage = playBoard.getCellImageByPieceId(selectedPieceId);
+			Image cellImage = piecesColor.getImageById(selectedPieceId);
 			boolean[][] pieceMatrix = selectedPieceClone.getPiece();
 
 			int x = mousePosition.x;

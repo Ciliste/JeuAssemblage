@@ -19,10 +19,11 @@ import model.ProfileUtils;
 import view.MainFrame;
 import view.component.MultiplayerGamePanel;
 import view.component.board.TimerPanel.Timer;
+import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 public class AIGameCreation extends SoloGameCreation {
-	
+
 	private final JPanel bots = new JPanel();
 	private final List<BotDescriptor> botDescriptors = new LinkedList<>();
 
@@ -33,7 +34,7 @@ public class AIGameCreation extends SoloGameCreation {
 	private final MainFrame mainFrame;
 
 	public AIGameCreation(MainFrame mainFrame) {
-		
+
 		super(mainFrame);
 
 		this.mainFrame = mainFrame;
@@ -61,34 +62,32 @@ public class AIGameCreation extends SoloGameCreation {
 
 	@Override
 	public void doLayout() {
-		
+
 		super.doLayout();
 
 		final int PADDING_LEFT = getWidthTimesPourcent(this, .05f);
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
-		
+
 		final int SCROLLPANE_WIDTH = getWidthTimesPourcent(this, .25f);
 		final int SCROLLPANE_HEIGHT = getHeightTimesPourcent(this, .15f);
 
 		scrollPane.setBounds(
-			getWidth() - SCROLLPANE_WIDTH - PADDING_LEFT,
-			PADDING_TOP,
-			SCROLLPANE_WIDTH,
-			SCROLLPANE_HEIGHT
-		);
+				getWidth() - SCROLLPANE_WIDTH - PADDING_LEFT,
+				PADDING_TOP,
+				SCROLLPANE_WIDTH,
+				SCROLLPANE_HEIGHT);
 
 		btnAddBot.setBounds(
-			scrollPane.getX(),
-			scrollPane.getY() + scrollPane.getHeight() + SwingUtils.getHeightTimesPourcent(this, .01f),
-			scrollPane.getWidth(),
-			SwingUtils.getHeightTimesPourcent(this, .05f)
-		);
+				scrollPane.getX(),
+				scrollPane.getY() + scrollPane.getHeight() + SwingUtils.getHeightTimesPourcent(this, .01f),
+				scrollPane.getWidth(),
+				SwingUtils.getHeightTimesPourcent(this, .05f));
 	}
 
 	@Override
-	protected void startGame(PlayBoard playBoard, Timer timer) {
+	protected void startGame(PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
 
-		mainFrame.setContentPane(new MultiplayerGamePanel(mainFrame, playBoard, timer, botDescriptors));
+		mainFrame.setContentPane(new MultiplayerGamePanel(mainFrame, playBoard, piecesColor, timer, botDescriptors));
 	}
 
 	private JPanel createBotDescriptorRenderer(BotDescriptor botDescriptor) {

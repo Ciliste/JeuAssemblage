@@ -15,6 +15,7 @@ import model.arrangement.Arrangement;
 import model.arrangement.ArrangementList;
 import view.MainFrame;
 import view.component.GameSummary;
+import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 public class SoloGameFinishScreen extends JPanel {
@@ -40,13 +41,13 @@ public class SoloGameFinishScreen extends JPanel {
 
 	private final PlayBoard playBoard;
 
-    public SoloGameFinishScreen(MainFrame mainFrame, PlayBoard playBoard) {
+    public SoloGameFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor) {
 
 		this.playBoard = playBoard;
 
         setLayout(null);
 
-        this.gameSummary = new GameSummary(playBoard);
+        this.gameSummary = new GameSummary(playBoard, piecesColor);
 
         this.lblArea      .setText("Aire : " + playBoard.getArea());
         this.lblPieceCount.setText("Nombres de pièces : " + playBoard.getPiecesCount());
