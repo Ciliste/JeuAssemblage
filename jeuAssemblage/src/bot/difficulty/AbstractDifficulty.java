@@ -15,11 +15,11 @@ public abstract class AbstractDifficulty implements IBot {
     protected IStrategyBot strategyBot;
     protected PlayBoard model;
 
-    private int AIsize;
+    private int AIdifficulty;
 
-    public AbstractDifficulty(PlayBoard model, int strategy, int AIsize) {
+    public AbstractDifficulty(PlayBoard model, int strategy, int AIdifficulty) {
         this.model = model;
-        this.AIsize = AIsize;
+        this.AIdifficulty = AIdifficulty;
 
         this.setStrategy(strategy);
     }
@@ -28,7 +28,7 @@ public abstract class AbstractDifficulty implements IBot {
     public void setStrategy(int strategy) {
         switch (strategy) {
             case AI_STRATEGY -> {
-                this.strategyBot = new AIStrategy(this.model, AIsize);
+                this.strategyBot = new AIStrategy(this.model, AIdifficulty);
             }
             case MEMO_STRATEGY -> {
                 this.strategyBot = new AbstractStrategyMemo(this.model);
@@ -42,7 +42,5 @@ public abstract class AbstractDifficulty implements IBot {
     @Override
     public void tick() {
         this.strategyBot.tick();
-    }
-   
-    
+    }   
 }

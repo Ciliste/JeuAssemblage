@@ -15,10 +15,10 @@ import model.PlayBoard;
 import model.SeedUtils;
 import piece.Piece;
 
-public class AIStrategy implements IStrategyBot {
-    public static final int EASY = 100;
-    public static final int MEDIUM = 200; 
-    public static final int HARD = 500; 
+public class AgStrategy implements IStrategyBot {
+    public static final int EASY = 1;
+    public static final int MEDIUM = 2; 
+    public static final int HARD = 5; 
     
     private static final int POP_SIZE = 100;
 
@@ -28,15 +28,15 @@ public class AIStrategy implements IStrategyBot {
     protected int testSize;
     private Random rand;
     
-    public AIStrategy(PlayBoard model) {
-        this(model, SeedUtils.generateRandomSeed(), AIStrategy.EASY);
+    public AgStrategy(PlayBoard model) {
+        this(model, SeedUtils.generateRandomSeed(), AgStrategy.EASY);
     }
 
-    public AIStrategy(PlayBoard model, int testSize) {
+    public AgStrategy(PlayBoard model, int testSize) {
         this(model, SeedUtils.generateRandomSeed(), testSize);
     }
 
-    protected AIStrategy(PlayBoard model, long seed, int testSize) {
+    protected AgStrategy(PlayBoard model, long seed, int testSize) {
         System.out.println(model);
         System.out.println(model.getArea());
 
@@ -51,7 +51,10 @@ public class AIStrategy implements IStrategyBot {
     
     @Override
     public void tick() {
-        pop = mutation(pop, 1d);
+
+        for (int i = 0; i < testSize; i++) {
+            pop = mutation(pop, 1d);
+        }
     }
 
     public List<Move> getMoves() {
@@ -73,9 +76,6 @@ public class AIStrategy implements IStrategyBot {
                 }
             }
         }
-
-        System.out.println(bestSolution);
-        System.out.println(bestSolution.getArea());
 
         return ret;
     }
@@ -244,7 +244,7 @@ public class AIStrategy implements IStrategyBot {
     }
 
     public static void main(String args) {
-        new AIStrategy(PlayBoard.constructPlayBoard(SeedUtils.generateRandomSeed(), 8, 8, 4));
+        new AgStrategy(PlayBoard.constructPlayBoard(SeedUtils.generateRandomSeed(), 8, 8, 4));
     }
     
 }

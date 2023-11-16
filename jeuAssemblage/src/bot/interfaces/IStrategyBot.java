@@ -1,6 +1,10 @@
 package bot.interfaces;
 
-public interface IStrategyBot {
+import java.util.List;
 
-    public abstract void tick();
+import bot.Move;
+
+public interface IStrategyBot extends ITickable{
+
+    public abstract List<Move> getMoves();
 }
