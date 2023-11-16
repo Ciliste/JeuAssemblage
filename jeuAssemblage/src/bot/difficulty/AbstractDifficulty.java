@@ -1,9 +1,8 @@
 package bot.difficulty;
 
-import bot.Move;
 import bot.interfaces.IBot;
 import bot.interfaces.IStrategyBot;
-import bot.strategy.AIStrategy;
+import bot.strategy.AgStrategy;
 import bot.strategy.AbstractStrategyMemo;
 import model.PlayBoard;
 
@@ -28,7 +27,7 @@ public abstract class AbstractDifficulty implements IBot {
     public void setStrategy(int strategy) {
         switch (strategy) {
             case AI_STRATEGY -> {
-                this.strategyBot = new AIStrategy(this.model, AIdifficulty);
+                this.strategyBot = new AgStrategy(this.model, AIdifficulty);
             }
             case MEMO_STRATEGY -> {
                 this.strategyBot = new AbstractStrategyMemo(this.model);
