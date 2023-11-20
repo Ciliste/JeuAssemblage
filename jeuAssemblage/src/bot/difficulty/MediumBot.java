@@ -3,9 +3,9 @@ package bot.difficulty;
 import bot.strategy.AgStrategy;
 import model.PlayBoard;
 
-public class MediumDifficulty extends AbstractDifficulty {
+public class MediumBot extends Bot {
 
-    public MediumDifficulty(PlayBoard model, int strategy) {
+    public MediumBot(PlayBoard model, int strategy) {
         super(model, strategy, AgStrategy.MEDIUM);
     }
 }

@@ -11,8 +11,8 @@ import java.awt.Point;
 
 import bot.utils.Move;
 import model.PlayBoard;
-import model.SeedUtils;
 import piece.Piece;
+import utils.SeedUtils;
 
 public class AgStrategy extends AbstractStrategy {
 

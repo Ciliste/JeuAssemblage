@@ -3,11 +3,9 @@ package view.component.board;
 import static view.utils.SwingUtils.*;
 
 import model.PlayBoard;
-import model.listener.PlayBoardAdapter;
 import observer.interfaces.Listener;
 import piece.Piece;
 import utils.ETypeListen;
-import view.component.board.listener.IPieceManipulationComponent;
 import view.utils.KeyboardManager;
 import view.utils.PieceRenderUtils;
 import view.utils.PiecesColor;
@@ -21,9 +19,6 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.JPanel;
 

@@ -12,15 +12,22 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class TimerPanel extends JPanel {
+import view.component.timer.Timer;
+import view.component.timer.TimerListener;
+
+public class TimerPanel extends JPanel implements TimerListener {
 
     private final JLabel lblMinutes = new JLabel("00");
     private final JLabel lblColon   = new JLabel(" : ");
     private final JLabel lblSeconds = new JLabel("00");
 
+    private Runnable onTimerFinished;
+
     public TimerPanel(JFrame frame, Timer timer, Runnable onTimerFinished) {
         
         super();
+
+        this.onTimerFinished = onTimerFinished;
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
@@ -33,30 +40,7 @@ public class TimerPanel extends JPanel {
             lblMinutes.setText(String.format("%02d", timer.getNbMinutes()));
             lblSeconds.setText(String.format("%02d", timer.getNbSeconds()));
 
-            timer.addTimerListener(new TimerListener() {
-        
-                @Override
-                public void timerChanged(Object source, Timer timer) {
-        
-                    System.out.println("timerChanged");
-
-                    lblMinutes.setText(String.format("%02d", timer.getCurrentNbMinutes()));
-                    lblSeconds.setText(String.format("%02d", timer.getCurrentNbSeconds()));
-
-                    repaint();
-                }
-        
-                @Override
-                public void timerFinished(Object source, Timer timer) {
-        
-                    lblMinutes.setText("00");
-                    lblSeconds.setText("00");
-
-                    onTimerFinished.run();
-
-                    repaint();
-                }
-            });
+            timer.addTimerListener(this);
 
             frame.addWindowListener(new WindowAdapter() {
                 
@@ -71,132 +55,26 @@ public class TimerPanel extends JPanel {
         }
     }
 
-    public static class Timer {
-    
-        public static final Timer NO_TIMER = new Timer(-1, -1);
+    @Override
+    public void timerChanged(Object source, Timer timer) {
 
-        private final int nbMinutes;
-        private final int nbSeconds;
+        System.out.println("timerChanged");
 
-        private int currentNbMinutes;
-        private int currentNbSeconds;
+        lblMinutes.setText(String.format("%02d", timer.getCurrentNbMinutes()));
+        lblSeconds.setText(String.format("%02d", timer.getCurrentNbSeconds()));
 
-        private Thread thread;
-
-        public Timer(int nbMinutes, int nbSeconds) {
-    
-            this.nbMinutes = nbMinutes;
-            this.nbSeconds = nbSeconds;
-
-            this.currentNbMinutes = nbMinutes;
-            this.currentNbSeconds = nbSeconds;
-        }
-
-        public int getCurrentNbMinutes() {
-    
-            return currentNbMinutes;
-        }
-
-        public int getCurrentNbSeconds() {
-    
-            return currentNbSeconds;
-        }
-
-        public int getNbMinutes() {
-    
-            return nbMinutes;
-        }
-
-        public int getNbSeconds() {
-    
-            return nbSeconds;
-        }
-
-        public void startTimer() {
-
-            if (thread != null) {
-
-                thread.interrupt();
-            }
-
-            thread = new Thread(() -> {
-
-                while (currentNbMinutes > 0 || currentNbSeconds > 0) {
-
-                    try {
-
-                        Thread.sleep(1000);
-                    } 
-                    catch (InterruptedException e) {
-
-                        return;
-                    }
-
-                    if (currentNbSeconds > 0) {
-
-                        currentNbSeconds--;
-                    } 
-                    else {
-
-                        currentNbSeconds = 59;
-                        currentNbMinutes--;
-                    }
-
-                    fireTimerChanged();
-                }
-
-                fireTimerFinished();
-            });
-
-            thread.start();
-        }
-
-        private void stopTimer() {
-
-            if (thread != null) {
-
-                thread.interrupt();
-            }
-        }
-
-        private void fireTimerChanged() {
-    
-            for (TimerListener listener : listeners) {
-    
-                listener.timerChanged(this, this);
-            }
-        }
-
-        private void fireTimerFinished() {
-    
-            for (TimerListener listener : listeners) {
-    
-                listener.timerFinished(this, this);
-            }
-        }
-
-        private final List<TimerListener> listeners = new LinkedList<>();
-
-        public void addTimerListener(TimerListener listener) {
-    
-            listeners.add(listener);
-        }
-
-        public void removeTimerListener(TimerListener listener) {
-    
-            listeners.remove(listener);
-        }
+        repaint();
     }
 
-    public static interface TimerListenable {
-    
-        public abstract void addTimerListener(TimerListener listener);
-        public abstract void removeTimerListener(TimerListener listener);
+    @Override
+    public void timerFinished(Object source, Timer timer) {
+
+        lblMinutes.setText("00");
+        lblSeconds.setText("00");
+
+        this.onTimerFinished.run();
+
+        repaint();
     }
 
-    public static interface TimerListener {
-    
-        public abstract void timerChanged(Object source, Timer timer);
-        public abstract void timerFinished(Object source, Timer timer);
-    }
 }
