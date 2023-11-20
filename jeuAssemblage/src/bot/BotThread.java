@@ -11,6 +11,8 @@ public class BotThread implements Runnable {
     private ArrayList<IBot> bots;
     private int sleepTime;
 
+    private boolean stop;
+
     public BotThread() {
 
         this(new ArrayList<IBot>());
@@ -25,16 +27,25 @@ public class BotThread implements Runnable {
 
         this.bots = bots;
         this.sleepTime = sleepTime;
+        this.stop = false;
     }
 
     public ArrayList<IBot> getBots() {
         return this.bots;
     }
 
+    public void stop() {
+        this.stop = true;
+    }
+
+    public void start() {
+        this.stop = false;
+    }
+
     @Override
     public void run() {
 
-        while (true) {
+        while (!this.stop) {
 
             for (IBot bot : bots) {
                 bot.tick();   

@@ -23,6 +23,12 @@ public class GamePanel extends JPanel {
 	private final Finish finish;
 
 	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
+		
+		this(mainFrame, playBoard, piecesColor, timer, new SoloGameFinishScreen(mainFrame, playBoard, piecesColor));
+	}
+
+	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer,
+			JPanel finishScreen) {
 
 		super();
 
@@ -30,14 +36,14 @@ public class GamePanel extends JPanel {
 
 
 		this.grid = new Grid(playBoard, piecesColor);
-		this.finish = new Finish(mainFrame, playBoard, piecesColor);
+		this.finish = new Finish(mainFrame, playBoard, piecesColor, finishScreen);
 
 		this.timerPanel = new TimerPanel(mainFrame, timer, new Runnable() {
 			
 			@Override
 			public void run() {
 				
-				mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard, piecesColor));
+				mainFrame.setContentPane(finishScreen);
 			}
 		});
 

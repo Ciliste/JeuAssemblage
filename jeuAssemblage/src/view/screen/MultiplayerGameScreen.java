@@ -29,8 +29,6 @@ public class MultiplayerGameScreen extends JPanel {
 
 		super();
 
-		this.gamePanel = new GamePanel(mainFrame, playBoard, piecesColor, timer);
-
 		JPanel bots = new JPanel();
 		bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
 
@@ -44,8 +42,10 @@ public class MultiplayerGameScreen extends JPanel {
 			botsAl.add(new EasyBot(playBoard, Bot.AI_STRATEGY));
 		}
 		
-		//TODO Finir
 		BotThread botT = new BotThread(botsAl);
+
+		this.gamePanel = new GamePanel(mainFrame, playBoard, piecesColor, timer, new MultiplayerFinishScreen(mainFrame, playBoard, piecesColor, botT));
+
 		
 		scrollPane.setViewportView(bots);
 

@@ -24,6 +24,11 @@ public abstract class Bot implements IBot {
     }
 
     @Override
+    public PlayBoard getModel() {
+        return this.model;
+    }
+
+    @Override
     public void setStrategy(int strategy) {
         switch (strategy) {
             case AI_STRATEGY -> {

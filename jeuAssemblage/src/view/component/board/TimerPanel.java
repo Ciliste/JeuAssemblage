@@ -2,10 +2,6 @@ package view.component.board;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;

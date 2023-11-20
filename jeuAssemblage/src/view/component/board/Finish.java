@@ -28,7 +28,12 @@ public class Finish extends JPanel {
     private final PlayBoard playBoard;
 
     public Finish(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor) {
+        
+        this(mainFrame, playBoard, piecesColor, new SoloGameFinishScreen(mainFrame, playBoard, piecesColor));
+    }
 
+    public Finish(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, JPanel finishScreen) {
+        
 		super();
 
 		this.mainFrame = mainFrame;
@@ -59,7 +64,7 @@ public class Finish extends JPanel {
 
         this.btnFinish.addActionListener(e -> {
 
-            mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard, piecesColor));
+            mainFrame.setContentPane(finishScreen);
         });
 
         this.add(this.lblPreciseArea);
