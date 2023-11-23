@@ -9,14 +9,12 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 
 import model.PlayBoard;
-import model.SeedUtils;
 import model.arrangement.ArrangementList;
-import piece.Piece;
 import utils.EDifficulty;
+import utils.SeedUtils;
 import view.MainFrame;
 import view.component.Separator;
 import view.component.board.Grid;
-import view.component.board.TimerPanel.Timer;
 import view.utils.DocumentAdapter;
 
 public class SoloGameCreation extends JPanel {

@@ -1,4 +1,4 @@
-package model;
+package utils;
 
 public final class SeedUtils {
     

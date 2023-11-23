@@ -9,9 +9,9 @@ import view.MainFrame;
 import view.component.board.Finish;
 import view.component.board.Grid;
 import view.component.board.TimerPanel;
-import view.component.board.TimerPanel.Timer;
 import view.screen.SoloGameFinishScreen;
 import view.utils.SwingUtils;
+import view.component.timer.Timer;
 
 import java.awt.Graphics;
 

@@ -6,21 +6,26 @@ import bot.strategy.AgStrategy;
 import bot.strategy.NoobStrategy;
 import model.PlayBoard;
 
-public abstract class AbstractDifficulty implements IBot {
+public abstract class Bot implements IBot {
 
-    public final int AI_STRATEGY = 0;
-    public final int MEMO_STRATEGY = 1;
+    public static final int AI_STRATEGY = 0;
+    public static final int MEMO_STRATEGY = 1;
 
     protected IStrategyBot strategyBot;
     protected PlayBoard model;
 
     private int AIdifficulty;
 
-    public AbstractDifficulty(PlayBoard model, int strategy, int AIdifficulty) {
+    public Bot(PlayBoard model, int strategy, int AIdifficulty) {
         this.model = model;
         this.AIdifficulty = AIdifficulty;
 
         this.setStrategy(strategy);
+    }
+
+    @Override
+    public PlayBoard getModel() {
+        return this.model;
     }
 
     @Override

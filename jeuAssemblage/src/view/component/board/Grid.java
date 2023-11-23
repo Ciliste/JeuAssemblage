@@ -3,11 +3,9 @@ package view.component.board;
 import static view.utils.SwingUtils.*;
 
 import model.PlayBoard;
-import model.listener.PlayBoardAdapter;
 import observer.interfaces.Listener;
 import piece.Piece;
 import utils.ETypeListen;
-import view.component.board.listener.IPieceManipulationComponent;
 import view.utils.KeyboardManager;
 import view.utils.PieceRenderUtils;
 import view.utils.SwingUtils;

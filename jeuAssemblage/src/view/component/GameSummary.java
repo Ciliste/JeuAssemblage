@@ -14,7 +14,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
 import java.awt.Color;
 
 
