@@ -9,28 +9,28 @@ public class BotThread implements Runnable {
     
     private final static int DEFAULT_SLEEP = 1000;
 
-    private ArrayList<IBot> bot;
     private int sleepTime;
 
-    private IMovesView movesView;
+    private ArrayList<IBot> bots;
+    private ArrayList<IMovesView> movesViews;
 
     private boolean stop;
 
-    public BotThread(ArrayList<IBot> bot, IMovesView movesView) {
+    public BotThread(ArrayList<IBot> bots, ArrayList<IMovesView> movesViews) {
 
-        this(bot, DEFAULT_SLEEP, movesView);
+        this(bots, DEFAULT_SLEEP, movesViews);
     }
 
-    public BotThread(ArrayList<IBot> bot, int sleepTime, IMovesView movesView) {
+    public BotThread(ArrayList<IBot> bots, int sleepTime, ArrayList<IMovesView> movesViews) {
 
-        this.bot = bot;
+        this.bots = bots;
         this.sleepTime = sleepTime;
-        this.movesView = movesView;
+        this.movesViews = movesViews;
         this.stop = false;
     }
 
     public ArrayList<IBot> getBots() {
-        return this.bot;
+        return this.bots;
     }
 
     public void stop() {
@@ -44,13 +44,25 @@ public class BotThread implements Runnable {
     @Override
     public void run() {
 
-        while (!this.stop && bot.tick()) {
+        while (!this.stop) {
+            boolean stopable = true;
+
+            for ( int i = 0; i < this.bots.size(); i++) {
+                IBot bot = this.bots.get(i);
+                IMovesView movesView = this.movesViews.get(i);
+                
+                if ( bot.tick() ) {
+                    stopable = false;
+                } else {
+                    movesView.start();
+                }
+            }
+
+            if ( stopable ) this.stop();
+
             try { Thread.sleep(sleepTime); }
             catch(Exception e ) { e.printStackTrace(); }        
         }
-        
-        this.movesView.setMoves(this.bot.getMoves());
-        this.movesView.start();
         
         this.stop();
     }

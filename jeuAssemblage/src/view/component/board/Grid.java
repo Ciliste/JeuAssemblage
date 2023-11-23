@@ -10,6 +10,7 @@ import view.utils.KeyboardManager;
 import view.utils.PieceRenderUtils;
 import view.utils.PiecesColor;
 import view.utils.SwingUtils;
+import view.utils.KeyboardManager.KeyboardAdapter;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -22,7 +23,9 @@ import java.awt.geom.Rectangle2D;
 
 import javax.swing.JPanel;
 
-public class Grid extends JPanel implements Listener {
+import bot.view.interfaces.IMovableView;
+
+public class Grid extends JPanel implements Listener, IMovableView{
 
 	private final PlayBoard playBoard;
 
@@ -71,158 +74,13 @@ public class Grid extends JPanel implements Listener {
 		this.addMouseMotionListener(new GridMouseMotionListener());
 
 		// Gestion des contrôles de la manipulation des pièces
-		KeyboardManager.addKeyboardListener(new KeyboardManager.KeyboardAdapter() {
-			
-			@Override
-			public void onKeyPressed(KeyboardManager.Keys key) {
-
-				if (null != selectedPieceClone) {
-
-					if (KeyboardManager.Keys.R == key) {
-
-						if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.SHIFT)) {
-
-							selectedPieceClone.rotateLeft();
-						}
-						else if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.CONTROL)) {
-
-							selectedPieceClone.reverse();
-						}
-						else {
-
-							selectedPieceClone.rotateRight();
-						}
-
-						repaint();
-					}
-				}
-			}
-		});
+		KeyboardManager.addKeyboardListener(new PieceKeyboardListener() );
 
 		// Gestion des contrôles de la sélection des pièces
-		KeyboardManager.addKeyboardListener(new KeyboardManager.KeyboardAdapter() {
-
-			@Override
-			public void onKeyPressed(KeyboardManager.Keys key) {
-
-				if (KeyboardManager.Keys.TAB == key) {
-
-					int pieceId = (-1 == selectedPieceId) ? 1 : selectedPieceId + 1;
-
-					try {
-						
-						selectedPiece = playBoard.getPieceById(pieceId);
-
-						if (null == selectedPiece) {
-
-							pieceId = 1;
-							selectedPiece = playBoard.getPieceById(pieceId);
-						}
-
-						selectedPieceClone = Piece.clone(selectedPiece);
-					} 
-					catch (Exception e) {
-
-						e.printStackTrace();
-						pieceId = 1;
-						selectedPiece = playBoard.getPieceById(pieceId);
-						selectedPieceClone = Piece.clone(selectedPiece);
-					}
-
-					selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPieceClone.getPiece(), Color.CYAN);
-
-					Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
-					xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
-					ySelectedPieceSurrondingImage = upperLeftPieceCorner.y;
-
-					selectedPieceId = pieceId;
-
-					xClickOriginSelectedPiece = 0;
-					yClickOriginSelectedPiece = 0;
-
-					repaint();
-				}
-				else if (KeyboardManager.Keys.ESCAPE == key) {
-
-					selectedPieceId = -1;
-					xClickOriginSelectedPiece = -1;
-					yClickOriginSelectedPiece = -1;
-
-					selectedPieceSurrondingImage = null;
-					xSelectedPieceSurrondingImage = -1;
-					ySelectedPieceSurrondingImage = -1;
-
-					selectedPiece = null;
-					selectedPieceClone = null;
-
-					repaint();
-				}
-			}
-		});
+		KeyboardManager.addKeyboardListener(new SelectPieceKeyboardListener() );
 
 		// Gestion des contrôles du déplacement des pièces
-		KeyboardManager.addKeyboardListener(new KeyboardManager.KeyboardAdapter() {
-
-			@Override
-			public void onKeyPressed(KeyboardManager.Keys key) {
-
-				if (null != selectedPieceClone) {
-
-					switch (key) {
-						
-						case UP : {
-
-							mousePosition.setLocation(
-								mousePosition.getX(),
-								mousePosition.getY() - 1
-							);
-
-							repaint();
-
-							break;
-						}
-
-						case DOWN : {
-
-							mousePosition.setLocation(
-								mousePosition.getX(),
-								mousePosition.getY() + 1
-							);
-
-							repaint();
-
-							break;
-						}
-
-						case LEFT : {
-
-							mousePosition.setLocation(
-								mousePosition.getX() - 1,
-								mousePosition.getY()
-							);
-
-							repaint();
-
-							break;
-						}
-
-						case RIGHT : {
-
-							mousePosition.setLocation(
-								mousePosition.getX() + 1,
-								mousePosition.getY()
-							);
-
-							repaint();
-
-							break;
-						}
-
-						default : {}
-					}
-				}
-			}
-		});
+		KeyboardManager.addKeyboardListener(new ControlMoveKeyboardListener() );
     }
 
 	@Override
@@ -443,8 +301,192 @@ public class Grid extends JPanel implements Listener {
 		}
 	}
 
+	private class PieceKeyboardListener extends KeyboardAdapter {
+			
+		@Override
+		public void onKeyPressed(KeyboardManager.Keys key) {
+
+			if (null != selectedPieceClone) {
+
+				if (KeyboardManager.Keys.R == key) {
+
+					if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.SHIFT)) {
+
+						selectedPieceClone.rotateLeft();
+					}
+					else if (true == KeyboardManager.isKeyPressed(KeyboardManager.Keys.CONTROL)) {
+
+						selectedPieceClone.reverse();
+					}
+					else {
+
+						selectedPieceClone.rotateRight();
+					}
+
+					repaint();
+				}
+			}
+		}
+	}
+
+	private class SelectPieceKeyboardListener extends KeyboardAdapter {
+
+		@Override
+		public void onKeyPressed(KeyboardManager.Keys key) {
+
+			if (KeyboardManager.Keys.TAB == key) {
+
+				int pieceId = (-1 == selectedPieceId) ? 1 : selectedPieceId + 1;
+
+				try {
+					
+					selectedPiece = playBoard.getPieceById(pieceId);
+
+					if (null == selectedPiece) {
+
+						pieceId = 1;
+						selectedPiece = playBoard.getPieceById(pieceId);
+					}
+
+					selectedPieceClone = Piece.clone(selectedPiece);
+				} 
+				catch (Exception e) {
+
+					e.printStackTrace();
+					pieceId = 1;
+					selectedPiece = playBoard.getPieceById(pieceId);
+					selectedPieceClone = Piece.clone(selectedPiece);
+				}
+
+				selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPieceClone.getPiece(), Color.CYAN);
+
+				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
+				xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
+				ySelectedPieceSurrondingImage = upperLeftPieceCorner.y;
+
+				selectedPieceId = pieceId;
+
+				xClickOriginSelectedPiece = 0;
+				yClickOriginSelectedPiece = 0;
+
+				repaint();
+			}
+			else if (KeyboardManager.Keys.ESCAPE == key) {
+
+				selectedPieceId = -1;
+				xClickOriginSelectedPiece = -1;
+				yClickOriginSelectedPiece = -1;
+
+				selectedPieceSurrondingImage = null;
+				xSelectedPieceSurrondingImage = -1;
+				ySelectedPieceSurrondingImage = -1;
+
+				selectedPiece = null;
+				selectedPieceClone = null;
+
+				repaint();
+			}
+		}
+	}
+
+	private class ControlMoveKeyboardListener extends KeyboardAdapter {
+
+		@Override
+		public void onKeyPressed(KeyboardManager.Keys key) {
+
+			if (null != selectedPieceClone) {
+
+				switch (key) {
+					
+					case UP : {
+
+						mousePosition.setLocation(
+							mousePosition.getX(),
+							mousePosition.getY() - 1
+						);
+
+						repaint();
+
+						break;
+					}
+
+					case DOWN : {
+
+						mousePosition.setLocation(
+							mousePosition.getX(),
+							mousePosition.getY() + 1
+						);
+
+						repaint();
+
+						break;
+					}
+
+					case LEFT : {
+
+						mousePosition.setLocation(
+							mousePosition.getX() - 1,
+							mousePosition.getY()
+						);
+
+						repaint();
+
+						break;
+					}
+
+					case RIGHT : {
+
+						mousePosition.setLocation(
+							mousePosition.getX() + 1,
+							mousePosition.getY()
+						);
+
+						repaint();
+
+						break;
+					}
+
+					default : {}
+				}
+			}
+		}
+	}
+
 	@Override
 	public void update() {
 		this.repaint();
+	}
+
+	@Override
+	public void moveMouseOn(int pieceId) {
+		Point leftCorner = this.playBoard.getUpperLeftPieceCornerById(pieceId);
+		int deltaX = mousePosition.x - leftCorner.x;
+		int deltaY = mousePosition.y - leftCorner.y; 
+
+		int size = 30;
+		for ( int i = 0; i < size; i++) {
+			if (i == size - 1) {
+				
+			}
+		}
+
+	}
+
+	@Override
+	public void moveMouseOn(int x, int y) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'moveMouseOn'");
+	}
+
+	@Override
+	public void click() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'click'");
+	}
+
+	@Override
+	public boolean placePiece() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'placePiece'");
 	}
 }

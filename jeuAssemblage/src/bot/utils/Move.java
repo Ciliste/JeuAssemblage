@@ -4,9 +4,9 @@ import piece.Piece;
 
 public class Move {
     
-    protected int pieceId;
-    protected int x;
-    protected int y;
+    public int pieceId;
+    public int x;
+    public int y;
 
     public Move(int pieceId, int x, int y) {
         this.pieceId = pieceId;
