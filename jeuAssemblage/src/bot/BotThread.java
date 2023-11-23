@@ -3,35 +3,34 @@ package bot;
 import java.util.ArrayList;
 
 import bot.interfaces.IBot;
+import bot.view.interfaces.IMovesView;
 
 public class BotThread implements Runnable {
     
     private final static int DEFAULT_SLEEP = 1000;
 
-    private ArrayList<IBot> bots;
+    private ArrayList<IBot> bot;
     private int sleepTime;
+
+    private IMovesView movesView;
 
     private boolean stop;
 
-    public BotThread() {
+    public BotThread(ArrayList<IBot> bot, IMovesView movesView) {
 
-        this(new ArrayList<IBot>());
+        this(bot, DEFAULT_SLEEP, movesView);
     }
 
-    public BotThread(ArrayList<IBot> bots) {
+    public BotThread(ArrayList<IBot> bot, int sleepTime, IMovesView movesView) {
 
-        this(bots, DEFAULT_SLEEP);
-    }
-
-    public BotThread(ArrayList<IBot> bots, int sleepTime) {
-
-        this.bots = bots;
+        this.bot = bot;
         this.sleepTime = sleepTime;
+        this.movesView = movesView;
         this.stop = false;
     }
 
     public ArrayList<IBot> getBots() {
-        return this.bots;
+        return this.bot;
     }
 
     public void stop() {
@@ -45,15 +44,15 @@ public class BotThread implements Runnable {
     @Override
     public void run() {
 
-        while (!this.stop) {
-
-            for (IBot bot : bots) {
-                bot.tick();   
-            }
-
+        while (!this.stop && bot.tick()) {
             try { Thread.sleep(sleepTime); }
             catch(Exception e ) { e.printStackTrace(); }        
         }
+        
+        this.movesView.setMoves(this.bot.getMoves());
+        this.movesView.start();
+        
+        this.stop();
     }
 
 }

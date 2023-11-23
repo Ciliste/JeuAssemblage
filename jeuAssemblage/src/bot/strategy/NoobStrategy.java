@@ -12,7 +12,7 @@ public class NoobStrategy extends AbstractStrategy {
     
 
     @Override
-    public void tick() {
+    public boolean tick() {
 
         throw new UnsupportedOperationException("Unimplemented method 'tick'");
     }

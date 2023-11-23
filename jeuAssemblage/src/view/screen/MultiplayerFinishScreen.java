@@ -1,26 +1,30 @@
 package view.screen;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import bot.BotThread;
 import bot.interfaces.IBot;
 import model.PlayBoard;
 import view.MainFrame;
 import view.component.GameSummary;
+import view.screen.AIGameCreation.BotDescriptor;
 import view.utils.PiecesColor;
+import view.utils.SwingUtils;
 
 public class MultiplayerFinishScreen extends JPanel {
     
     private SoloGameFinishScreen finishScreen;
 
-    private final JLabel lblFinishGame = new JLabel();
-    private final ArrayList<GameSummary> botPanels = new ArrayList<GameSummary>();
+    private final JLabel lblFinishGame = new JLabel("Le gagnant est le ");
+	private final JScrollPane scrollPane = new JScrollPane();   
     
-    
-    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, BotThread botThread) {
+    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, BotThread botThread, List<BotDescriptor> botDescriptor) {
 
         super();
 
@@ -28,22 +32,59 @@ public class MultiplayerFinishScreen extends JPanel {
 
         botThread.stop();
 
-        for (IBot bot : botThread.getBots()) {
-            new GameSummary(bot.getModel(), piecesColor);
+        this.finishScreen = new SoloGameFinishScreen(mainFrame, playBoard, piecesColor);
+        JPanel bots = new JPanel();
+        bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
+
+        String winnerName = "Joueur";
+        int minArea = playBoard.getArea();
+
+        List<IBot> botLst = botThread.getBots();
+        for (int i = 0; i < botLst.size(); i++) {
+
+            IBot bot = botLst.get(i);
+            String name = botDescriptor.get(i).getName();
+
+            GameSummary gTemp = new GameSummary(bot.getModel(), piecesColor);
+            bots.add(gTemp);
+
+            if (bot.getModel().getArea() < minArea) {
+                winnerName = name;
+            }
         }
 
-        this.finishScreen = new SoloGameFinishScreen(mainFrame, playBoard, piecesColor);
+        this.lblFinishGame.setText(this.lblFinishGame.getText() + winnerName);
+        
+        this.scrollPane.setViewportView(bots);
 
+        this.add(this.lblFinishGame);
         this.add(this.finishScreen);
+        this.add(this.scrollPane);
     }
     
     @Override
     public void doLayout() {
-        this.finishScreen.setBounds(
+        super.doLayout();
+
+        this.lblFinishGame.setBounds(
             0,
-            0,
-            this.getWidth(),
-            this.getHeight()
+		 	0,
+		 	SwingUtils.getWidthTimesPourcent(this, .8f),
+			SwingUtils.getHeightTimesPourcent(this, .1f)
         );
+
+		this.finishScreen.setBounds(
+			0,
+		 	SwingUtils.getHeightTimesPourcent(this, .1f),
+		 	SwingUtils.getWidthTimesPourcent(this, .8f),
+			SwingUtils.getHeightTimesPourcent(this, .9f)
+		);
+
+		this.scrollPane.setBounds(
+			SwingUtils.getWidthTimesPourcent(this, .8f),
+			0,
+			SwingUtils.getWidthTimesPourcent(this, .2f),
+			getHeight()
+		);
     }
 }
