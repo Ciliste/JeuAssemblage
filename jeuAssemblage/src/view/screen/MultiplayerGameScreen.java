@@ -1,5 +1,8 @@
 package view.screen;
 
+import bot.difficulty.Bot;
+import bot.difficulty.EasyBot;
+
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -7,9 +10,6 @@ import javax.swing.JScrollPane;
 import java.util.ArrayList;
 import java.util.List;
 
-import bot.BotThread;
-import bot.difficulty.Bot;
-import bot.difficulty.EasyBot;
 import bot.interfaces.IBot;
 import model.PlayBoard;
 import view.MainFrame;
@@ -25,10 +25,10 @@ public class MultiplayerGameScreen extends JPanel {
 
 	private final JScrollPane scrollPane = new JScrollPane();
 
-	public MultiplayerGamePanel(MainFrame mainFrame, PlayBoard playBoard, Timer timer, Iterable<BotDescriptor> botDescriptors) {
+	public MultiplayerGameScreen(MainFrame mainFrame, PlayBoard playBoard, Timer timer, Iterable<BotDescriptor> botDescriptors) {
 
 		super();
-
+	
 		this.gamePanel = new GamePanel(mainFrame, playBoard, timer);
 
 		JPanel bots = new JPanel();
@@ -43,11 +43,6 @@ public class MultiplayerGameScreen extends JPanel {
 
 			botsAl.add(new EasyBot(playBoard, Bot.AI_STRATEGY));
 		}
-		
-		BotThread botT = null;//new BotThread(botsAl);
-
-		this.gamePanel = new GamePanel(mainFrame, playBoard, piecesColor, timer, new MultiplayerFinishScreen(mainFrame, playBoard, piecesColor, botT, botDescriptors));
-
 		
 		scrollPane.setViewportView(bots);
 

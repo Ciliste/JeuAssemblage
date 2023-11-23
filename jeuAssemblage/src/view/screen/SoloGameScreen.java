@@ -5,7 +5,7 @@ import javax.swing.JPanel;
 import model.PlayBoard;
 import view.MainFrame;
 import view.component.GamePanel;
-import view.component.board.TimerPanel.Timer;
+import view.component.timer.Timer;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;

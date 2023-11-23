@@ -5,7 +5,17 @@ import static view.utils.SwingUtils.*;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.DocumentEvent;
 
 import model.PlayBoard;
@@ -15,6 +25,7 @@ import utils.SeedUtils;
 import view.MainFrame;
 import view.component.Separator;
 import view.component.board.Grid;
+import view.component.timer.Timer;
 import view.utils.DocumentAdapter;
 
 public class SoloGameCreation extends JPanel {

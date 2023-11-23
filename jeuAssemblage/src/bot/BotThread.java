@@ -44,15 +44,15 @@ public class BotThread implements Runnable {
     @Override
     public void run() {
 
-        while (!this.stop && bot.tick()) {
-            try { Thread.sleep(sleepTime); }
-            catch(Exception e ) { e.printStackTrace(); }        
-        }
+        // while (!this.stop && bot.tick()) {
+        //     try { Thread.sleep(sleepTime); }
+        //     catch(Exception e ) { e.printStackTrace(); }        
+        // }
         
-        this.movesView.setMoves(this.bot.getMoves());
-        this.movesView.start();
+        // this.movesView.setMoves(this.bot.getMoves());
+        // this.movesView.start();
         
-        this.stop();
+        // this.stop();
     }
 
 }

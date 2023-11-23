@@ -14,7 +14,6 @@ import model.PlayBoard;
 import view.MainFrame;
 import view.component.GameSummary;
 import view.screen.AIGameCreation.BotDescriptor;
-import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 public class MultiplayerFinishScreen extends JPanel {
@@ -24,7 +23,7 @@ public class MultiplayerFinishScreen extends JPanel {
     private final JLabel lblFinishGame = new JLabel("Le gagnant est le ");
 	private final JScrollPane scrollPane = new JScrollPane();   
     
-    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, BotThread botThread, List<BotDescriptor> botDescriptor) {
+    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, BotThread botThread, List<BotDescriptor> botDescriptor) {
 
         super();
 
@@ -32,7 +31,7 @@ public class MultiplayerFinishScreen extends JPanel {
 
         botThread.stop();
 
-        this.finishScreen = new SoloGameFinishScreen(mainFrame, playBoard, piecesColor);
+        this.finishScreen = new SoloGameFinishScreen(mainFrame, playBoard);
         JPanel bots = new JPanel();
         bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
 
@@ -45,7 +44,7 @@ public class MultiplayerFinishScreen extends JPanel {
             IBot bot = botLst.get(i);
             String name = botDescriptor.get(i).getName();
 
-            GameSummary gTemp = new GameSummary(bot.getModel(), piecesColor);
+            GameSummary gTemp = new GameSummary(bot.getModel());
             bots.add(gTemp);
 
             if (bot.getModel().getArea() < minArea) {

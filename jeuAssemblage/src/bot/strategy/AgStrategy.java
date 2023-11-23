@@ -59,7 +59,7 @@ public class AgStrategy extends AbstractStrategy {
             return false;
         }
 
-        int toTest = this.rand.nextInt(0, (this.testSize/3));
+        int toTest = this.rand.nextInt((this.testSize/3));
         for (int i = 0; i < toTest; i++) {
             pop = mutation(pop, 1d);
         }

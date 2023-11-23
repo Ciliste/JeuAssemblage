@@ -26,9 +26,12 @@ public class Finish extends JPanel {
 	private final MainFrame mainFrame;
     private final PlayBoard playBoard;
 
-    public Finish(MainFrame mainFrame, PlayBoard playBoard) {}
+    public Finish(MainFrame mainFrame, PlayBoard playBoard) {
 
-    public Finish(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, JPanel finishScreen) {
+        this(mainFrame, playBoard, null);
+    }
+
+    public Finish(MainFrame mainFrame, PlayBoard playBoard, JPanel finishScreen) {
         
 		super();
 

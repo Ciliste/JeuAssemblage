@@ -18,8 +18,7 @@ import javax.swing.JScrollPane;
 import model.PlayBoard;
 import model.SettingsUtils;
 import view.MainFrame;
-import view.component.MultiplayerGamePanel;
-import view.component.board.TimerPanel.Timer;
+import view.component.timer.Timer;
 import view.utils.SwingUtils;
 
 public class AIGameCreation extends SoloGameCreation {
@@ -87,7 +86,7 @@ public class AIGameCreation extends SoloGameCreation {
 	@Override
 	protected void startGame(PlayBoard playBoard, Timer timer) {
 
-		mainFrame.setContentPane(new MultiplayerGamePanel(mainFrame, playBoard, timer, botDescriptors));
+		mainFrame.setContentPane(new MultiplayerGameScreen(mainFrame, playBoard, timer, botDescriptors));
 	}
 
 	@Override

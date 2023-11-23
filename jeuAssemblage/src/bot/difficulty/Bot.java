@@ -34,13 +34,15 @@ public abstract class Bot implements IBot {
     @Override
     public void setStrategy(int strategy) {
         switch (strategy) {
-            case AI_STRATEGY -> {
+            case AI_STRATEGY : {
                 this.strategyBot = new AgStrategy(this.model, AIdifficulty);
+                break;
             }
-            case MEMO_STRATEGY -> {
+            case MEMO_STRATEGY : {
                 this.strategyBot = new NoobStrategy(this.model);
+                break;
             }
-            default -> {
+            default : {
                 throw new IllegalStateException("Strategy " + strategy + " doesn't exist");
             }
         }

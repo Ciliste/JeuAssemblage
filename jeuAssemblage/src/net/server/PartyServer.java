@@ -32,6 +32,16 @@ public class PartyServer extends Server {
 		this.udpPort = udpPort;
 
 		NetUtils.registerClasses(getKryo());
+
+		addListener(new Listener() {
+
+			@Override
+			public void received(Connection connection, Object object) {
+				
+				System.out.println("Received: " + object);
+				System.out.println("From: " + connection.getID());
+			}
+		});
 	}
 
 	public int getTcpPort() {

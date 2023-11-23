@@ -79,6 +79,15 @@ public class LocalMultiplayerScreen extends JPanel {
 					LocalMultiplayerGameCreationScreen gameCreationScreen = new LocalMultiplayerGameCreationScreen(mainFrame, client, true);
 					gameCreationScreen.setupListeners();
 
+					client.onDisconnect(() -> {
+
+						JOptionPane.showMessageDialog(new JDialog(mainFrame, "Créer une partie"), "Une erreur est survenue...", "Erreur", JOptionPane.ERROR_MESSAGE);
+
+						mainFrame.setContentPane(new LocalMultiplayerScreen(mainFrame));
+
+						serverRef.get().stop();
+					});
+
 					mainFrame.setContentPane(gameCreationScreen);
 
 				});
@@ -116,6 +125,13 @@ public class LocalMultiplayerScreen extends JPanel {
 				gameCreationScreen.setupListeners();
 
 				mainFrame.setContentPane(gameCreationScreen);
+			});
+
+			clientRef.get().onDisconnect(() -> {
+
+				JOptionPane.showMessageDialog(new JDialog(mainFrame, "Rejoindre une partie"), "Connexion perdue...", "Erreur", JOptionPane.ERROR_MESSAGE);
+
+				mainFrame.setContentPane(new LocalMultiplayerScreen(mainFrame));
 			});
 
 			clientRef.get().connect();

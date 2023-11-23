@@ -100,6 +100,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 		} while (iteration < MAX_ITERATIONS);
 
+		System.out.println("CACA");
+
 		return false;
 		// for (int i = 0; i < board.length; i++) {
 	
