@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import javax.swing.BoxLayout;
 import javax.swing.Box;
+import javax.swing.SwingWorker;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -135,31 +136,19 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 				@Override
 				public void changedUpdate(DocumentEvent e) {
 
-					sendSeed();
+					buildWorker().execute();
 				}
 
 				@Override
 				public void insertUpdate(DocumentEvent e) {
 
-					sendSeed();
+					buildWorker().execute();
 				}
 
 				@Override
 				public void removeUpdate(DocumentEvent e) {
 
-					sendSeed();
-				}
-
-				private void sendSeed() {
-
-					try {
-						
-						long seed = Long.parseLong(txtSeed.getText());
-						hostClient.sendTCP(new GameSettingsPacket.SeedUpdate(seed));
-					} 
-					catch (Exception ex) {
-						// TODO: handle exception
-					}
+					buildWorker().execute();
 				}
 			});
 		
@@ -168,31 +157,19 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 				@Override
 				public void changedUpdate(DocumentEvent e) {
 
-					sendSizeX();
+					buildWorker().execute();
 				}
 
 				@Override
 				public void insertUpdate(DocumentEvent e) {
 
-					sendSizeX();
+					buildWorker().execute();
 				}
 
 				@Override
 				public void removeUpdate(DocumentEvent e) {
 
-					sendSizeX();
-				}
-
-				private void sendSizeX() {
-
-					try {
-						
-						int sizeX = Integer.parseInt(txtSizeX.getText());
-						hostClient.sendTCP(new GameSettingsPacket.SizeXUpdate(sizeX));
-					} 
-					catch (Exception ex) {
-
-					}
+					buildWorker().execute();
 				}
 			});
 
@@ -201,60 +178,40 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 				@Override
 				public void changedUpdate(DocumentEvent e) {
 
-					sendSizeY();
+					buildWorker().execute();
 				}
 
 				@Override
 				public void insertUpdate(DocumentEvent e) {
 
-					sendSizeY();
+					buildWorker().execute();
 				}
 
 				@Override
 				public void removeUpdate(DocumentEvent e) {
 
-					sendSizeY();
-				}
-
-				private void sendSizeY() {
-
-					try {
-						
-						int sizeY = Integer.parseInt(txtSizeY.getText());
-						hostClient.sendTCP(new GameSettingsPacket.SizeYUpdate(sizeY));
-					} 
-					catch (Exception ex) {
-
-					}
+					buildWorker().execute();
 				}
 			});
 		
 			nbPiecesSpinner.addChangeListener(e -> {
 
-				int nbPieces = (int) nbPiecesSpinner.getValue();
-
-				hostClient.sendTCP(new GameSettingsPacket.NbPiecesUpdate(nbPieces));
+				buildWorker().execute();
 			});
 
 			nbMinutesSpinner.addChangeListener(e -> {
 
-				int nbMinutes = (int) nbMinutesSpinner.getValue();
-
-				hostClient.sendTCP(new GameSettingsPacket.NbMinutesUpdate(nbMinutes));
+				buildWorker().execute();
 			});
 
 			nbSecondsSpinner.addChangeListener(e -> {
 
-				int nbSeconds = (int) nbSecondsSpinner.getValue();
-
-				hostClient.sendTCP(new GameSettingsPacket.NbSecondsUpdate(nbSeconds));
+				buildWorker().execute();
 			});
 
 			timeLimitCheckBox.addActionListener(e -> {
 
-				boolean timeLimit = timeLimitCheckBox.isSelected();
-
-				hostClient.sendTCP(new GameSettingsPacket.TimeLimitUpdate(timeLimit));
+				buildWorker().execute();
 			});
 
 			difficultyList.addListSelectionListener(e -> {
@@ -264,9 +221,7 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 					return;
 				}
 
-				EDifficulty difficulty = EDifficulty.values()[difficultyList.getSelectedIndex()];
-
-				hostClient.sendTCP(new GameSettingsPacket.DifficultyUpdate(difficulty));
+				buildWorker().execute();
 			});
 
 			hostClient.addListener(new Listener() {
@@ -283,14 +238,7 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 
 						Logger.getGlobal().info("CompleteGameSettingsRequest received");
 
-						hostClient.sendTCP(new GameSettingsPacket.SeedUpdate(Long.parseLong(txtSeed.getText())));
-						hostClient.sendTCP(new GameSettingsPacket.SizeXUpdate(Integer.parseInt(txtSizeX.getText())));
-						hostClient.sendTCP(new GameSettingsPacket.SizeYUpdate(Integer.parseInt(txtSizeY.getText())));
-						hostClient.sendTCP(new GameSettingsPacket.NbPiecesUpdate((int) nbPiecesSpinner.getValue()));
-						hostClient.sendTCP(new GameSettingsPacket.NbMinutesUpdate((int) nbMinutesSpinner.getValue()));
-						hostClient.sendTCP(new GameSettingsPacket.NbSecondsUpdate((int) nbSecondsSpinner.getValue()));
-						hostClient.sendTCP(new GameSettingsPacket.TimeLimitUpdate(timeLimitCheckBox.isSelected()));
-						hostClient.sendTCP(new GameSettingsPacket.DifficultyUpdate(EDifficulty.values()[difficultyList.getSelectedIndex()]));
+						buildWorker().execute();
 					}
 					else if (object instanceof Requests.PlayerListRequest) {
 
@@ -359,4 +307,50 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 		bots.revalidate();
 		bots.repaint();
 	} 
+
+	private SwingWorker<Void, Void> buildWorker() {
+
+		return new SwingWorker<>() {
+
+			@Override
+			protected Void doInBackground() throws Exception {
+
+				System.out.println("**************");
+				System.out.println("doInBackground");
+				System.out.println("**************");
+
+				long seed = Long.parseLong(txtSeed.getText());
+				int sizeX = Integer.parseInt(txtSizeX.getText());
+				int sizeY = Integer.parseInt(txtSizeY.getText());
+
+				int nbPieces = (int) nbPiecesSpinner.getValue();
+
+				int nbMinutes = (int) nbMinutesSpinner.getValue();
+				int nbSeconds = (int) nbSecondsSpinner.getValue();
+
+				boolean timeLimit = timeLimitCheckBox.isSelected();
+
+				EDifficulty difficulty = EDifficulty.values()[difficultyList.getSelectedIndex()];
+
+				hostClient.sendTCP(new GameSettingsPacket.SeedUpdate(seed));
+				hostClient.sendTCP(new GameSettingsPacket.SizeXUpdate(sizeX));
+				hostClient.sendTCP(new GameSettingsPacket.SizeYUpdate(sizeY));
+				hostClient.sendTCP(new GameSettingsPacket.NbPiecesUpdate(nbPieces));
+				hostClient.sendTCP(new GameSettingsPacket.NbMinutesUpdate(nbMinutes));
+				hostClient.sendTCP(new GameSettingsPacket.NbSecondsUpdate(nbSeconds));
+				hostClient.sendTCP(new GameSettingsPacket.TimeLimitUpdate(timeLimit));
+				hostClient.sendTCP(new GameSettingsPacket.DifficultyUpdate(difficulty));
+
+				return null;
+			}
+
+			@Override
+			protected void done() {
+
+				System.out.println("**************");
+				System.out.println("done");
+				System.out.println("**************");
+			}
+		};
+	};
 }

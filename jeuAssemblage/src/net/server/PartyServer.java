@@ -38,6 +38,7 @@ public class PartyServer extends Server {
 			@Override
 			public void received(Connection connection, Object object) {
 				
+				System.out.println("*** PARTY SERVER ***");
 				System.out.println("Received: " + object);
 				System.out.println("From: " + connection.getID());
 			}

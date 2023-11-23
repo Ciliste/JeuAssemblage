@@ -36,6 +36,13 @@ public class HostClient extends Client {
 			addListener(new Listener() {
 
 				@Override
+				public void received(Connection connection, Object object) {
+
+					System.out.println("*** HOST CLIENT ***");
+					System.out.println("Received: " + object);
+				}
+
+				@Override
 				public void disconnected(Connection connection) {
 					
 					onDisconnect.forEach(Runnable::run);
