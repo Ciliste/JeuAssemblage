@@ -16,15 +16,16 @@ import utils.SeedUtils;
 
 public class AgStrategy extends AbstractStrategy {
 
-    public static final int EASY = 1;
-    public static final int MEDIUM = 2; 
-    public static final int HARD = 5; 
+    public static final int EASY = 100;
+    public static final int MEDIUM = 200; 
+    public static final int HARD = 500; 
     
     private static final int POP_SIZE = 100;
 
     protected List<PlayBoard> pop;
     protected long seed;
     protected int testSize;
+    protected int testedSize;
     private Random rand;
     
     public AgStrategy(PlayBoard model) {
@@ -41,6 +42,7 @@ public class AgStrategy extends AbstractStrategy {
 
         this.seed = seed;
         this.testSize = testSize;
+        this.testedSize = 0;
         this.rand = new Random(this.seed);
 
         this.pop = createPopulation(this.model, POP_SIZE, this.rand);
@@ -51,13 +53,21 @@ public class AgStrategy extends AbstractStrategy {
     }
     
     @Override
-    public void tick() {
+    public boolean tick() {
 
-        for (int i = 0; i < testSize; i++) {
-            pop = mutation(pop, 1d);
+        if (this.testedSize >= this.testSize) {
+            return false;
         }
 
+        int toTest = this.rand.nextInt(0, (this.testSize/3));
+        for (int i = 0; i < toTest; i++) {
+            pop = mutation(pop, 1d);
+        }
+        
         this.bestSolution = pop.get(0);
+        this.testedSize += toTest;
+        
+        return true;
     }
     
 

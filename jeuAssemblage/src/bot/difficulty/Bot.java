@@ -1,9 +1,12 @@
 package bot.difficulty;
 
+import java.util.List;
+
 import bot.interfaces.IBot;
 import bot.interfaces.IStrategyBot;
 import bot.strategy.AgStrategy;
 import bot.strategy.NoobStrategy;
+import bot.utils.Move;
 import model.PlayBoard;
 
 public abstract class Bot implements IBot {
@@ -44,7 +47,12 @@ public abstract class Bot implements IBot {
     }
 
     @Override
-    public void tick() {
-        this.strategyBot.tick();
-    }   
+    public boolean tick() {
+        return this.strategyBot.tick();
+    }
+    
+    @Override
+    public List<Move> getMoves() {
+        return this.strategyBot.getMoves();
+    }
 }

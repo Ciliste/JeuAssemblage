@@ -28,7 +28,7 @@ import java.util.Random;
 
 import javax.swing.JPanel;
 
-public class Grid extends JPanel implements Listener{
+public class Grid extends JPanel implements Listener {
 
 	private final PlayBoard playBoard;
 

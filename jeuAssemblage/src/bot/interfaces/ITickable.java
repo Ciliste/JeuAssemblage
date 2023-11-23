@@ -2,5 +2,5 @@ package bot.interfaces;
 
 public interface ITickable {
     
-    public abstract void tick();
+    public abstract boolean tick();
 }
