@@ -5,6 +5,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import model.SettingsUtils;
 import model.arrangement.Arrangement;
 import model.arrangement.ArrangementList;
 import view.MainFrame;
@@ -28,10 +29,17 @@ public class App {
         new AIStrategy(p);
         */
 
+		SettingsUtils.load();
+
         SwingUtilities.invokeLater(() -> {
             
             frame = new MainFrame();
         });
+
+		SwingUtilities.invokeLater(() -> {
+
+			new MainFrame();
+		});
 
         JPanel panel = new JPanel();
         JButton btn = new JButton("REBOOT");

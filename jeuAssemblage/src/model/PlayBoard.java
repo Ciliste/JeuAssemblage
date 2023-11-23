@@ -461,7 +461,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	
 	public long getSeed() { return this.seed; }
 
-	
+	public Iterable<Piece> getPiecesIterable() { return this.piecesMap.values(); }
+
 	// -----------------
 	// STATIC METHODS
 	// -----------------

@@ -6,7 +6,7 @@ import javax.swing.JPanel;
 
 import model.PlayBoard;
 import piece.Piece;
-import view.utils.PiecesColor;
+import view.utils.PieceRenderUtils;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;
@@ -21,15 +21,12 @@ import java.awt.Color;
 public class GameSummary extends JPanel {
 
     private final PlayBoard playBoard;
-    private final PiecesColor piecesColor;
 
-
-    public GameSummary(PlayBoard playBoard, PiecesColor piecesColor) {
+    public GameSummary(PlayBoard playBoard) {
 
         super();
 
         this.playBoard = playBoard;
-        this.piecesColor = piecesColor;
 
         this.setLayout(null);
     }
@@ -74,7 +71,7 @@ public class GameSummary extends JPanel {
 
                     Piece p = playBoard.getPieceById(matrices[i][j]);
 
-					Image img = piecesColor.getImageById(matrices[i][j]);
+					Image img = PieceRenderUtils.PLACEHOLDER_IMAGE;
 
 		 			g2d.drawImage(
 		 				img,

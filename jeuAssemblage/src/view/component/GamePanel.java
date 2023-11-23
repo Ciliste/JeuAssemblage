@@ -11,7 +11,6 @@ import view.component.board.Grid;
 import view.component.board.TimerPanel;
 import view.component.board.TimerPanel.Timer;
 import view.screen.SoloGameFinishScreen;
-import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 import java.awt.Graphics;
@@ -22,22 +21,22 @@ public class GamePanel extends JPanel {
 	private final TimerPanel timerPanel;
 	private final Finish finish;
 
-	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
+	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, Timer timer) {
 
 		super();
 
 		this.setLayout(null);
 
 
-		this.grid = new Grid(playBoard, piecesColor);
-		this.finish = new Finish(mainFrame, playBoard, piecesColor);
+		this.grid = new Grid(playBoard);
+		this.finish = new Finish(mainFrame, playBoard);
 
 		this.timerPanel = new TimerPanel(mainFrame, timer, new Runnable() {
 			
 			@Override
 			public void run() {
 				
-				mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard, piecesColor));
+				mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard));
 			}
 		});
 

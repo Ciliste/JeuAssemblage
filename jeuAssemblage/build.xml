@@ -7,7 +7,7 @@
     <property name="docs.home" value="${basedir}/docs"/>
     <property name="src.home" value="${basedir}/src"/>
     <property name="lib.home" value="${basedir}/lib"/>
-	<property name="resources.home" value="${basedir}/resources"/>
+	<property name="resources.home" value="${basedir}/assets"/>
     <property name="javac.encoding" value="UTF-8"/>
     <!--  ==================== Compile options ===========================  -->
     <property name="compile.debug" value="true"/>

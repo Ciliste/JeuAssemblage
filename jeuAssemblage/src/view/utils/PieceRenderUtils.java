@@ -8,6 +8,9 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.Buffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
@@ -21,6 +24,8 @@ public final class PieceRenderUtils {
 
 	private PieceRenderUtils() {}
 	
+	public static Image PLACEHOLDER_IMAGE = createCellImage(Color.WHITE);
+
 	public static BufferedImage createCellImage(long seed) {
 		
 		return createCellImage(getRandomColor(seed));
@@ -165,6 +170,22 @@ public final class PieceRenderUtils {
 		}
 
 		return image;
+	}
+
+	public static List<Color> getDefaultColors() {
+
+		List<Color> colors = new ArrayList<>();
+
+		colors.add(Color.RED);
+		colors.add(Color.BLUE);
+		colors.add(Color.GREEN);
+		colors.add(Color.YELLOW);
+		colors.add(Color.MAGENTA);
+		colors.add(Color.CYAN);
+		colors.add(Color.ORANGE);
+		colors.add(Color.PINK);
+
+		return colors;
 	}
 
 	// public static void main(String[] args) {

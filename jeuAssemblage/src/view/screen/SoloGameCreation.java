@@ -2,6 +2,9 @@ package view.screen;
 
 import static view.utils.SwingUtils.*;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 
@@ -15,38 +18,37 @@ import view.component.Separator;
 import view.component.board.Grid;
 import view.component.board.TimerPanel.Timer;
 import view.utils.DocumentAdapter;
-import view.utils.PiecesColor;
 
 public class SoloGameCreation extends JPanel {
     
     private final JButton btnCancel = new JButton("<--");
 
     private final JLabel lblSeed = new JLabel("Seed :");
-    private final JTextField txtSeed = new JTextField();
+    protected final JTextField txtSeed = new JTextField();
 
     private final JButton btnRandomSeed = new JButton("Random");
 
     private final Separator separator = new Separator();
 
     private final JLabel lblSizeX = new JLabel("Size X :");
-    private final JTextField txtSizeX = new JTextField();
+    protected final JTextField txtSizeX = new JTextField();
 
     private final JLabel lblSizeY = new JLabel("Size Y :");
-    private final JTextField txtSizeY = new JTextField();
+    protected final JTextField txtSizeY = new JTextField();
 
     private final JLabel lblNbPieces = new JLabel("Nb pièces :");
-    private final JSpinner nbPiecesSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
+    protected final JSpinner nbPiecesSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 100, 1));
 
 	private final JLabel lblDifficulty = new JLabel("Difficulté :");
-	private final JList<String> difficultyList = new JList<String>(EDifficulty.getDifficultysName());
+	protected final JList<String> difficultyList = new JList<String>(EDifficulty.getDifficultysName());
 
-	private final JLabel lblArrangement = new JLabel("Parties Enregistrées :");
-	private final JTable tableArrangement = new JTable(new ArrangementList());
-	private final JScrollPane scrollArrangement = new JScrollPane(tableArrangement);
+	protected final JLabel lblArrangement = new JLabel("Parties Enregistrées :");
+	protected final JTable tableArrangement = new JTable(new ArrangementList());
+	protected final JScrollPane scrollArrangement = new JScrollPane(tableArrangement);
 
 	protected final JSpinner nbMinutesSpinner = new JSpinner(new SpinnerNumberModel(0, 0, Integer.MAX_VALUE, 1));
-	private final JSpinner nbSecondsSpinner = new JSpinner(new SpinnerNumberModel(0, -1, 60, 1));
-	private final JCheckBox timeLimitCheckBox = new JCheckBox("Temps limité");
+	protected final JSpinner nbSecondsSpinner = new JSpinner(new SpinnerNumberModel(0, -1, 60, 1));
+	protected final JCheckBox timeLimitCheckBox = new JCheckBox("Temps limité");
 
 	private JPanel gridPreview = new JPanel();
 
@@ -77,6 +79,9 @@ public class SoloGameCreation extends JPanel {
         this.add(lblSizeY);
         this.add(txtSizeY);
 
+		txtSizeX.setText("10");
+		txtSizeY.setText("10");
+
         this.add(lblNbPieces);
         this.add(nbPiecesSpinner);
 
@@ -94,6 +99,10 @@ public class SoloGameCreation extends JPanel {
 		this.add(gridPreview);
 
 		this.add(btnPlay);
+
+		this.nbMinutesSpinner.setValue(5);
+		this.nbSecondsSpinner.setValue(0);
+		this.timeLimitCheckBox.setSelected(true);
 
         // LISTENERS
 
@@ -129,8 +138,6 @@ public class SoloGameCreation extends JPanel {
 				(int) nbPiecesSpinner.getValue()
 			);
 
-			PiecesColor piecesColor = new PiecesColor(playBoard);
-
 			Timer timer = null;
 			if (timeLimitCheckBox.isSelected()) {
 
@@ -141,7 +148,7 @@ public class SoloGameCreation extends JPanel {
 				timer = Timer.NO_TIMER;
 			}
 
-			startGame(playBoard, piecesColor, timer);
+			startGame(playBoard, timer);
 		});
 
 		nbMinutesSpinner.setEnabled(timeLimitCheckBox.isSelected());
@@ -176,9 +183,9 @@ public class SoloGameCreation extends JPanel {
 		revalidate();
     }
 
-	protected void startGame(PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
+	protected void startGame(PlayBoard playBoard, Timer timer) {
 
-		mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, piecesColor, timer));
+		mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, timer));
 	}
 
 	@Override
@@ -342,9 +349,11 @@ public class SoloGameCreation extends JPanel {
 
 		EDifficulty difficulty = EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue());
 
-		txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
-		txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));
-		nbPiecesSpinner.setValue(PlayBoard.getPiecesCountBySeedAndDifficulty(seed, difficulty));
+		// txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
+		// txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));
+		// nbPiecesSpinner.setValue(PlayBoard.getPiecesCountBySeedAndDifficulty(seed, difficulty));
+
+		updateGridPreview();
 	}
 	
 	private void setParams(int index) {
@@ -360,7 +369,7 @@ public class SoloGameCreation extends JPanel {
 		this.nbPiecesSpinner.setValue(pieceCount);
 	}
 
-	private void updateGridPreview() {
+	protected void updateGridPreview() {
 
 		JPanel temp = null;
 		try {
@@ -369,8 +378,7 @@ public class SoloGameCreation extends JPanel {
 				Integer.parseInt(txtSizeX.getText()),
 				Integer.parseInt(txtSizeY.getText()), 
 					(int) nbPiecesSpinner.getValue());
-			PiecesColor piecesColor = new PiecesColor(p);
-			temp = new Grid(p, true, piecesColor);	
+			temp = new Grid(p, true);	
 		} 
 		catch (Exception ignored) {}
 
@@ -383,6 +391,25 @@ public class SoloGameCreation extends JPanel {
 			revalidate();
 			repaint();
 		}
+	}
+
+	public List<JComponent> getSettingsComponents() {
+
+		List<JComponent> components = new LinkedList<>();
+
+		components.add(txtSeed);
+		components.add(btnRandomSeed);
+		components.add(txtSizeX);
+		components.add(txtSizeY);
+		components.add(nbPiecesSpinner);
+		components.add(difficultyList);
+		components.add(nbMinutesSpinner);
+		components.add(nbSecondsSpinner);
+		components.add(timeLimitCheckBox);
+		components.add(tableArrangement);
+		components.add(btnPlay);
+
+		return components;
 	}
 
     private static Runnable createRandomSeedCallback(SoloGameCreation soloGameCreation) {

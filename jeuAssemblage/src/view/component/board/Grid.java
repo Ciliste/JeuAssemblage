@@ -10,7 +10,6 @@ import utils.ETypeListen;
 import view.component.board.listener.IPieceManipulationComponent;
 import view.utils.KeyboardManager;
 import view.utils.PieceRenderUtils;
-import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 import java.awt.Color;
@@ -24,6 +23,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -47,21 +50,34 @@ public class Grid extends JPanel implements Listener{
 	private int xSelectedPieceSurrondingImage = 0;
 	private int ySelectedPieceSurrondingImage = 0;
 
-	private PiecesColor piecesColor;
-
 	private final boolean isPreview;
 
-	public Grid(PlayBoard playBoard, PiecesColor piecesColor) {
+	private final Map<Piece, Image> piecesColor = new HashMap<>();
 
-		this(playBoard, false, piecesColor);
+	public Grid(PlayBoard playBoard) {
+
+		this(playBoard, false);
 	}
 
-    public Grid(PlayBoard playBoard, boolean isPreview, PiecesColor piecesColor) {
+    public Grid(PlayBoard playBoard, boolean isPreview) {
         
 		this.playBoard = playBoard;
 		this.playBoard.addListener(ETypeListen.PLAYVIEW.typeListen, this);
 
-		this.piecesColor = piecesColor;
+		Logger.getGlobal().info("Grid : " + playBoard.getSeed());
+
+		List<Color> colors = PieceRenderUtils.getDefaultColors();
+		final Random random = new Random(playBoard.getSeed());
+
+		for (Piece piece : playBoard.getPiecesIterable()) {
+
+			if (colors.isEmpty()) {
+
+				colors = PieceRenderUtils.getDefaultColors();
+			}
+
+			piecesColor.put(piece, PieceRenderUtils.createCellImage(colors.remove(random.nextInt(colors.size()))));
+		}
 
         this.setLayout(null);
 
@@ -276,7 +292,7 @@ public class Grid extends JPanel implements Listener{
 
                 if (matrices[i][j] != 0) {
 
-                    Image cell = piecesColor.getImageById(matrices[i][j]);
+					Image cell = piecesColor.getOrDefault(playBoard.getPieceById(matrices[i][j]), PieceRenderUtils.PLACEHOLDER_IMAGE);
 
 					g2d.drawImage(
 						cell,
@@ -311,7 +327,7 @@ public class Grid extends JPanel implements Listener{
 			System.out.println("xClickOriginSelectedPiece : " + xClickOriginSelectedPiece);
 			System.out.println("yClickOriginSelectedPiece : " + yClickOriginSelectedPiece);
 
-			Image cellImage = piecesColor.getImageById(selectedPieceId);
+			Image cellImage = piecesColor.getOrDefault(selectedPiece, PieceRenderUtils.PLACEHOLDER_IMAGE);
 			boolean[][] pieceMatrix = selectedPieceClone.getPiece();
 
 			int x = mousePosition.x;
@@ -359,6 +375,29 @@ public class Grid extends JPanel implements Listener{
 
 	private final Point mousePosition = new Point(0, 0);
 
+	private void checkMousePosition() {
+
+		if (selectedPieceClone == null) return;
+
+		if (mousePosition.x - xClickOriginSelectedPiece < 0) {
+
+			mousePosition.x = 0 + xClickOriginSelectedPiece;
+		}
+		else if (mousePosition.x + xClickOriginSelectedPiece >= playBoard.getWidth()) {
+
+			mousePosition.x = playBoard.getWidth() - selectedPieceClone.getWidth() + xClickOriginSelectedPiece;
+		}
+
+		if (mousePosition.y - yClickOriginSelectedPiece < 0) {
+
+			mousePosition.y = 0 + yClickOriginSelectedPiece;
+		}
+		else if (mousePosition.y + yClickOriginSelectedPiece >= playBoard.getHeight()) {
+
+			mousePosition.y = playBoard.getHeight() - selectedPieceClone.getHeight() + yClickOriginSelectedPiece;
+		}
+	}
+
 	private class GridClickListener extends MouseAdapter {
 	
 		@Override
@@ -368,6 +407,8 @@ public class Grid extends JPanel implements Listener{
 				(int) ((e.getX() - xGridDeb) / ((xGridFin - xGridDeb) / playBoard.getWidth())),
 				(int) ((e.getY() - yGridDeb) / ((yGridFin - yGridDeb) / playBoard.getHeight()))
 			);
+
+			checkMousePosition();
 
 			int x = mousePosition.x;
 			int y = mousePosition.y;
@@ -409,6 +450,9 @@ public class Grid extends JPanel implements Listener{
 					playBoard.placePieceAsId(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPieceClone, selectedPieceId);
 					System.out.println(playBoard);
 
+					piecesColor.put(selectedPieceClone, piecesColor.get(selectedPiece));
+					piecesColor.remove(selectedPiece);
+
 					selectedPieceId = -1;
 					xClickOriginSelectedPiece = -1;
 					yClickOriginSelectedPiece = -1;
@@ -440,6 +484,8 @@ public class Grid extends JPanel implements Listener{
 				(int) ((e.getX() - xGridDeb) / ((xGridFin - xGridDeb) / playBoard.getWidth())),
 				(int) ((e.getY() - yGridDeb) / ((yGridFin - yGridDeb) / playBoard.getHeight()))
 			);
+
+			checkMousePosition();
 
 			if (selectedPiece != null) {
 

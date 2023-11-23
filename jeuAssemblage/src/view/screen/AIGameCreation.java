@@ -9,23 +9,23 @@ import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import model.PlayBoard;
-import model.ProfileUtils;
+import model.SettingsUtils;
 import view.MainFrame;
 import view.component.MultiplayerGamePanel;
 import view.component.board.TimerPanel.Timer;
-import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 public class AIGameCreation extends SoloGameCreation {
 
-	private final JPanel bots = new JPanel();
-	private final List<BotDescriptor> botDescriptors = new LinkedList<>();
+	protected final JPanel bots = new JPanel();
+	protected final List<BotDescriptor> botDescriptors = new LinkedList<>();
 
 	private final JButton btnAddBot = new JButton("Ajouter un robot");
 
@@ -46,7 +46,7 @@ public class AIGameCreation extends SoloGameCreation {
 
 		btnAddBot.addActionListener(e -> {
 
-			final String botName = ProfileUtils.generateRandomProfileName();
+			final String botName = SettingsUtils.generateRandomProfileName();
 
 			BotDescriptor bot = new BotDescriptor(botName, 1);
 
@@ -85,9 +85,21 @@ public class AIGameCreation extends SoloGameCreation {
 	}
 
 	@Override
-	protected void startGame(PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
+	protected void startGame(PlayBoard playBoard, Timer timer) {
 
-		mainFrame.setContentPane(new MultiplayerGamePanel(mainFrame, playBoard, piecesColor, timer, botDescriptors));
+		mainFrame.setContentPane(new MultiplayerGamePanel(mainFrame, playBoard, timer, botDescriptors));
+	}
+
+	@Override
+	public List<JComponent> getSettingsComponents() {
+
+		List<JComponent> components = super.getSettingsComponents();
+
+		components.add(bots);
+
+		components.add(btnAddBot);
+
+		return components;
 	}
 
 	private JPanel createBotDescriptorRenderer(BotDescriptor botDescriptor) {

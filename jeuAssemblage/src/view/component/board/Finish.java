@@ -14,7 +14,6 @@ import model.PlayBoard;
 import model.listener.IPlayBoardListener;
 import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
-import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 public class Finish extends JPanel {
@@ -27,7 +26,7 @@ public class Finish extends JPanel {
 	private final MainFrame mainFrame;
     private final PlayBoard playBoard;
 
-    public Finish(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor) {
+    public Finish(MainFrame mainFrame, PlayBoard playBoard) {
 
 		super();
 
@@ -59,7 +58,7 @@ public class Finish extends JPanel {
 
         this.btnFinish.addActionListener(e -> {
 
-            mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard, piecesColor));
+            mainFrame.setContentPane(new SoloGameFinishScreen(mainFrame, playBoard));
         });
 
         this.add(this.lblPreciseArea);
