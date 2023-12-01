@@ -4,6 +4,7 @@ import static view.utils.SwingUtils.*;
 
 import javax.swing.JPanel;
 
+import bot.BotThread;
 import model.PlayBoard;
 import view.MainFrame;
 import view.component.board.Finish;
@@ -23,11 +24,16 @@ public class GamePanel extends JPanel {
 	private final Finish finish;
 
 	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
-		
+
 		this(mainFrame, playBoard, piecesColor, timer, new SoloGameFinishScreen(mainFrame, playBoard, piecesColor));
 	}
+	
+	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer, JPanel finishScreen) {
+		
+		this(mainFrame, playBoard, piecesColor, timer, null, finishScreen);
+	}
 
-	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer,
+	public GamePanel(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, Timer timer, BotThread botThread,
 			JPanel finishScreen) {
 
 		super();
@@ -36,7 +42,12 @@ public class GamePanel extends JPanel {
 
 
 		this.grid = new Grid(playBoard, piecesColor);
-		this.finish = new Finish(mainFrame, playBoard, piecesColor, finishScreen);
+
+		if (botThread != null) {
+			this.finish = new Finish(mainFrame, playBoard, piecesColor, botThread, finishScreen);
+		} else {
+			this.finish = new Finish(mainFrame, playBoard, piecesColor, finishScreen);
+		}
 
 		this.timerPanel = new TimerPanel(mainFrame, timer, new Runnable() {
 			

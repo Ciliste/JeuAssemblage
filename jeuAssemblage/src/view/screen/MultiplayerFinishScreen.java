@@ -24,13 +24,11 @@ public class MultiplayerFinishScreen extends JPanel {
     private final JLabel lblFinishGame = new JLabel("Le gagnant est le ");
 	private final JScrollPane scrollPane = new JScrollPane();   
     
-    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, BotThread botThread, List<BotDescriptor> botDescriptor) {
+    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, BotThread botThread, List<BotDescriptor> botDescriptor, List<PlayBoard> botPlayboard) {
 
         super();
 
         this.setLayout(null);
-
-        botThread.stop();
 
         this.finishScreen = new SoloGameFinishScreen(mainFrame, playBoard, piecesColor);
         JPanel bots = new JPanel();
@@ -44,8 +42,9 @@ public class MultiplayerFinishScreen extends JPanel {
 
             IBot bot = botLst.get(i);
             String name = botDescriptor.get(i).getName();
+            PlayBoard p = botPlayboard.get(i);
 
-            GameSummary gTemp = new GameSummary(bot.getModel(), piecesColor);
+            GameSummary gTemp = new GameSummary(p, piecesColor);
             bots.add(gTemp);
 
             if (bot.getModel().getArea() < minArea) {

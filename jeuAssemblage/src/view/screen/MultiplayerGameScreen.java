@@ -10,7 +10,11 @@ import java.util.List;
 import bot.BotThread;
 import bot.difficulty.Bot;
 import bot.difficulty.EasyBot;
+import bot.difficulty.HardBot;
+import bot.difficulty.MediumBot;
 import bot.interfaces.IBot;
+import bot.view.MovesToIHM;
+import bot.view.interfaces.IMovesView;
 import model.PlayBoard;
 import view.MainFrame;
 import view.component.GamePanel;
@@ -33,20 +37,37 @@ public class MultiplayerGameScreen extends JPanel {
 		JPanel bots = new JPanel();
 		bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
 
+		ArrayList<IMovesView> movesViews = new ArrayList<IMovesView>();
 		ArrayList<IBot> botsAl = new ArrayList<IBot>();
+		ArrayList<PlayBoard> botPlayboard = new ArrayList<PlayBoard>();
+
 		for (BotDescriptor botDescriptor : botDescriptors) {
 
-			Grid grid = new Grid(PlayBoard.constructCopyPlayBoard(playBoard), true, piecesColor);
+			PlayBoard p = PlayBoard.constructPlayBoard(playBoard);
+			Grid grid = new Grid(p, true, piecesColor);
 
+			botPlayboard.add(p);
 			bots.add(grid);
 
-			botsAl.add(new EasyBot(playBoard, Bot.AI_STRATEGY));
+			IBot bot = null;
+			if (botDescriptor.getDifficulty() == 1) {
+				bot = new EasyBot(playBoard, Bot.AI_STRATEGY);
+			} else if (botDescriptor.getDifficulty() == 2) {
+				bot = new MediumBot(playBoard, Bot.AI_STRATEGY);
+			} else {
+				bot = new HardBot(playBoard, Bot.AI_STRATEGY);
+			}
+
+			movesViews.add(new MovesToIHM(bot, grid, playBoard));
+			botsAl.add(bot);
 		}
 		
-		BotThread botT = null;//new BotThread(botsAl);
+		BotThread botT = new BotThread(botsAl, movesViews);
 
-		this.gamePanel = new GamePanel(mainFrame, playBoard, piecesColor, timer, new MultiplayerFinishScreen(mainFrame, playBoard, piecesColor, botT, botDescriptors));
-
+		this.gamePanel = new GamePanel(mainFrame, playBoard, piecesColor, timer, botT,
+				new MultiplayerFinishScreen(mainFrame, playBoard, piecesColor, botT, botDescriptors, botPlayboard));
+		
+		new Thread(botT).start();
 		
 		scrollPane.setViewportView(bots);
 

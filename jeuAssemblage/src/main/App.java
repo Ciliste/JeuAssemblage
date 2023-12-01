@@ -5,6 +5,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import bot.strategy.AgStrategy;
+import model.PlayBoard;
 import model.arrangement.Arrangement;
 import model.arrangement.ArrangementList;
 import view.MainFrame;
@@ -21,34 +23,42 @@ public class App {
         /*
         Arrangement a = new Arrangement(0, 0, 0, 0, "shesh", 0);
         Arrangement b = new Arrangement(0, 0, 0, 0, "shesh10", 10);
-
+        
         ArrangementList.addArrangement(a);
-
+        
         PlayBoard p = PlayBoard.constructPlayBoard(Long.parseLong("2392006401451300864"), 10, 11, 5);
         new AIStrategy(p);
+        
+        
+        AgStrategy a = new AgStrategy(PlayBoard.constructPlayBoard(new Long("1252177511074775040"), 12, 15, 6));
+        while (a.tick()) {
+        }
         */
-
+        
+        
+        
         SwingUtilities.invokeLater(() -> {
             
             frame = new MainFrame();
         });
-
+        
         JPanel panel = new JPanel();
         JButton btn = new JButton("REBOOT");
         btn.addActionListener(e -> {
-
+        
             frame.dispose();
             SwingUtilities.invokeLater(() -> {
             
                 frame = new MainFrame();
             });
         });
-
+        
         panel.add(btn);
-
+        
         JFrame rebootFrame = new JFrame();
         rebootFrame.setContentPane(panel);
         rebootFrame.pack();
         rebootFrame.setVisible(true);
+        
     }
 }

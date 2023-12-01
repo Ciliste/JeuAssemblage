@@ -14,6 +14,8 @@ public class BotThread implements Runnable {
     private ArrayList<IBot> bots;
     private ArrayList<IMovesView> movesViews;
 
+    private ThreadGroup th;
+
     private boolean stop;
 
     public BotThread(ArrayList<IBot> bots, ArrayList<IMovesView> movesViews) {
@@ -26,6 +28,7 @@ public class BotThread implements Runnable {
         this.bots = bots;
         this.sleepTime = sleepTime;
         this.movesViews = movesViews;
+        this.th = new ThreadGroup("Moves");
         this.stop = false;
     }
 
@@ -35,6 +38,7 @@ public class BotThread implements Runnable {
 
     public void stop() {
         this.stop = true;
+        this.th.interrupt();
     }
 
     public void start() {
@@ -47,24 +51,31 @@ public class BotThread implements Runnable {
         while (!this.stop) {
             boolean stopable = true;
 
-            for ( int i = 0; i < this.bots.size(); i++) {
+            for (int i = 0; i < this.bots.size(); i++) {
                 IBot bot = this.bots.get(i);
-                IMovesView movesView = this.movesViews.get(i);
-                
-                if ( bot.tick() ) {
+
+                if (bot.tick()) {
                     stopable = false;
-                } else {
-                    movesView.start();
                 }
             }
 
-            if ( stopable ) this.stop();
+            if (stopable || Thread.interrupted()) {
+                this.stop = true;
+            }
 
-            try { Thread.sleep(sleepTime); }
-            catch(Exception e ) { e.printStackTrace(); }        
+            try {
+                Thread.sleep(10);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         
-        this.stop();
+        for (IMovesView movesView : this.movesViews) {
+            Thread t = new Thread(this.th, movesView);
+            t.start();
+        }
+
+        System.out.println("fini");
     }
 
 }

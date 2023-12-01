@@ -42,8 +42,7 @@ public class PiecesColor {
         { 
             Color.RED,
             Color.GREEN, 
-            Color.GRAY, 
-            Color.BLACK,
+            Color.GRAY,
             Color.CYAN,
             Color.ORANGE,
             Color.PINK,

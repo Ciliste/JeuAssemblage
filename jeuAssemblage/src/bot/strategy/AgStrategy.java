@@ -47,19 +47,17 @@ public class AgStrategy extends AbstractStrategy {
 
         this.pop = createPopulation(this.model, POP_SIZE, this.rand);
         this.pop.add(model);
-
-        System.out.println(model);
-        System.out.println(model.getArea());
     }
     
     @Override
     public boolean tick() {
 
         if (this.testedSize >= this.testSize) {
+            System.out.println(bestSolution.getArea());
             return false;
         }
 
-        int toTest = this.rand.nextInt(0, (this.testSize/3));
+        int toTest = Math.min(this.testSize - this.testedSize, this.rand.nextInt(1, (int) Math.ceil(this.testSize / 30)));
         for (int i = 0; i < toTest; i++) {
             pop = mutation(pop, 1d);
         }
@@ -122,7 +120,7 @@ public class AgStrategy extends AbstractStrategy {
     }
     
     private PlayBoard individualMutationRotation(PlayBoard parent1) {
-
+        
         PlayBoard son = PlayBoard.constructCopyPlayBoard(parent1);
 
         Map<Integer, Piece> piecesParent1 = parent1.getPieces();
@@ -165,8 +163,8 @@ public class AgStrategy extends AbstractStrategy {
             int mouvementnbTime = rand.nextInt(MAX_MOUVEMENT);
             for (int j = 0; j < mouvementnbTime; j++) {
                 Point p = son.getUpperLeftPieceCornerById(cpt);
-                int x = mid.x - p.x; 
-                int y = mid.y - p.y;
+                int x = mid.x - p.x + rand.nextInt(4) - 2; 
+                int y = mid.y - p.y + rand.nextInt(4) - 2;
                 
                 if (x != 0) x = x / Math.abs(x);
                 if (y != 0) y = y / Math.abs(y);
@@ -188,7 +186,7 @@ public class AgStrategy extends AbstractStrategy {
         int pieceCount = model.getPieces().size();
         for (int i = 0; i < size; i++) {
 
-            population.add(PlayBoard.constructPlayBoard(rand.nextLong(), model.getBoardWidth(), model.getBoardHeight(),
+            population.add(PlayBoard.constructPlayBoardWithPlacementSeed(model.getSeed(), rand.nextLong(), model.getBoardWidth(), model.getBoardHeight(),
                     pieceCount));
         }
 
@@ -220,7 +218,7 @@ public class AgStrategy extends AbstractStrategy {
                     Piece p = bestSolution.getPieceById(pieceId);
                     if (!pieceAl.contains(p)) {
                         Point upperLeftCorner = bestSolution.getUpperLeftPieceCornerById(pieceId);
-                        ret.add(new Move(pieceId, upperLeftCorner.x, upperLeftCorner.y));
+                        ret.add(new Move(pieceId, upperLeftCorner.x, upperLeftCorner.y, p.getNumberOfLeftRotation(), p.getNumberOfReverse()));
                         pieceAl.add(p);
                     }
                 }

@@ -138,8 +138,6 @@ public final class PieceRenderUtils {
 
 	public static BufferedImage createSurrondingRectangleImage(int width, int height, Color color) {
 
-		System.out.println("width: " + width + " height: " + height);
-
 		if (width < 1 || height < 1) {
 
 			return null;

@@ -19,6 +19,7 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 import javax.swing.JPanel;
@@ -54,19 +55,20 @@ public class Grid extends JPanel implements Listener, IMovableView{
 		this(playBoard, false, piecesColor);
 	}
 
-    public Grid(PlayBoard playBoard, boolean isPreview, PiecesColor piecesColor) {
-        
+	public Grid(PlayBoard playBoard, boolean isPreview, PiecesColor piecesColor) {
+
 		this.playBoard = playBoard;
 		this.playBoard.addListener(ETypeListen.PLAYVIEW.typeListen, this);
 
 		this.piecesColor = piecesColor;
 
-        this.setLayout(null);
+		this.setLayout(null);
 
-        this.setVisible(true);
+		this.setVisible(true);
 
 		this.isPreview = isPreview;
-		if (isPreview) return;
+		if (isPreview)
+			return;
 
 		this.addMouseListener(new GridClickListener());
 		this.addMouseMotionListener(new GridMouseMotionListener());
@@ -74,29 +76,30 @@ public class Grid extends JPanel implements Listener, IMovableView{
 		this.addMouseMotionListener(new GridMouseMotionListener());
 
 		// Gestion des contrôles de la manipulation des pièces
-		KeyboardManager.addKeyboardListener(new PieceKeyboardListener() );
+		KeyboardManager.addKeyboardListener(new PieceKeyboardListener());
 
 		// Gestion des contrôles de la sélection des pièces
-		KeyboardManager.addKeyboardListener(new SelectPieceKeyboardListener() );
+		KeyboardManager.addKeyboardListener(new SelectPieceKeyboardListener());
 
 		// Gestion des contrôles du déplacement des pièces
-		KeyboardManager.addKeyboardListener(new ControlMoveKeyboardListener() );
-    }
+		KeyboardManager.addKeyboardListener(new ControlMoveKeyboardListener());
+	}
 
 	@Override
 	public void paintComponent(Graphics g) {
 
 		super.paintComponent(g);
 
-        SwingUtils.drawDebugBounds(this, g);
+		SwingUtils.drawDebugBounds(this, g);
 
         int componentSize = (int) Math.min(
 			getHeightTimesPourcent(this, 0.95f) / (playBoard.getHeight() * 1d),
 			getWidthTimesPourcent(this,0.95f) / (playBoard.getWidth() * 1d)
-        );
+		);
+		
 
         double paddingWidth  = this.getWidth () - (componentSize * playBoard.getBoardWidth());
-        double paddingHeight = this.getHeight() - (componentSize * playBoard.getBoardHeight());
+		double paddingHeight = this.getHeight() - (componentSize * playBoard.getBoardHeight());
 
 		xGridDeb = (int) (paddingWidth / 2);
 		yGridDeb = (int) (paddingHeight / 2);
@@ -161,9 +164,6 @@ public class Grid extends JPanel implements Listener, IMovableView{
 
 		if (selectedPieceClone != null) {
 
-			System.out.println("xClickOriginSelectedPiece : " + xClickOriginSelectedPiece);
-			System.out.println("yClickOriginSelectedPiece : " + yClickOriginSelectedPiece);
-
 			Image cellImage = piecesColor.getImageById(selectedPieceId);
 			boolean[][] pieceMatrix = selectedPieceClone.getPiece();
 
@@ -208,6 +208,20 @@ public class Grid extends JPanel implements Listener, IMovableView{
 				null
 			);
 		}
+		
+		if (this.isPreview) {
+			g.setColor(Color.RED);
+			Ellipse2D.Double circle = new Ellipse2D.Double(
+				(mousePosition.x * componentSize) + paddingWidth/2,
+				(mousePosition.y * componentSize) + paddingHeight/2,
+				componentSize,
+				componentSize
+			);
+
+			((Graphics2D) g).fill(circle);
+			g.setColor(Color.BLACK);
+			((Graphics2D) g).draw(circle);
+		}
 	}
 
 	private final Point mousePosition = new Point(0, 0);
@@ -225,62 +239,11 @@ public class Grid extends JPanel implements Listener, IMovableView{
 			int x = mousePosition.x;
 			int y = mousePosition.y;
 
-			int pieceId = playBoard.getPieceIdAt(x, y);
-
-			if (pieceId != 0) {
-
-				System.out.println("pieceId : " + pieceId);
-
-				selectedPiece = playBoard.getPieceById(pieceId);
-				selectedPieceClone = Piece.clone(selectedPiece);
-
-				selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPieceClone.getPiece(), Color.CYAN);
-
-				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
-				xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
-				ySelectedPieceSurrondingImage = upperLeftPieceCorner.y;
-
-				selectedPieceId = pieceId;
-
-				xClickOriginSelectedPiece = x - upperLeftPieceCorner.x;
-				yClickOriginSelectedPiece = y - upperLeftPieceCorner.y;
-
-				repaint();
-
-				return;
-			}
-
-			if (selectedPieceClone != null) {
-
-				Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(selectedPieceId);
-				Piece tempPiece = playBoard.getPieceById(selectedPieceId);
-				playBoard.removePieceFromBoardWithoutRegistration(selectedPiece);
-				
-				//TODO REFACTO POUR ESSAyEZR DE PLACER JUSTE FLEMME
-				if (playBoard.canBePlaced(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPiece)) {
-
-					playBoard.placePieceAsId(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece, selectedPieceClone, selectedPieceId);
-					System.out.println(playBoard);
-
-					selectedPieceId = -1;
-					xClickOriginSelectedPiece = -1;
-					yClickOriginSelectedPiece = -1;
-
-					selectedPieceSurrondingImage = null;
-					xSelectedPieceSurrondingImage = -1;
-					ySelectedPieceSurrondingImage = -1;
-
-					selectedPiece = null;
-					selectedPieceClone = null;
-
-					repaint();
-					return;
-				}
-				else {
-
-					playBoard.placePieceAsId(upperLeftPieceCorner.x, upperLeftPieceCorner.y, tempPiece, selectedPieceId);
-				}
-			}
+			if (selectedPiece  == null) {
+				clickOnPiece(x, y);
+			} else {
+				placePiece(x, y);
+			} 
 		}
 	}
 
@@ -322,8 +285,7 @@ public class Grid extends JPanel implements Listener, IMovableView{
 
 						selectedPieceClone.rotateRight();
 					}
-
-					repaint();
+					
 				}
 			}
 		}
@@ -454,39 +416,157 @@ public class Grid extends JPanel implements Listener, IMovableView{
 
 	@Override
 	public void update() {
+
 		this.repaint();
+
+		if (this.selectedPieceClone != null) {
+
+			Point middle = this.selectedPieceClone.getPieceMiddle();
+
+			xClickOriginSelectedPiece = middle.x;
+			yClickOriginSelectedPiece = middle.y;
+		}
 	}
 
 	@Override
 	public void moveMouseOn(int pieceId) {
+
 		Point leftCorner = this.playBoard.getUpperLeftPieceCornerById(pieceId);
-		int deltaX = mousePosition.x - leftCorner.x;
-		int deltaY = mousePosition.y - leftCorner.y; 
-
-		int size = 30;
-		for ( int i = 0; i < size; i++) {
-			if (i == size - 1) {
-				
-			}
-		}
-
+		this.moveMouseOn(leftCorner.x, leftCorner.y);
 	}
 
 	@Override
 	public void moveMouseOn(int x, int y) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'moveMouseOn'");
+
+		int deltaX = x - mousePosition.x;
+		int deltaY = y - mousePosition.y; 
+
+		int sizeX = Math.abs(deltaX);
+		int sizeY = Math.abs(deltaY);
+
+		int uniqueMoveX = (deltaX == 0 ) ? 0 : (deltaX / sizeX);
+		int uniqueMoveY = (deltaY == 0 ) ? 0 : (deltaY / sizeY);
+
+		for (int i = 0; i < Math.max(sizeX, sizeY); i++) {
+
+			int xPlus = (i > sizeX) ? 0 : uniqueMoveX;
+			int yPlus = (i > sizeY) ? 0 : uniqueMoveY;
+
+			this.mousePosition.setLocation(
+				mousePosition.x + xPlus,
+				mousePosition.y + yPlus
+			);
+
+			repaint();
+			
+			try {
+				Thread.sleep(30);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	@Override
+	public boolean clickOnPiece(int pieceId) {
+
+		Point p = playBoard.getPieceById(pieceId).getPieceMiddle();
+		Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
+		return clickOnPiece(upperLeftPieceCorner.x + p.x, upperLeftPieceCorner.y + p.y);
 	}
 
 	@Override
-	public void click() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'click'");
+	public boolean clickOnPiece(int x, int y) {
+
+		int pieceId = playBoard.getPieceIdAt(x, y);
+
+		if (pieceId != 0) {
+
+			selectedPiece = playBoard.getPieceById(pieceId);
+			selectedPieceClone = Piece.clone(selectedPiece);
+
+			selectedPieceId = pieceId;
+
+			selectedPieceSurrondingImage = PieceRenderUtils.createSurrondingPieceImage(selectedPieceClone.getPiece(),
+					Color.CYAN);
+
+			Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(pieceId);
+			xSelectedPieceSurrondingImage = upperLeftPieceCorner.x;
+			ySelectedPieceSurrondingImage = upperLeftPieceCorner.y;
+
+			selectedPieceId = pieceId;
+
+			update();
+		}
+
+		return pieceId != 0;
+	}
+	
+
+	@Override
+	public boolean placePiece(int x, int y) {
+
+		return placePieceWithoutTranslate(x - xClickOriginSelectedPiece, y - yClickOriginSelectedPiece);
+	}
+	
+	@Override
+	public boolean placePieceWithoutTranslate(int x, int y) {
+
+		if (selectedPieceClone == null) {
+			return false;
+		}
+
+		Point upperLeftPieceCorner = playBoard.getUpperLeftPieceCornerById(selectedPieceId);
+		Piece tempPiece = playBoard.getPieceById(selectedPieceId);
+		playBoard.removePieceFromBoardWithoutRegistration(selectedPiece);
+
+		if (playBoard.canBePlaced(x, y, selectedPieceClone)) {
+
+			playBoard.placePieceAsId(x, y, selectedPieceClone, selectedPieceId);
+
+			clearSelectedPiece();
+
+			return true;
+		} else {
+
+			playBoard.placePieceAsId(upperLeftPieceCorner.x, upperLeftPieceCorner.y, tempPiece, selectedPieceId);
+			return false;
+		}
+	}
+	
+	@Override
+	public void rotateLeftPiece() {
+
+		if (this.selectedPieceClone != null) {
+			this.selectedPieceClone.rotateLeft();
+		}
+	}
+	
+	@Override
+	public void reversePiece() {
+
+		if (this.selectedPieceClone != null) {
+			this.selectedPieceClone.reverse();
+		}
 	}
 
 	@Override
-	public boolean placePiece() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'placePiece'");
+	public void clearSelectedPiece() {
+		selectedPieceId = -1;
+		xClickOriginSelectedPiece = -1;
+		yClickOriginSelectedPiece = -1;
+
+		selectedPieceSurrondingImage = null;
+		xSelectedPieceSurrondingImage = -1;
+		ySelectedPieceSurrondingImage = -1;
+
+		selectedPiece = null;
+		selectedPieceClone = null;
+	}
+
+	@Override
+	public Piece getSelectedPiece() {
+		
+		return this.selectedPieceClone;
 	}
 }

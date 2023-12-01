@@ -107,7 +107,6 @@ public final class KeyboardManager {
 					case java.awt.event.KeyEvent.KEY_PRESSED:
 						keysMap.put(e.getKeyCode(), true);
 						fireKeyPressed(e.getKeyCode());
-						System.out.println(e.getKeyCode());
 						break;
 						
 					case java.awt.event.KeyEvent.KEY_RELEASED:

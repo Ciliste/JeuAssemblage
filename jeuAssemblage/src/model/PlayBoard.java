@@ -59,37 +59,33 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		}
 	}
 
+	boolean randomlyPlacePiece(Piece piece, long seedPlacement) {
 
-	boolean randomlyPlacePiece(Piece piece) {
-
-		//System.out.println("Randomly placing piece: " + piece);
-
-		Random random = new Random(this.seed + piecesMap.size() + 1);
-	
+		Random randomRotation = new Random(seedPlacement + piecesMap.size() + 1);
 		final int MAX_ROTATIONS = 4;
-		int nbRotations = random.nextInt(MAX_ROTATIONS);
+		int nbRotations = randomRotation.nextInt(MAX_ROTATIONS);
 		for (int i = 0; i < nbRotations; i++) {
 
-			piece.rotateLeft(); 
+			piece.rotateLeft();
 		}
 
 		final int MAX_FLIPS = 2;
-		int nbReverse = random.nextInt(MAX_FLIPS);
+		int nbReverse = randomRotation.nextInt(MAX_FLIPS);
 		for (int i = 0; i < nbReverse; i++) {
 
 			piece.reverse();
 		}
-	
+
 		final int MAX_ITERATIONS = 100;
 		int iteration = 0;
-		
-		//TODO: y'a des beugs
+		Random randomPlacement = new Random(seedPlacement + piecesMap.size() + 1);
+		// TODO: y'a des beugs
 		do {
 
-			int x = random.nextInt(this.board[0].length - piece.getWidth() + 1);
-			int y = random.nextInt(this.board.length - piece.getHeight() + 1);
+			int x = randomPlacement.nextInt(this.board[0].length - piece.getWidth() + 1);
+			int y = randomPlacement.nextInt(this.board.length - piece.getHeight() + 1);
 
-			//System.out.println("Trying to place piece at: " + x + ", " + y);
+			// System.out.println("Trying to place piece at: " + x + ", " + y);
 
 			if (placePiece(x, y, piece)) {
 
@@ -101,21 +97,27 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		} while (iteration < MAX_ITERATIONS);
 
 		return false;
-		// for (int i = 0; i < board.length; i++) {
-	
-		// 	for (int j = 0; j < board[i].length; j++) {
-	
-		// 		System.out.println("Trying to place piece at: " + j + ", " + i);
+	}
 
-		// 		if (placePiece(j, i, piece)) {
-	
-		// 			return;
-		// 		}
-		// 	}
+	boolean randomlyPlacePiece(Piece piece) {
+
+		return randomlyPlacePiece(piece, this.seed);
+
+		// for (int i = 0; i < board.length; i++) {
+
+		// for (int j = 0; j < board[i].length; j++) {
+
+		// System.out.println("Trying to place piece at: " + j + ", " + i);
+
+		// if (placePiece(j, i, piece)) {
+
+		// return;
+		// }
+		// }
 		// }
 	}
 
-	public boolean placePiece(int x, int y, Piece piece) {
+	private boolean placePiece(int x, int y, Piece piece) {
 
 		int pieceId = piecesMap.size() + 1;
 
@@ -125,7 +127,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -158,7 +160,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	}
 
 	public void removePieceFromBoard(Piece piece) {
-		
+
 		removePieceFromBoardWithoutRegistration(piece);
 
 		this.unregisterPiece(piece);
@@ -182,7 +184,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 		return false;
 	}
-	
+
 	public boolean swap(Piece p1, Piece p2) {
 
 		int id1 = getPieceId(p1);
@@ -192,9 +194,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		Point pointP2 = getUpperLeftPieceCornerById(id2);
 
 		int[][] rollback = new int[this.board.length][this.board[0].length];
-		for(int i = 0; i < this.board.length; i++)
-    		rollback[i] = this.board[i].clone();
-
+		for (int i = 0; i < this.board.length; i++)
+			rollback[i] = this.board[i].clone();
 
 		if (canBeSwapped(pointP2.x, pointP2.y, p1, id2) && canBeSwapped(pointP1.x, pointP1.y, p2, id1)) {
 
@@ -205,7 +206,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 				return true;
 			}
 		}
-		
+
 		this.board = rollback;
 		piecesMap.put(id1, p1);
 		piecesMap.put(id2, p2);
@@ -213,7 +214,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		return false;
 	}
 
-	public void removePieceFromBoardWithoutRegistration(Piece piece) {	
+	public void removePieceFromBoardWithoutRegistration(Piece piece) {
 
 		int pieceId = getPieceId(piece);
 
@@ -244,7 +245,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			pieceId = this.getPieceId(piece);
 		} catch (Exception e) {
 			pieceId = EMPTY;
-		} 
+		}
 
 		boolean canBePlaced = true;
 		for (int i = 0; i < piece.getHeight() && canBePlaced; i++) {
@@ -252,16 +253,12 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			for (int j = 0; j < piece.getWidth() && canBePlaced; j++) {
 
 				if (pieceMatrix[i][j] == true) {
-					canBePlaced = (
-						y + i < this.board.length && 
-						x + j < this.board[0].length && 
-						(
-							this.board[y + i][x + j] == EMPTY ||
-							this.board[y + i][x + j] == ignoreId ||
-							this.board[y + i][x + j] == pieceId
-						)
-					);
-				}	
+					canBePlaced = (y + i < this.board.length &&
+							x + j < this.board[0].length &&
+							(this.board[y + i][x + j] == EMPTY ||
+									this.board[y + i][x + j] == ignoreId ||
+									this.board[y + i][x + j] == pieceId));
+				}
 			}
 		}
 
@@ -271,6 +268,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	private void registerPiece(int pieceId, Piece piece) {
 
 		this.piecesMap.put(pieceId, piece);
+
+		piece.addListener(this);
 	}
 
 	private void unregisterPiece(Piece piece) {
@@ -282,25 +281,29 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 	@Override
 	public void update() {
-		this.fireEvents(ETypeListen.PIECEVIEW.typeListen);
+		this.fireAllEvents();
 	}
-	
+
 	@Override
 	public boolean equals(Object p) {
 		if (!(p instanceof PlayBoard) || p == null) {
-            return false;
-        }
+			return false;
+		}
 
 		PlayBoard pBoard = (PlayBoard) p;
-		
-		if (this.seed != pBoard.seed) return false;
-		if (this.sizeX != pBoard.sizeX) return false;
-		if (this.sizeY != pBoard.sizeY) return false;
-		if (this.piecesMap.size() != pBoard.piecesMap.size()) return false;
+
+		if (this.seed != pBoard.seed)
+			return false;
+		if (this.sizeX != pBoard.sizeX)
+			return false;
+		if (this.sizeY != pBoard.sizeY)
+			return false;
+		if (this.piecesMap.size() != pBoard.piecesMap.size())
+			return false;
 
 		for (int i = 0; i < this.board.length; i++) {
 			if (!Arrays.deepEquals(this.board, pBoard.board))
-				return false; 
+				return false;
 		}
 
 		return true;
@@ -315,7 +318,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 			for (int j = 0; j < this.board[i].length; j++) {
 
-				sb.append((this.board[i][j] == EMPTY) ? "░ " : this.board[i][j] + " ");
+				sb.append((this.board[i][j] == EMPTY) ? " " : this.board[i][j]);
 				sb.append(" ");
 			}
 
@@ -324,7 +327,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 		return sb.toString();
 	}
-
 
 	// -----------------
 	// GET METHODS
@@ -338,7 +340,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("Piece is not on board"));
 	}
-
 
 	public int getLowerPieceX() {
 
@@ -440,37 +441,66 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		return (getLowerPieceX() - getUpperPieceX()) * (getLowerPieceY() - getUpperPieceY());
 	}
 
-	public Map<Integer, Piece> getPieces() { return new HashMap<>(piecesMap); }
-	public int getPiecesCount() { return this.piecesMap.size(); }
+	public Map<Integer, Piece> getPieces() {
+		return new HashMap<>(piecesMap);
+	}
 
-	public Point getLowerRightPieceCorner() { return new Point(getUpperPieceX(), getUpperPieceY()); }		
-	public Point getUpperLeftPieceCorner() { return new Point(getLowerPieceX(), getLowerPieceY()); }
+	public int getPiecesCount() {
+		return this.piecesMap.size();
+	}
 
-	public Point getUpperLeftPieceCornerById(int pieceId) { return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId)); }
-	
-	public int getPieceIdAt(int x, int y) { return this.board[y][x]; }
+	public Point getLowerRightPieceCorner() {
+		return new Point(getUpperPieceX(), getUpperPieceY());
+	}
 
-	public Piece getPieceById(int pieceId) { return this.piecesMap.get(pieceId); }
+	public Point getUpperLeftPieceCorner() {
+		return new Point(getLowerPieceX(), getLowerPieceY());
+	}
 
-	public int getBoardWidth() { return this.board[0].length; }
-	public int getBoardHeight() { return this.board.length; }
-	public int[][] getBoardArray() { return this.board.clone(); }
+	public Point getUpperLeftPieceCornerById(int pieceId) {
+		return new Point(getLowerPieceXById(pieceId), getLowerPieceYById(pieceId));
+	}
 
-	public int getWidth() { return this.sizeX; }
-	public int getHeight() { return this.sizeY; }
-	
-	public long getSeed() { return this.seed; }
+	public int getPieceIdAt(int x, int y) {
+		return this.board[y][x];
+	}
 
-	
+	public Piece getPieceById(int pieceId) {
+		return this.piecesMap.get(pieceId);
+	}
+
+	public int getBoardWidth() {
+		return this.board[0].length;
+	}
+
+	public int getBoardHeight() {
+		return this.board.length;
+	}
+
+	public int[][] getBoardArray() {
+		return this.board.clone();
+	}
+
+	public int getWidth() {
+		return this.sizeX;
+	}
+
+	public int getHeight() {
+		return this.sizeY;
+	}
+
+	public long getSeed() {
+		return this.seed;
+	}
+
 	// -----------------
 	// STATIC METHODS
 	// -----------------
-	
+
 	@Override
 	public int compareTo(PlayBoard o) {
 		return this.getArea() - o.getArea();
 	}
-
 
 	// -----------------
 	// STATIC METHODS
@@ -478,12 +508,14 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 	public static int getSizeXBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
-		return new Random(seed).nextInt(difficulty.getMaxSizeX() - difficulty.getMinSizeX() + 1) + difficulty.getMinSizeX();
+		return new Random(seed).nextInt(difficulty.getMaxSizeX() - difficulty.getMinSizeX() + 1)
+				+ difficulty.getMinSizeX();
 	}
 
 	public static int getSizeYBySeedAndDifficulty(long seed, EDifficulty difficulty) {
 
-		return new Random(seed + 1).nextInt(difficulty.getMaxSizeY() - difficulty.getMinSizeY() + 1) + difficulty.getMinSizeY();
+		return new Random(seed + 1).nextInt(difficulty.getMaxSizeY() - difficulty.getMinSizeY() + 1)
+				+ difficulty.getMinSizeY();
 	}
 
 	public static int getPiecesCountBySeedAndDifficulty(long seed, EDifficulty difficulty) {
@@ -492,7 +524,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 				+ difficulty.getMinNbPieces();
 	}
 
-	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
+	public static PlayBoard constructPlayBoardWithPlacementSeed(long seed, long seedPlacement, int sizeX, int sizeY,
+			int nbPieces) {
 
 		PlayBoard playBoard = constructEmptyPlayBoard(seed, sizeX, sizeY);
 		List<PieceFactory> pieceFactorys = getPossiblePieceFactorys();
@@ -504,7 +537,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			PieceFactory pieceFactory = pieceFactorys.get(random.nextInt(pieceFactorys.size()));
 			Piece piece = pieceFactory.createPiece(0);
 
-			playBoard.randomlyPlacePiece(piece);
+			playBoard.randomlyPlacePiece(piece, seedPlacement);
 
 			// TODO: REFAIRE CETTE MERDE
 		}
@@ -513,8 +546,26 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	}
 
 	public static PlayBoard constructCopyPlayBoard(PlayBoard parent) {
-		
-		return constructPlayBoard(parent.seed, parent.sizeX, parent.sizeY, parent.piecesMap.size());
+
+		PlayBoard copy = constructEmptyPlayBoardCopy(parent);
+
+		for (int i = 1; i <= parent.piecesMap.keySet().size(); i++) {
+			Piece p = parent.piecesMap.get(i);
+			Point point = parent.getUpperLeftPieceCornerById(i);
+			copy.placePiece(point.x, point.y, p);
+		}
+
+		return copy;
+	}
+
+	public static PlayBoard constructPlayBoard(long seed, int sizeX, int sizeY, int nbPieces) {
+
+		return constructPlayBoardWithPlacementSeed(seed, seed, sizeX, sizeY, nbPieces);
+	}
+
+	public static PlayBoard constructPlayBoard(PlayBoard p) {
+
+		return constructPlayBoard(p.seed, p.sizeX, p.sizeY, p.getPiecesCount());
 	}
 
 	public static PlayBoard constructEmptyPlayBoard(long seed, int sizeX, int sizeY) {
@@ -545,36 +596,36 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 
 	@Override
 	public void addPlayBoardListener(IPlayBoardListener listener) {
-		
+
 		this.listeners.add(listener);
 	}
 
 	@Override
 	public void removePlayBoardListener(IPlayBoardListener listener) {
-		
+
 		this.listeners.remove(listener);
 	}
 
 	private void firePieceAdded(Object source, int pieceId) {
-		
+
 		for (IPlayBoardListener listener : this.listeners) {
-			
+
 			listener.pieceAdded(source, pieceId);
 		}
 	}
 
 	private void firePieceRemoved(Object source, int pieceId) {
-		
+
 		for (IPlayBoardListener listener : this.listeners) {
-			
+
 			listener.pieceRemoved(source, pieceId);
 		}
 	}
 
 	private void firePieceMoved(Object source, int pieceId) {
-		
+
 		for (IPlayBoardListener listener : this.listeners) {
-			
+
 			listener.pieceMoved(source, pieceId);
 		}
 	}

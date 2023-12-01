@@ -33,12 +33,15 @@ public abstract class AbstractStrategy implements IStrategyBot {
                     Piece p = bestSolution.getPieceById(pieceId);
                     if (!pieceAl.contains(p)) {
                         Point upperLeftCorner = bestSolution.getUpperLeftPieceCornerById(pieceId);
-                        ret.add(new Move(pieceId, upperLeftCorner.x, upperLeftCorner.y));
+                        ret.add(new Move(pieceId, upperLeftCorner.x, upperLeftCorner.y, p.getNumberOfLeftRotation(), p.getNumberOfReverse()));
                         pieceAl.add(p);
                     }
                 }
             }
         }
+        
+        System.out.println((bestSolution).toString());
+        System.out.println(ret);
 
         return ret;
     }

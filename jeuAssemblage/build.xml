@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="jeuAssemblage" default="run" basedir=".">
     <property name="app.name" value="jeuAssemblage"/>
     <property name="app.version" value="0.1"/>
@@ -9,6 +10,7 @@
     <property name="lib.home" value="${basedir}/lib"/>
 	<property name="resources.home" value="${basedir}/resources"/>
     <property name="javac.encoding" value="UTF-8"/>
+    <property name="input.encoding" value="UTF-8" />
     <!--  ==================== Compile options ===========================  -->
     <property name="compile.debug" value="true"/>
     <property name="compile.deprecation" value="false"/>

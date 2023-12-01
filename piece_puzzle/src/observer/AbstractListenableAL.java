@@ -27,9 +27,9 @@ public abstract class AbstractListenableAL {
 
     @Override
     public String toString() {
-        String ret = "";
+        String ret = "Piece \n";
         for (Listener l : this.alListeners) {
-            ret += l.getClass() + "\n";
+            ret += l + "\n";
         }
         return ret;
     }

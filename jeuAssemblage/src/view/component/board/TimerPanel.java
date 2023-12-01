@@ -54,8 +54,6 @@ public class TimerPanel extends JPanel implements TimerListener {
     @Override
     public void timerChanged(Object source, Timer timer) {
 
-        System.out.println("timerChanged");
-
         lblMinutes.setText(String.format("%02d", timer.getCurrentNbMinutes()));
         lblSeconds.setText(String.format("%02d", timer.getCurrentNbSeconds()));
 
