@@ -61,7 +61,7 @@ public class MovesToIHM implements IMovesView {
             }
 
             
-            for (int i = 0; i < alMoves.size(); i++) {
+            for (int i = 0; i < alMoves.size() && !Thread.currentThread().isInterrupted(); i++) {
                 Move m = alMoves.get(i);
 
                 boolean result = this.doMove(m);
@@ -76,10 +76,12 @@ public class MovesToIHM implements IMovesView {
 
             actualIte++;
 
-        } while (!alMoves.isEmpty() && actualIte < maxIte);
+        } while (!alMoves.isEmpty() && actualIte < maxIte && !Thread.currentThread().isInterrupted());
     }
     
     private boolean doMove(Move m) {
+
+        System.out.println("shesh");
 
         Piece p = model.getPieceById(m.pieceId);
         
@@ -118,7 +120,7 @@ public class MovesToIHM implements IMovesView {
             int sleep = (int) ((Math.random() * (DEFAULT_SLEEP / 2)) + DEFAULT_SLEEP);
             Thread.sleep(sleep);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
 
     }

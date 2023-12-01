@@ -21,10 +21,9 @@ public class MultiplayerFinishScreen extends JPanel {
     
     private SoloGameFinishScreen finishScreen;
 
-    private final JLabel lblFinishGame = new JLabel("Le gagnant est le ");
 	private final JScrollPane scrollPane = new JScrollPane();   
     
-    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, BotThread botThread, List<BotDescriptor> botDescriptor, List<PlayBoard> botPlayboard) {
+    public MultiplayerFinishScreen(MainFrame mainFrame, PlayBoard playBoard, PiecesColor piecesColor, BotThread botThread, List<PlayBoard> botPlayboard) {
 
         super();
 
@@ -34,29 +33,18 @@ public class MultiplayerFinishScreen extends JPanel {
         JPanel bots = new JPanel();
         bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
 
-        String winnerName = "Joueur";
-        int minArea = playBoard.getArea();
-
         List<IBot> botLst = botThread.getBots();
         for (int i = 0; i < botLst.size(); i++) {
 
-            IBot bot = botLst.get(i);
-            String name = botDescriptor.get(i).getName();
             PlayBoard p = botPlayboard.get(i);
 
             GameSummary gTemp = new GameSummary(p, piecesColor);
             bots.add(gTemp);
 
-            if (bot.getModel().getArea() < minArea) {
-                winnerName = name;
-            }
         }
 
-        this.lblFinishGame.setText(this.lblFinishGame.getText() + winnerName);
-        
         this.scrollPane.setViewportView(bots);
 
-        this.add(this.lblFinishGame);
         this.add(this.finishScreen);
         this.add(this.scrollPane);
     }
@@ -65,18 +53,11 @@ public class MultiplayerFinishScreen extends JPanel {
     public void doLayout() {
         super.doLayout();
 
-        this.lblFinishGame.setBounds(
-            0,
-		 	0,
-		 	SwingUtils.getWidthTimesPourcent(this, .8f),
-			SwingUtils.getHeightTimesPourcent(this, .1f)
-        );
-
 		this.finishScreen.setBounds(
 			0,
-		 	SwingUtils.getHeightTimesPourcent(this, .1f),
+		 	0,
 		 	SwingUtils.getWidthTimesPourcent(this, .8f),
-			SwingUtils.getHeightTimesPourcent(this, .9f)
+			SwingUtils.getHeightTimesPourcent(this, 1f)
 		);
 
 		this.scrollPane.setBounds(

@@ -66,7 +66,7 @@ public class MultiplayerGameScreen extends JPanel {
 		BotThread botT = new BotThread(botsAl, movesViews);
 
 		this.gamePanel = new GamePanel(mainFrame, playBoard, piecesColor, timer, botT,
-				new MultiplayerFinishScreen(mainFrame, playBoard, piecesColor, botT, botDescriptors, botPlayboard));
+				new MultiplayerFinishScreen(mainFrame, playBoard, piecesColor, botT, botPlayboard));
 		
 		new Thread(botT).start();
 		

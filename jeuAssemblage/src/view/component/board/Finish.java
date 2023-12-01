@@ -3,8 +3,6 @@ package view.component.board;
 import static view.utils.SwingUtils.*;
 
 import java.awt.Graphics;
-import java.awt.Point;
-import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -12,13 +10,14 @@ import javax.swing.JPanel;
 
 import bot.BotThread;
 import model.PlayBoard;
-import model.listener.IPlayBoardListener;
+import observer.interfaces.Listener;
+import utils.ETypeListen;
 import view.MainFrame;
 import view.screen.SoloGameFinishScreen;
 import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
-public class Finish extends JPanel {
+public class Finish extends JPanel implements Listener {
 
     private final JLabel lblPreciseArea = new JLabel();
     private final JLabel lblArea = new JLabel();
@@ -45,26 +44,7 @@ public class Finish extends JPanel {
         this.mainFrame = mainFrame;
         this.playBoard = playBoard;
 
-        this.playBoard.addPlayBoardListener(new IPlayBoardListener() {
-
-            @Override
-            public void pieceAdded(Object source, int pieceId) {
-
-                update();
-            }
-
-            @Override
-            public void pieceRemoved(Object source, int pieceId) {
-
-                update();
-            }
-
-            @Override
-            public void pieceMoved(Object source, int pieceId) {
-
-                update();
-            }
-        });
+        this.playBoard.addListener(ETypeListen.AREAVIEW.typeListen, this);
 
         this.setLayout(null);
 
@@ -117,11 +97,7 @@ public class Finish extends JPanel {
         SwingUtils.drawDebugBounds(this, g);
     }
 
-    // @Override
-    // public void update() {
-    // 	this.repaint();
-    // };
-
+    @Override
     public void update() {
 
         int area = playBoard.getArea();

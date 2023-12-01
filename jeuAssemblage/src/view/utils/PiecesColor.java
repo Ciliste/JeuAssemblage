@@ -10,8 +10,6 @@ import java.awt.Image;
 
 public class PiecesColor {
 
-    private static Color[] colors = getColors();
-
     private HashMap<Integer, Image> piecesImageMap;
 
     public PiecesColor(PlayBoard model) {
@@ -32,25 +30,20 @@ public class PiecesColor {
 
         int size = model.getPiecesCount();
         for (int i = 1; i <= size; i++) {
-            Color c = colors[rand.nextInt(colors.length)];
+
+            Color c = getColor(rand);
+
+            if (rand.nextBoolean()) {
+                c = c.darker();
+            }
+
             piecesImageMap.put(i, PieceRenderUtils.createCellImage(c));
         }
     }
-    
-    private static Color[] getColors() {
-        return new Color[]
-        { 
-            Color.RED,
-            Color.GREEN, 
-            Color.GRAY,
-            Color.CYAN,
-            Color.ORANGE,
-            Color.PINK,
-            Color.MAGENTA,
-            Color.BLUE,
-            Color.WHITE,
-            Color.YELLOW
-        };
+
+    private static Color getColor(Random rand) {
+
+        return new Color(rand.nextInt(20, 220), rand.nextInt(20, 220), rand.nextInt(20, 220));
     }
     
 }

@@ -51,7 +51,7 @@ public class BotThread implements Runnable {
         while (!this.stop) {
             boolean stopable = true;
 
-            for (int i = 0; i < this.bots.size(); i++) {
+            for (int i = 0; i < this.bots.size() && !Thread.interrupted(); i++) {
                 IBot bot = this.bots.get(i);
 
                 if (bot.tick()) {
@@ -66,16 +66,20 @@ public class BotThread implements Runnable {
             try {
                 Thread.sleep(10);
             } catch (Exception e) {
-                e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
         }
         
-        for (IMovesView movesView : this.movesViews) {
-            Thread t = new Thread(this.th, movesView);
-            t.start();
-        }
+        if (!this.stop) {
 
-        System.out.println("fini");
+            for (IMovesView movesView : this.movesViews) {
+
+                Thread t = new Thread(this.th, movesView);
+                t.start();
+            }
+
+        }
+        
     }
 
 }

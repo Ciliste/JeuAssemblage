@@ -18,15 +18,13 @@ import factory.OFactory;
 import factory.PieceFactory;
 import factory.TFactory;
 import factory.ZFactory;
-import model.listener.IPlayBoardListenable;
-import model.listener.IPlayBoardListener;
 import observer.AbstractListenableHM;
 import observer.interfaces.Listener;
 import piece.Piece;
 import utils.EDifficulty;
 import utils.ETypeListen;
 
-public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBoardListenable, Comparable<PlayBoard> {
+public class PlayBoard extends AbstractListenableHM implements Listener, Comparable<PlayBoard> {
 
 	private static final int EMPTY = 0;
 
@@ -151,7 +149,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			piecesMap.put(pieceId, piece);
 
 			this.fireAllEvents();
-			firePieceAdded(this, pieceId);
 
 			return true;
 		}
@@ -176,8 +173,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 			this.placePieceAsId(x, y, piece, pieceId);
 
 			this.fireAllEvents();
-
-			firePieceRemoved(this, pieceId);
 
 			return true;
 		}
@@ -596,43 +591,5 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		pieceFactorys.add(new ZFactory());
 
 		return pieceFactorys;
-	}
-
-	private final Set<IPlayBoardListener> listeners = new HashSet<>();
-
-	@Override
-	public void addPlayBoardListener(IPlayBoardListener listener) {
-
-		this.listeners.add(listener);
-	}
-
-	@Override
-	public void removePlayBoardListener(IPlayBoardListener listener) {
-
-		this.listeners.remove(listener);
-	}
-
-	private void firePieceAdded(Object source, int pieceId) {
-
-		for (IPlayBoardListener listener : this.listeners) {
-
-			listener.pieceAdded(source, pieceId);
-		}
-	}
-
-	private void firePieceRemoved(Object source, int pieceId) {
-
-		for (IPlayBoardListener listener : this.listeners) {
-
-			listener.pieceRemoved(source, pieceId);
-		}
-	}
-
-	private void firePieceMoved(Object source, int pieceId) {
-
-		for (IPlayBoardListener listener : this.listeners) {
-
-			listener.pieceMoved(source, pieceId);
-		}
 	}
 }
