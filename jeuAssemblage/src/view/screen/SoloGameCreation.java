@@ -369,7 +369,7 @@ public class SoloGameCreation extends JPanel {
 				Integer.parseInt(txtSizeY.getText()), 
 					(int) nbPiecesSpinner.getValue());
 			PiecesColor piecesColor = new PiecesColor(p);
-			temp = new Grid(p, true, piecesColor);	
+			temp = new Grid(p, true, false, piecesColor);	
 		} 
 		catch (Exception ignored) {}
 

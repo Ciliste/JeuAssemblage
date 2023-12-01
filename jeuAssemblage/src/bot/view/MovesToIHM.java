@@ -12,7 +12,7 @@ import piece.Piece;
 
 public class MovesToIHM implements IMovesView {
 
-    private final int DEFAULT_SLEEP = 500;
+    private final int DEFAULT_SLEEP = 200;
 
     private IBot bot;
     private IMovableView view;
@@ -30,20 +30,34 @@ public class MovesToIHM implements IMovesView {
         List<Move> alMoves = (ArrayList<Move>) this.bot.getMoves();
         List<Move> alMovesNotCheck = new ArrayList<Move>();
 
-        int maxIte = 4;
+        int maxIte = 6;
         int actualIte = 0;
 
         do {
 
             if (actualIte == 2) {
-                Move m = alMoves.get(alMoves.size() - 1);
+
+                Move m = alMoves.get(getRandom(1, alMoves.size() - 1));
                 doMove(new Move(m.pieceId, model.getBoardWidth() - 3, model.getBoardHeight() - 3,
-                        m.numberOfLeftRotation, m.numberOfReverse));
+                        0, m.numberOfReverse));
             }
 
             if (actualIte == 3) {
-                Move m = alMoves.get(alMoves.size() - 1);
-                doMove(new Move(m.pieceId, 2, 2, m.numberOfLeftRotation, m.numberOfReverse));
+
+                Move m = alMoves.get(getRandom(1, alMoves.size() - 1));
+                doMove(new Move(m.pieceId, 2, 2, 0, m.numberOfReverse));
+            }
+
+            if (actualIte == 4) {
+
+                Move m = alMoves.get(getRandom(1, alMoves.size() - 1));
+                doMove(new Move(m.pieceId, model.getBoardWidth() - 3, 2, 0, m.numberOfReverse));
+            }
+            
+            if (actualIte == 5) {
+                
+                Move m = alMoves.get(getRandom(1, alMoves.size() - 1));
+                doMove(new Move(m.pieceId, 2 , model.getBoardHeight() - 3, 0, m.numberOfReverse));
             }
 
             
@@ -86,8 +100,7 @@ public class MovesToIHM implements IMovesView {
         this.sleep();
 
         p = this.view.getSelectedPiece();
-        int numberOfLeftRotation = (m.numberOfLeftRotation - p.getNumberOfLeftRotation()) % 4;
-        for (int j = 0; j < numberOfLeftRotation; j++) {
+        while (p.getNumberOfLeftRotation() != m.numberOfLeftRotation) {
             this.view.rotateLeftPiece();
         }
         this.sleep();
@@ -100,14 +113,18 @@ public class MovesToIHM implements IMovesView {
         return ret;
     }
     
-    public void sleep() {
+    private void sleep() {
         try {
-            int sleep = (int) ((Math.random() * (DEFAULT_SLEEP/2)) + DEFAULT_SLEEP);
+            int sleep = (int) ((Math.random() * (DEFAULT_SLEEP / 2)) + DEFAULT_SLEEP);
             Thread.sleep(sleep);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+    }
+
+    private int getRandom(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
     
     

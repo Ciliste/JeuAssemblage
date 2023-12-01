@@ -14,6 +14,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import bot.difficulty.Bot;
 import model.PlayBoard;
 import model.ProfileUtils;
 import view.MainFrame;
@@ -47,7 +48,7 @@ public class AIGameCreation extends SoloGameCreation {
 
 			final String botName = ProfileUtils.generateRandomProfileName();
 
-			BotDescriptor bot = new BotDescriptor(botName, 1);
+			BotDescriptor bot = new BotDescriptor(botName, 1, Bot.AI_STRATEGY);
 
 			JPanel renderer = createBotDescriptorRenderer(bot);
 
@@ -101,15 +102,25 @@ public class AIGameCreation extends SoloGameCreation {
 		label.setAlignmentX(LEFT_ALIGNMENT);
 		panel.add(label);
 
-		JComboBox<Integer> comboBox = new JComboBox<>(new Integer[] { 1, 2, 3, 4, 5 });
-		comboBox.setSelectedItem(botDescriptor.getDifficulty());
+		JComboBox<Integer> comboDiff = new JComboBox<>(new Integer[] { 1, 2, 3 });
+		JComboBox<String> comboStrategy = new JComboBox<>(Bot.strategies);
 
-		comboBox.addActionListener(e -> {
+		comboDiff.setSelectedItem(botDescriptor.getDifficulty());
+		comboStrategy.setSelectedIndex(botDescriptor.getStrategy());
 
-			botDescriptor.setDifficulty((int) comboBox.getSelectedItem());
+		comboDiff.addActionListener(e -> {
+
+			botDescriptor.setDifficulty((int) comboDiff.getSelectedItem());
 		});
 
-		panel.add(comboBox);
+		comboStrategy.addActionListener(e -> {
+
+			botDescriptor.setStrategy((int) comboStrategy.getSelectedIndex());
+		});
+
+		panel.add(comboDiff);
+		panel.add(comboStrategy);
+
 
 		JButton btnRemove = new JButton("X");
 
@@ -132,11 +143,13 @@ public class AIGameCreation extends SoloGameCreation {
 
 		private String name;
 		private int difficulty;
+		private int strategy;
 
-		public BotDescriptor(String name, int difficulty) {
+		public BotDescriptor(String name, int difficulty, int strategy) {
 
 			this.name = name;
 			this.difficulty = difficulty;
+			this.strategy = strategy;
 		}
 
 		public String getName() {
@@ -149,6 +162,11 @@ public class AIGameCreation extends SoloGameCreation {
 			return difficulty;
 		}
 
+		public int getStrategy() {
+
+			return strategy;
+		}
+
 		public void setName(String name) {
 
 			this.name = name;
@@ -157,6 +175,11 @@ public class AIGameCreation extends SoloGameCreation {
 		public void setDifficulty(int difficulty) {
 
 			this.difficulty = difficulty;
+		}
+
+		public void setStrategy(int strategy) {
+
+			this.strategy = strategy;
 		}
 
 		@Override

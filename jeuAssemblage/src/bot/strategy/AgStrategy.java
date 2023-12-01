@@ -16,18 +16,12 @@ import utils.SeedUtils;
 
 public class AgStrategy extends AbstractStrategy {
 
-    public static final int EASY = 100;
-    public static final int MEDIUM = 200; 
-    public static final int HARD = 500; 
+    public static final int EASY = 50;
+    public static final int MEDIUM = 100; 
+    public static final int HARD = 200; 
     
     private static final int POP_SIZE = 100;
 
-    protected List<PlayBoard> pop;
-    protected long seed;
-    protected int testSize;
-    protected int testedSize;
-    private Random rand;
-    
     public AgStrategy(PlayBoard model) {
         this(model, SeedUtils.generateRandomSeed(), AgStrategy.EASY);
     }
@@ -38,36 +32,23 @@ public class AgStrategy extends AbstractStrategy {
 
     protected AgStrategy(PlayBoard model, long seed, int testSize) {
 
-        super(model);
-
-        this.seed = seed;
-        this.testSize = testSize;
-        this.testedSize = 0;
-        this.rand = new Random(this.seed);
+        super(model, seed, testSize);
 
         this.pop = createPopulation(this.model, POP_SIZE, this.rand);
         this.pop.add(model);
     }
-    
+
     @Override
-    public boolean tick() {
+    public void tickMethod() {
 
-        if (this.testedSize >= this.testSize) {
-            System.out.println(bestSolution.getArea());
-            return false;
-        }
+        pop = mutation(pop, 1d);
+    }
 
-        int toTest = Math.min(this.testSize - this.testedSize, this.rand.nextInt(1, (int) Math.ceil(this.testSize / 30)));
-        for (int i = 0; i < toTest; i++) {
-            pop = mutation(pop, 1d);
-        }
+    @Override
+    protected void setBestSolution() {
         
         this.bestSolution = pop.get(0);
-        this.testedSize += toTest;
-        
-        return true;
     }
-    
 
     // ******************
     // Privates methods

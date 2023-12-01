@@ -79,6 +79,8 @@ public class Finish extends JPanel {
         this.add(this.btnFinish);
 
         this.setVisible(true);
+
+        this.update();
     }
 
     @Override
@@ -118,19 +120,12 @@ public class Finish extends JPanel {
     // @Override
     // public void update() {
     // 	this.repaint();
-    // }
+    // };
 
     public void update() {
 
-        Point upperLeft = playBoard.getUpperLeftPieceCorner();
-        Point lowerRight = playBoard.getLowerRightPieceCorner();
-
-        int area = (lowerRight.x - upperLeft.x) * (lowerRight.y - upperLeft.y);
+        int area = playBoard.getArea();
 
         lblArea.setText("Aire : " + area);
-
-        //int[] areaInfo = this.controller.areaInfomartion();
-        //lblPreciseArea.setText("Nombre de carrés : " + areaInfo[4]);
-        //lblArea.setText("Aire : " + ((areaInfo[2] - areaInfo[0]) * (areaInfo[3] - areaInfo[1])));
     }
 }

@@ -49,13 +49,15 @@ public class Grid extends JPanel implements Listener, IMovableView{
 	private PiecesColor piecesColor;
 
 	private final boolean isPreview;
+	private final boolean isNotPlayer;
+
 
 	public Grid(PlayBoard playBoard, PiecesColor piecesColor) {
 
-		this(playBoard, false, piecesColor);
+		this(playBoard, false, false, piecesColor);
 	}
 
-	public Grid(PlayBoard playBoard, boolean isPreview, PiecesColor piecesColor) {
+	public Grid(PlayBoard playBoard, boolean isPreview, boolean isNotPlayer, PiecesColor piecesColor) {
 
 		this.playBoard = playBoard;
 		this.playBoard.addListener(ETypeListen.PLAYVIEW.typeListen, this);
@@ -67,7 +69,8 @@ public class Grid extends JPanel implements Listener, IMovableView{
 		this.setVisible(true);
 
 		this.isPreview = isPreview;
-		if (isPreview)
+		this.isNotPlayer = isNotPlayer;
+		if (isPreview || isNotPlayer)
 			return;
 
 		this.addMouseListener(new GridClickListener());
@@ -209,7 +212,7 @@ public class Grid extends JPanel implements Listener, IMovableView{
 			);
 		}
 		
-		if (this.isPreview) {
+		if (this.isNotPlayer) {
 			g.setColor(Color.RED);
 			Ellipse2D.Double circle = new Ellipse2D.Double(
 				(mousePosition.x * componentSize) + paddingWidth/2,

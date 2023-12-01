@@ -44,18 +44,19 @@ public class MultiplayerGameScreen extends JPanel {
 		for (BotDescriptor botDescriptor : botDescriptors) {
 
 			PlayBoard p = PlayBoard.constructPlayBoard(playBoard);
-			Grid grid = new Grid(p, true, piecesColor);
+			Grid grid = new Grid(p, false, true, piecesColor);
 
 			botPlayboard.add(p);
 			bots.add(grid);
 
 			IBot bot = null;
+			int strategy = botDescriptor.getStrategy();
 			if (botDescriptor.getDifficulty() == 1) {
-				bot = new EasyBot(playBoard, Bot.AI_STRATEGY);
+				bot = new EasyBot(playBoard, strategy);
 			} else if (botDescriptor.getDifficulty() == 2) {
-				bot = new MediumBot(playBoard, Bot.AI_STRATEGY);
+				bot = new MediumBot(playBoard, strategy);
 			} else {
-				bot = new HardBot(playBoard, Bot.AI_STRATEGY);
+				bot = new HardBot(playBoard, strategy);
 			}
 
 			movesViews.add(new MovesToIHM(bot, grid, playBoard));

@@ -438,7 +438,7 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 	}
 
 	public int getArea() {
-		return (getLowerPieceX() - getUpperPieceX()) * (getLowerPieceY() - getUpperPieceY());
+		return ((getUpperPieceX() - getLowerPieceX()) + 1) * ((getUpperPieceY() - getLowerPieceY()) + 1);
 	}
 
 	public Map<Integer, Piece> getPieces() {
@@ -543,6 +543,12 @@ public class PlayBoard extends AbstractListenableHM implements Listener, IPlayBo
 		}
 
 		return playBoard;
+	}
+
+	public static PlayBoard constructPlayBoardWithPlacementSeed(PlayBoard model, long seedPlacement) {
+
+		return constructPlayBoardWithPlacementSeed(model.seed, seedPlacement, model.sizeX, model.sizeY,
+				model.getPiecesCount());
 	}
 
 	public static PlayBoard constructCopyPlayBoard(PlayBoard parent) {

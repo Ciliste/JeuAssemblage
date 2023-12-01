@@ -11,8 +11,10 @@ import model.PlayBoard;
 
 public abstract class Bot implements IBot {
 
+    public static String[] strategies = { "AI", "Noob" };
+
     public static final int AI_STRATEGY = 0;
-    public static final int MEMO_STRATEGY = 1;
+    public static final int NOOB_STRATEGY = 1;
 
     protected IStrategyBot strategyBot;
     protected PlayBoard model;
@@ -37,8 +39,8 @@ public abstract class Bot implements IBot {
             case AI_STRATEGY -> {
                 this.strategyBot = new AgStrategy(this.model, AIdifficulty);
             }
-            case MEMO_STRATEGY -> {
-                this.strategyBot = new NoobStrategy(this.model);
+            case NOOB_STRATEGY -> {
+                this.strategyBot = new NoobStrategy(this.model, AIdifficulty);
             }
             default -> {
                 throw new IllegalStateException("Strategy " + strategy + " doesn't exist");
