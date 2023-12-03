@@ -5,6 +5,8 @@ import static view.utils.SwingUtils.*;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 
+import com.formdev.flatlaf.ui.FlatLabelUI;
+
 import model.PlayBoard;
 import model.arrangement.ArrangementList;
 import utils.EDifficulty;
@@ -97,8 +99,9 @@ public class SoloGameCreation extends JPanel {
         // LISTENERS
 
 		// ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
-        // this.addComponentListener(resizeListener);
+		// this.addComponentListener(resizeListener);
 
+		btnCancel.putClientProperty( "JButton.buttonType", "roundRect" );
         btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
 
         final Runnable randomSeedCallback = createRandomSeedCallback(this);
@@ -187,7 +190,7 @@ public class SoloGameCreation extends JPanel {
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
 
 		final int BTN_CANCEL_WIDTH = Math.max(getWidthTimesPourcent(this, .03f), getHeightTimesPourcent(this, .03f));
-		final int BTN_CANCEL_HEIGHT = BTN_CANCEL_WIDTH;
+		final int BTN_CANCEL_HEIGHT = BTN_CANCEL_WIDTH/2 + BTN_CANCEL_WIDTH/3;
 
 		btnCancel.setBounds(
 			PADDING_LEFT, 
@@ -217,7 +220,7 @@ public class SoloGameCreation extends JPanel {
 		btnRandomSeed.setBounds(
 			PADDING_LEFT + getWidthTimesPourcent(this, .2f),
 			PADDING_TOP_LBL_SEED + BTN_CANCEL_HEIGHT,
-			BTN_CANCEL_WIDTH,
+			BTN_CANCEL_WIDTH * 2,
 			BTN_CANCEL_HEIGHT 
 		);
 
@@ -294,7 +297,7 @@ public class SoloGameCreation extends JPanel {
 		scrollArrangement.setBounds(
 			PADDING_LEFT,
 			difficultyList.getY() + difficultyList.getHeight() + BTN_CANCEL_HEIGHT * 2,
-			getWidthTimesPourcent(this, .35f),
+			getWidthTimesPourcent(this, .5f),
 			BTN_CANCEL_HEIGHT * 3
 		);
 
@@ -326,7 +329,7 @@ public class SoloGameCreation extends JPanel {
 			getWidth() - PADDING_RIGHT - getWidthTimesPourcent(this, .3f),
 			getHeightTimesPourcent(this, .33f),
 			getWidthTimesPourcent(this, .3f),
-			getWidthTimesPourcent(this, .3f)
+			getHeightTimesPourcent(this, .5f)
 		);
 
 		btnPlay.setBounds(

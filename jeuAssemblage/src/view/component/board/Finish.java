@@ -86,15 +86,7 @@ public class Finish extends JPanel implements Listener {
                 PADDING,
                 PADDING_BUTTON,
                 getWidthTimesPourcent(this, .9f),
-                getHeightTimesPourcent(this, .2f));
-    }
-
-    @Override
-    public void paintComponent(Graphics g) {
-
-        super.paintComponent(g);
-
-        SwingUtils.drawDebugBounds(this, g);
+                getHeightTimesPourcent(this, .1f));
     }
 
     @Override

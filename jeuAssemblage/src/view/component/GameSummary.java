@@ -38,8 +38,6 @@ public class GameSummary extends JPanel {
 
         super.paintComponent(g);
 
-        SwingUtils.drawDebugBounds(this, g);
-
         Point upperLeftCorner = playBoard.getUpperLeftPieceCorner();
         Point lowerRightCorner = playBoard.getLowerRightPieceCorner();
 

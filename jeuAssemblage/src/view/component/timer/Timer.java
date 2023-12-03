@@ -3,7 +3,10 @@ package view.component.timer;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Timer {
+import view.component.timer.interfaces.TimerListenable;
+import view.component.timer.interfaces.TimerListener;
+
+public class Timer implements TimerListenable{
     
     public static final Timer NO_TIMER = new Timer(-1, -1);
 

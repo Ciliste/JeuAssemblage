@@ -203,12 +203,4 @@ public class SoloGameFinishScreen extends JPanel {
         
     }
     
-    @Override
-	public void paintComponent(Graphics g) {
-
-		super.paintComponent(g);
-		
-		SwingUtils.drawDebugBounds(this, g);
-	}
-    
 }

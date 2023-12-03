@@ -69,7 +69,10 @@ public class AIGameCreation extends SoloGameCreation {
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
 
 		final int SCROLLPANE_WIDTH = getWidthTimesPourcent(this, .25f);
-		final int SCROLLPANE_HEIGHT = getHeightTimesPourcent(this, .15f);
+		final int SCROLLPANE_HEIGHT = getHeightTimesPourcent(this, .12f);
+
+		final int HEIGHT = Math.max(getWidthTimesPourcent(this, .03f), getHeightTimesPourcent(this, .03f));
+		final int BTN_ADD_HEIGHT = HEIGHT/2 + HEIGHT/3;
 
 		scrollPane.setBounds(
 				getWidth() - SCROLLPANE_WIDTH - PADDING_LEFT,
@@ -79,9 +82,9 @@ public class AIGameCreation extends SoloGameCreation {
 
 		btnAddBot.setBounds(
 				scrollPane.getX(),
-				scrollPane.getY() + scrollPane.getHeight() + SwingUtils.getHeightTimesPourcent(this, .01f),
+				scrollPane.getY() + scrollPane.getHeight() + getHeightTimesPourcent(this, .01f),
 				scrollPane.getWidth(),
-				SwingUtils.getHeightTimesPourcent(this, .05f));
+				BTN_ADD_HEIGHT);
 	}
 
 	@Override

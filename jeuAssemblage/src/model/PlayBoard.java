@@ -5,11 +5,9 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import factory.HFactory;
 import factory.IFactory;
@@ -22,7 +20,6 @@ import observer.AbstractListenableHM;
 import observer.interfaces.Listener;
 import piece.Piece;
 import utils.EDifficulty;
-import utils.ETypeListen;
 
 public class PlayBoard extends AbstractListenableHM implements Listener, Comparable<PlayBoard> {
 

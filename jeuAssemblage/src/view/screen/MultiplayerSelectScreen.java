@@ -48,12 +48,4 @@ public class MultiplayerSelectScreen extends JPanel {
 			mainFrame.setContentPane(new AIGameCreation(mainFrame));
 		});
 	}
-
-	@Override
-	public void paintComponent(java.awt.Graphics g) {
-		
-		super.paintComponent(g);
-
-		SwingUtils.drawDebugBounds(this, g);
-	}
 }

@@ -81,8 +81,6 @@ public class MovesToIHM implements IMovesView {
     
     private boolean doMove(Move m) {
 
-        System.out.println("shesh");
-
         Piece p = model.getPieceById(m.pieceId);
         
         boolean inversible = m.numberOfReverse != p.getNumberOfReverse();

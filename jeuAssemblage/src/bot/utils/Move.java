@@ -1,7 +1,5 @@
 package bot.utils;
 
-import piece.Piece;
-
 public class Move {
     
     public int pieceId;

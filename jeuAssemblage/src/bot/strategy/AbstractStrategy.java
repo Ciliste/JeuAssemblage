@@ -76,9 +76,6 @@ public abstract class AbstractStrategy implements IStrategyBot {
                 }
             }
         }
-        
-        System.out.println((bestSolution).toString());
-        System.out.println(ret);
 
         return ret;
     }

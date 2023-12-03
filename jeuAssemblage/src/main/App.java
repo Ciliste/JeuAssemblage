@@ -1,14 +1,13 @@
 package main;
 
+import java.awt.Insets;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
-import bot.strategy.AgStrategy;
-import model.PlayBoard;
-import model.arrangement.Arrangement;
-import model.arrangement.ArrangementList;
 import view.MainFrame;
 
 public class App {
@@ -34,7 +33,13 @@ public class App {
         while (a.tick()) {
         }
         */
-        
+
+        UIManager.put( "ScrollBar.trackInsets", new Insets( 2, 4, 2, 4 ) );
+        UIManager.put("ScrollBar.thumbInsets", new Insets(2, 2, 2, 2));
+        UIManager.put("Component.arrowType", "triangle");
+        UIManager.put( "Button.arc", 10 );
+        UIManager.put( "Component.arc", 10 );
+        UIManager.put("TextComponent.arc", 2);
         
         
         SwingUtilities.invokeLater(() -> {

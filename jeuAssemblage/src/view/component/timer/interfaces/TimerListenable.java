@@ -1,4 +1,4 @@
-package view.component.timer;
+package view.component.timer.interfaces;
 
 public interface TimerListenable {
 

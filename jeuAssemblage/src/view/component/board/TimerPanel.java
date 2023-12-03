@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import view.component.timer.Timer;
-import view.component.timer.TimerListener;
+import view.component.timer.interfaces.TimerListener;
 
 public class TimerPanel extends JPanel implements TimerListener {
 

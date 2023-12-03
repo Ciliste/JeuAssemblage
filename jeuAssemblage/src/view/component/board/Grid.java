@@ -93,8 +93,6 @@ public class Grid extends JPanel implements Listener, IMovableView{
 
 		super.paintComponent(g);
 
-		SwingUtils.drawDebugBounds(this, g);
-
         int componentSize = (int) Math.min(
 			getHeightTimesPourcent(this, 0.95f) / (playBoard.getHeight() * 1d),
 			getWidthTimesPourcent(this,0.95f) / (playBoard.getWidth() * 1d)
@@ -465,7 +463,7 @@ public class Grid extends JPanel implements Listener, IMovableView{
 			try {
 				Thread.sleep(30);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 	}

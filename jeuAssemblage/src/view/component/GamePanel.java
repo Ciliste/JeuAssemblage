@@ -55,6 +55,9 @@ public class GamePanel extends JPanel {
 			public void run() {
 				
 				mainFrame.setContentPane(finishScreen);
+				if (botThread != null) {
+					botThread.stop();
+				}
 			}
 		});
 
@@ -88,13 +91,5 @@ public class GamePanel extends JPanel {
 		 	getWidthTimesPourcent (this, .2f),
 		 	getHeightTimesPourcent(this, .6f)
 		);
-	}
-
-	@Override
-	public void paintComponent(Graphics g) {
-
-		super.paintComponent(g);
-		
-		SwingUtils.drawDebugBounds(this, g);
 	}
 }

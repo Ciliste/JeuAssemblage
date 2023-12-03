@@ -30,6 +30,7 @@ public class MultiplayerFinishScreen extends JPanel {
         this.setLayout(null);
 
         this.finishScreen = new SoloGameFinishScreen(mainFrame, playBoard, piecesColor);
+        
         JPanel bots = new JPanel();
         bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
 

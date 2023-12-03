@@ -7,7 +7,7 @@ import bot.view.interfaces.IMovesView;
 
 public class BotThread implements Runnable {
     
-    private final static int DEFAULT_SLEEP = 1000;
+    private final static int DEFAULT_SLEEP = 10;
 
     private int sleepTime;
 
@@ -64,22 +64,18 @@ public class BotThread implements Runnable {
             }
 
             try {
-                Thread.sleep(10);
+                Thread.sleep(this.sleepTime);
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
         }
-        
-        if (!this.stop) {
 
-            for (IMovesView movesView : this.movesViews) {
+        for (IMovesView movesView : this.movesViews) {
 
-                Thread t = new Thread(this.th, movesView);
-                t.start();
-            }
-
+            Thread t = new Thread(this.th, movesView);
+            t.start();
         }
-        
+
     }
 
 }
