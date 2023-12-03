@@ -61,23 +61,6 @@
 			</fileset>
         </jar>
     </target>
-    <!--  ==================== Dist Target =====================================  -->
-    <target name="test" depends="clean,compile,copy-resources" description="Create binary distribution">
-        <copy todir="${dist.home}/lib">
-            <fileset dir="${lib.home}"/>
-			<fileset dir="${resources.home}"/>
-        </copy>
-        <!--  Create application JAR file  -->
-        <jar jarfile="${dist.home}/${app.fullname}.jar" basedir="${build.home}">
-            <manifest>
-                <attribute name="Main-Class" value="main.Test"/>
-                <attribute name="Class-Path" value="lib/pieces_puzzle-0.1.0.jar lib/flatlaf-2.6.jar"/>
-            </manifest>
-			<fileset dir="${resources.home}">
-				<include name="assets/**"/> <!-- Include all files and subdirectories in the assets folder -->
-			</fileset>
-        </jar>
-    </target>
     <!--  ==================== Javadoc Target ==================================  -->
     <target name="javadoc" depends="compile" description="Create Javadoc API documentation">
         <mkdir dir="${dist.home}/docs/api"/>
@@ -97,12 +80,6 @@
     </target>
     <!--  ==================== Run Target ==================================  -->
     <target name="run" depends="dist">
-        <record name="log.txt" action="start"/> 
-            <java jar="${dist.home}/${app.fullname}.jar" fork="true"/>
-        <record name="log.txt" action="stop"/>
-    </target>
-    <!--  ==================== Run Test Target ==================================  -->
-    <target name="run-test" depends="test">
         <record name="log.txt" action="start"/> 
             <java jar="${dist.home}/${app.fullname}.jar" fork="true"/>
         <record name="log.txt" action="stop"/>

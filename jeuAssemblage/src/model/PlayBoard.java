@@ -485,6 +485,8 @@ public class PlayBoard extends AbstractListenableHM implements Listener, Compara
 		return this.seed;
 	}
 
+	// courage à celui qui lira ça, il ne reste plus que 100 lignes
+
 	// -----------------
 	// STATIC METHODS
 	// -----------------
