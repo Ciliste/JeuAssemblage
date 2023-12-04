@@ -36,230 +36,249 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 		
 		super(mainFrame);
 
-		this.hostClient = hostClient;
+		Logger.getGlobal().info("LocalMultiplayerGameCreationScreen");
 
+		this.hostClient = hostClient;
 		this.isHost = isHost;
 	}
 
 	public void setupListeners() {
 
-		if (false == isHost) {
+		if (isHost) {
 
-			for (JComponent component : getSettingsComponents()) {
-				
-				component.setEnabled(false);
-			}
-
-			remove(lblArrangement);
-			remove(tableArrangement);
-			remove(scrollArrangement);
-
-			hostClient.addListener(new Listener() {
-
-				@Override
-				public void received(Connection connection, Object object) {
-
-					if (object instanceof GameSettingsPacket.SeedUpdate) {
-
-						GameSettingsPacket.SeedUpdate seedUpdate = (GameSettingsPacket.SeedUpdate) object;
-
-						txtSeed.setText(String.valueOf(seedUpdate.seed));
-
-						updateGridPreview();
-					}
-					else if (object instanceof GameSettingsPacket.SizeXUpdate) {
-
-						GameSettingsPacket.SizeXUpdate sizeXUpdate = (GameSettingsPacket.SizeXUpdate) object;
-
-						txtSizeX.setText(String.valueOf(sizeXUpdate.sizeX));
-
-						updateGridPreview();
-					}
-					else if (object instanceof GameSettingsPacket.SizeYUpdate) {
-
-						GameSettingsPacket.SizeYUpdate sizeYUpdate = (GameSettingsPacket.SizeYUpdate) object;
-
-						txtSizeY.setText(String.valueOf(sizeYUpdate.sizeY));
-
-						updateGridPreview();
-					}
-					else if (object instanceof GameSettingsPacket.NbPiecesUpdate) {
-
-						GameSettingsPacket.NbPiecesUpdate nbPiecesUpdate = (GameSettingsPacket.NbPiecesUpdate) object;
-
-						nbPiecesSpinner.setValue(nbPiecesUpdate.nbPieces);
-
-						updateGridPreview();
-					}
-					else if (object instanceof GameSettingsPacket.NbMinutesUpdate) {
-
-						GameSettingsPacket.NbMinutesUpdate nbMinutesUpdate = (GameSettingsPacket.NbMinutesUpdate) object;
-
-						nbMinutesSpinner.setValue(nbMinutesUpdate.nbMinutes);
-					}
-					else if (object instanceof GameSettingsPacket.NbSecondsUpdate) {
-
-						GameSettingsPacket.NbSecondsUpdate nbSecondsUpdate = (GameSettingsPacket.NbSecondsUpdate) object;
-
-						nbSecondsSpinner.setValue(nbSecondsUpdate.nbSeconds);
-					}
-					else if (object instanceof GameSettingsPacket.TimeLimitUpdate) {
-
-						GameSettingsPacket.TimeLimitUpdate timeLimitUpdate = (GameSettingsPacket.TimeLimitUpdate) object;
-
-						timeLimitCheckBox.setSelected(timeLimitUpdate.timeLimit);
-
-						nbMinutesSpinner.setEnabled(false);
-						nbSecondsSpinner.setEnabled(false);
-					}
-					else if (object instanceof GameSettingsPacket.DifficultyUpdate) {
-
-						int index = ((GameSettingsPacket.DifficultyUpdate) object).difficulty.ordinal();
-
-						difficultyList.setSelectedIndex(index);
-
-						updateGridPreview();
-					}
-				}
-			});
-
-			SwingUtilities.invokeLater(() -> {
-
-				hostClient.sendTCP(new Requests.CompleteGameSettingsRequest());
-				hostClient.sendTCP(new Requests.PlayerListRequest());
-			});
+			setupHostBehaviour();
 		}
 		else {
 
-			txtSeed.getDocument().addDocumentListener(new DocumentAdapter() {
+			setupClientBehaviour();
+		}
+	}
 
-				@Override
-				public void changedUpdate(DocumentEvent e) {
+	private void setupHostBehaviour() {
 
-					buildWorker().execute();
+		setupComponentsListeners();
+
+		setupRequestsListener();
+	}
+
+	private void setupComponentsListeners() {
+
+		setupSeedListener();
+		setupSizeXListener();
+		setupSizeYListener();
+		setupDifficultyListener();
+		setupNbPiecesListener();
+		setupNbMinutesListener();
+		setupNbSecondsListener();
+		setupTimeLimitListener();
+	}
+
+	private void setupSeedListener() {
+
+		txtSeed.getDocument().addDocumentListener(new DocumentAdapter() {
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+				callback();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+
+				callback();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+
+				callback();
+			}
+
+			private void callback() {
+
+				long seed = -1;
+				try {
+
+					seed = Long.parseLong(txtSeed.getText());
 				}
-
-				@Override
-				public void insertUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-
-				@Override
-				public void removeUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-			});
-		
-			txtSizeX.getDocument().addDocumentListener(new DocumentAdapter() {
-
-				@Override
-				public void changedUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-
-				@Override
-				public void insertUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-
-				@Override
-				public void removeUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-			});
-
-			txtSizeY.getDocument().addDocumentListener(new DocumentAdapter() {
-
-				@Override
-				public void changedUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-
-				@Override
-				public void insertUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-
-				@Override
-				public void removeUpdate(DocumentEvent e) {
-
-					buildWorker().execute();
-				}
-			});
-		
-			nbPiecesSpinner.addChangeListener(e -> {
-
-				buildWorker().execute();
-			});
-
-			nbMinutesSpinner.addChangeListener(e -> {
-
-				buildWorker().execute();
-			});
-
-			nbSecondsSpinner.addChangeListener(e -> {
-
-				buildWorker().execute();
-			});
-
-			timeLimitCheckBox.addActionListener(e -> {
-
-				buildWorker().execute();
-			});
-
-			difficultyList.addListSelectionListener(e -> {
-
-				if (e.getValueIsAdjusting()) {
+				catch (NumberFormatException e) {
 
 					return;
 				}
 
-				buildWorker().execute();
-			});
+				if (seed < 0) {
 
-			hostClient.addListener(new Listener() {
-
-				@Override
-				public void received(Connection connection, Object object) {
-
-					if (false == object instanceof Requests) {
-
-						return;
-					}
-
-					if (object instanceof Requests.CompleteGameSettingsRequest) {
-
-						Logger.getGlobal().info("CompleteGameSettingsRequest received");
-
-						buildWorker().execute();
-					}
-					else if (object instanceof Requests.PlayerListRequest) {
-
-						
-					}
+					return;
 				}
-			});
-		
-			hostClient.addListener(new Listener() {
 
-				@Override
-				public void received(Connection connection, Object object) {
+				sendSeed();
+			}
+		});
+	}
 
-					if (object instanceof ServerRequests.PseudonymRequest) {
+	private void setupSizeXListener() {
 
-						connection.sendTCP(new GameSettingsPacket.PlayerPseudonymPacket(SettingsUtils.getUsername()));
-					}
+		txtSizeX.getDocument().addDocumentListener(new DocumentAdapter() {
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+				sendSizeX();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+
+				sendSizeX();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+
+				sendSizeX();
+			}
+		});
+	}
+
+	private void setupSizeYListener() {
+
+		txtSizeY.getDocument().addDocumentListener(new DocumentAdapter() {
+
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+
+				sendSizeY();
+			}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+
+				sendSizeY();
+			}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+
+				sendSizeY();
+			}
+		});
+	}
+
+	private void setupDifficultyListener() {
+
+		difficultyList.addListSelectionListener(e -> {
+
+			sendDifficulty();
+		});
+	}
+
+	private void setupNbPiecesListener() {
+
+		nbPiecesSpinner.addChangeListener(e -> {
+
+			sendNbPieces();
+		});
+	}
+
+	private void setupNbMinutesListener() {
+
+		nbMinutesSpinner.addChangeListener(e -> {
+
+			sendNbMinutes();
+		});
+	}
+
+	private void setupNbSecondsListener() {
+
+		nbSecondsSpinner.addChangeListener(e -> {
+
+			sendNbSeconds();
+		});
+	}
+
+	private void setupTimeLimitListener() {
+
+		timeLimitCheckBox.addActionListener(e -> {
+
+			sendTimeLimit();
+		});
+	}
+
+	private void setupRequestsListener() {
+
+		hostClient.addListener(new Listener() {
+
+			@Override
+			public void received(Connection connection, Object object) {
+
+				if (object instanceof Requests.CompleteGameSettingsRequest) {
+
+					SwingUtilities.invokeLater(() -> {
+
+						sendAll();
+					});
 				}
-			});
-		}
-	
+			}
+		});
+	}
+
+	private void sendAll() {
+
+		sendSeed();
+		sendSizeX();
+		sendSizeY();
+		sendDifficulty();
+		sendNbPieces();
+		sendNbMinutes();
+		sendNbSeconds();
+		sendTimeLimit();
+	}
+
+	private void sendSeed() {
+
+		hostClient.sendTCP(new GameSettingsPacket.SeedUpdate(Long.parseLong(txtSeed.getText())));
+	}
+
+	private void sendSizeX() {
+
+		hostClient.sendTCP(new GameSettingsPacket.SizeXUpdate(Integer.parseInt(txtSizeX.getText())));
+	}
+
+	private void sendSizeY() {
+
+		hostClient.sendTCP(new GameSettingsPacket.SizeYUpdate(Integer.parseInt(txtSizeY.getText())));
+	}
+
+	private void sendDifficulty() {
+
+		hostClient.sendTCP(new GameSettingsPacket.DifficultyUpdate(EDifficulty.values()[difficultyList.getSelectedIndex()]));
+	}
+
+	private void sendNbPieces() {
+
+		hostClient.sendTCP(new GameSettingsPacket.NbPiecesUpdate((Integer) nbPiecesSpinner.getValue()));
+	}
+
+	private void sendNbMinutes() {
+
+		hostClient.sendTCP(new GameSettingsPacket.NbMinutesUpdate((Integer) nbMinutesSpinner.getValue()));
+	}
+
+	private void sendNbSeconds() {
+
+		hostClient.sendTCP(new GameSettingsPacket.NbSecondsUpdate((Integer) nbSecondsSpinner.getValue()));
+	}
+
+	private void sendTimeLimit() {
+
+		hostClient.sendTCP(new GameSettingsPacket.TimeLimitUpdate(timeLimitCheckBox.isSelected()));
+	}
+
+	private void setupClientBehaviour() {
+
+		disableAllSettingsComponents();
+
 		hostClient.addListener(new Listener() {
 
 			@Override
@@ -267,10 +286,59 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 
 				if (object instanceof GameSettingsPacket.PlayerJoinPacket) {
 
-					playerJoined((GameSettingsPacket.PlayerJoinPacket) object);
+					SwingUtilities.invokeLater(() -> playerJoined((GameSettingsPacket.PlayerJoinPacket) object));
+				}
+				else if (object instanceof GameSettingsPacket.SeedUpdate) {
+
+					SwingUtilities.invokeLater(() -> seedReceived((GameSettingsPacket.SeedUpdate) object));
+				}
+				else if (object instanceof GameSettingsPacket.SizeXUpdate) {
+
+					SwingUtilities.invokeLater(() -> sizeXReceived((GameSettingsPacket.SizeXUpdate) object));
+				}
+				else if (object instanceof GameSettingsPacket.SizeYUpdate) {
+
+					SwingUtilities.invokeLater(() -> sizeYReceived((GameSettingsPacket.SizeYUpdate) object));
+				}
+				else if (object instanceof GameSettingsPacket.DifficultyUpdate) {
+
+					SwingUtilities.invokeLater(() -> difficultyReceived((GameSettingsPacket.DifficultyUpdate) object));
+				}
+				else if (object instanceof GameSettingsPacket.NbPiecesUpdate) {
+
+					SwingUtilities.invokeLater(() -> nbPiecesReceived((GameSettingsPacket.NbPiecesUpdate) object));
+				}
+				else if (object instanceof GameSettingsPacket.NbMinutesUpdate) {
+
+					SwingUtilities.invokeLater(() -> nbMinutesReceived((GameSettingsPacket.NbMinutesUpdate) object));
+				}
+				else if (object instanceof GameSettingsPacket.NbSecondsUpdate) {
+
+					SwingUtilities.invokeLater(() -> nbSecondsReceived((GameSettingsPacket.NbSecondsUpdate) object));
+				}
+				else if (object instanceof GameSettingsPacket.TimeLimitUpdate) {
+
+					SwingUtilities.invokeLater(() -> timeLimitReceived((GameSettingsPacket.TimeLimitUpdate) object));
 				}
 			}
-		});	
+		});
+
+		SwingUtilities.invokeLater(() -> {
+
+			hostClient.sendTCP(new Requests.CompleteGameSettingsRequest());
+		});
+	}
+
+	private void disableAllSettingsComponents() {
+
+		for (JComponent component : getSettingsComponents()) {
+
+			component.setEnabled(false);
+		}
+
+		remove(tableArrangement);
+		remove(scrollArrangement);
+		remove(lblArrangement);
 	}
 
 	private final Map<Integer, GameSettingsPacket.PlayerJoinPacket> players = new ConcurrentHashMap<>();
@@ -279,78 +347,46 @@ public class LocalMultiplayerGameCreationScreen extends AIGameCreation {
 
 	private void playerJoined(GameSettingsPacket.PlayerJoinPacket packet) {
 
-		players.put(packet.id, packet);
 
-		JPanel playerPanel = new JPanel();
+	}
 
-		playerPanel.setLayout(new BoxLayout(playerPanel, BoxLayout.X_AXIS));
+	private void seedReceived(GameSettingsPacket.SeedUpdate packet) {
 
-		JLabel lblPlayer = new JLabel(packet.pseudonym);
-		JLabel lblAddress = new JLabel(packet.ip);
+		txtSeed.setText(String.valueOf(packet.seed));
+	}
 
-		playerPanel.add(lblPlayer);
+	private void sizeXReceived(GameSettingsPacket.SizeXUpdate packet) {
 
-		playerPanel.add(Box.createHorizontalGlue());
+		txtSizeX.setText(String.valueOf(packet.sizeX));
+	}
 
-		playerPanel.add(lblAddress);
+	private void sizeYReceived(GameSettingsPacket.SizeYUpdate packet) {
 
-		playerPanel.add(Box.createHorizontalGlue());
+		txtSizeY.setText(String.valueOf(packet.sizeY));
+	}
 
-		JButton btnKick = new JButton("X");
+	private void difficultyReceived(GameSettingsPacket.DifficultyUpdate packet) {
 
-		playerPanel.add(btnKick);
+		difficultyList.setSelectedIndex(packet.difficulty.ordinal());
+	}
 
-		playerPanels.put(packet.id, playerPanel);
+	private void nbPiecesReceived(GameSettingsPacket.NbPiecesUpdate packet) {
 
-		bots.add(playerPanel);
+		nbPiecesSpinner.setValue(packet.nbPieces);
+	}
 
-		bots.revalidate();
-		bots.repaint();
-	} 
+	private void nbMinutesReceived(GameSettingsPacket.NbMinutesUpdate packet) {
 
-	private SwingWorker<Void, Void> buildWorker() {
+		nbMinutesSpinner.setValue(packet.nbMinutes);
+	}
 
-		return new SwingWorker<>() {
+	private void nbSecondsReceived(GameSettingsPacket.NbSecondsUpdate packet) {
 
-			@Override
-			protected Void doInBackground() throws Exception {
+		nbSecondsSpinner.setValue(packet.nbSeconds);
+	}
 
-				System.out.println("**************");
-				System.out.println("doInBackground");
-				System.out.println("**************");
+	private void timeLimitReceived(GameSettingsPacket.TimeLimitUpdate packet) {
 
-				long seed = Long.parseLong(txtSeed.getText());
-				int sizeX = Integer.parseInt(txtSizeX.getText());
-				int sizeY = Integer.parseInt(txtSizeY.getText());
-
-				int nbPieces = (int) nbPiecesSpinner.getValue();
-
-				int nbMinutes = (int) nbMinutesSpinner.getValue();
-				int nbSeconds = (int) nbSecondsSpinner.getValue();
-
-				boolean timeLimit = timeLimitCheckBox.isSelected();
-
-				EDifficulty difficulty = EDifficulty.values()[difficultyList.getSelectedIndex()];
-
-				hostClient.sendTCP(new GameSettingsPacket.SeedUpdate(seed));
-				hostClient.sendTCP(new GameSettingsPacket.SizeXUpdate(sizeX));
-				hostClient.sendTCP(new GameSettingsPacket.SizeYUpdate(sizeY));
-				hostClient.sendTCP(new GameSettingsPacket.NbPiecesUpdate(nbPieces));
-				hostClient.sendTCP(new GameSettingsPacket.NbMinutesUpdate(nbMinutes));
-				hostClient.sendTCP(new GameSettingsPacket.NbSecondsUpdate(nbSeconds));
-				hostClient.sendTCP(new GameSettingsPacket.TimeLimitUpdate(timeLimit));
-				hostClient.sendTCP(new GameSettingsPacket.DifficultyUpdate(difficulty));
-
-				return null;
-			}
-
-			@Override
-			protected void done() {
-
-				System.out.println("**************");
-				System.out.println("done");
-				System.out.println("**************");
-			}
-		};
-	};
+		timeLimitCheckBox.setSelected(packet.timeLimit);
+	}
 }

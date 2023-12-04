@@ -36,11 +36,6 @@ public class App {
             frame = new MainFrame();
         });
 
-		SwingUtilities.invokeLater(() -> {
-
-			new MainFrame();
-		});
-
         JPanel panel = new JPanel();
         JButton btn = new JButton("REBOOT");
         btn.addActionListener(e -> {

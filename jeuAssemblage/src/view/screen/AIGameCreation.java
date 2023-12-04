@@ -5,6 +5,7 @@ import static view.utils.SwingUtils.getWidthTimesPourcent;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -36,6 +37,8 @@ public class AIGameCreation extends SoloGameCreation {
 
 		super(mainFrame);
 
+		Logger.getGlobal().info("AIGameCreation");
+
 		this.mainFrame = mainFrame;
 
 		bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
@@ -44,6 +47,8 @@ public class AIGameCreation extends SoloGameCreation {
 		add(btnAddBot);
 
 		btnAddBot.addActionListener(e -> {
+
+			Logger.getGlobal().info("AIGameCreation.btnAddBot");
 
 			final String botName = SettingsUtils.generateRandomProfileName();
 
@@ -63,6 +68,8 @@ public class AIGameCreation extends SoloGameCreation {
 	public void doLayout() {
 
 		super.doLayout();
+
+		Logger.getGlobal().info("AIGameCreation.doLayout");
 
 		final int PADDING_LEFT = getWidthTimesPourcent(this, .05f);
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
@@ -86,11 +93,15 @@ public class AIGameCreation extends SoloGameCreation {
 	@Override
 	protected void startGame(PlayBoard playBoard, Timer timer) {
 
+		Logger.getGlobal().info("AIGameCreation.startGame");
+
 		mainFrame.setContentPane(new MultiplayerGameScreen(mainFrame, playBoard, timer, botDescriptors));
 	}
 
 	@Override
 	public List<JComponent> getSettingsComponents() {
+
+		Logger.getGlobal().info("AIGameCreation.getSettingsComponents");
 
 		List<JComponent> components = super.getSettingsComponents();
 
@@ -102,6 +113,8 @@ public class AIGameCreation extends SoloGameCreation {
 	}
 
 	private JPanel createBotDescriptorRenderer(BotDescriptor botDescriptor) {
+
+		Logger.getGlobal().info("AIGameCreation.createBotDescriptorRenderer");
 
 		JPanel panel = new JPanel();
 
@@ -147,32 +160,44 @@ public class AIGameCreation extends SoloGameCreation {
 
 		public BotDescriptor(String name, int difficulty) {
 
+			Logger.getGlobal().info("BotDescriptor");
+
 			this.name = name;
 			this.difficulty = difficulty;
 		}
 
 		public String getName() {
 
+			Logger.getGlobal().info("BotDescriptor.getName");
+
 			return name;
 		}
 
 		public int getDifficulty() {
+
+			Logger.getGlobal().info("BotDescriptor.getDifficulty");
 
 			return difficulty;
 		}
 
 		public void setName(String name) {
 
+			Logger.getGlobal().info("BotDescriptor.setName");
+
 			this.name = name;
 		}
 
 		public void setDifficulty(int difficulty) {
+
+			Logger.getGlobal().info("BotDescriptor.setDifficulty");
 
 			this.difficulty = difficulty;
 		}
 
 		@Override
 		public String toString() {
+
+			Logger.getGlobal().info("BotDescriptor.toString");
 
 			return name + " (" + difficulty + ")";
 		}

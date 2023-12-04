@@ -4,6 +4,7 @@ import static view.utils.SwingUtils.*;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -68,6 +69,8 @@ public class SoloGameCreation extends JPanel {
     public SoloGameCreation(MainFrame mainFrame) {
 
 		super();
+
+		Logger.getGlobal().info("Solo game creation");
 
 		this.mainFrame = mainFrame;
 
@@ -194,11 +197,15 @@ public class SoloGameCreation extends JPanel {
 
 	protected void startGame(PlayBoard playBoard, Timer timer) {
 
+		Logger.getGlobal().info("Start game");
+
 		mainFrame.setContentPane(new SoloGameScreen(mainFrame, playBoard, timer));
 	}
 
 	@Override
 	public void doLayout() {
+
+		Logger.getGlobal().info("Do layout");
 
 		final int PADDING_LEFT = getWidthTimesPourcent(this, .05f);
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
@@ -356,7 +363,9 @@ public class SoloGameCreation extends JPanel {
 
 	private void seedUpdated(long seed) {
 
-		EDifficulty difficulty = EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue());
+		Logger.getGlobal().info("Seed updated: " + seed);
+
+		// EDifficulty difficulty = EDifficulty.getDifficultyFromName(difficultyList.getSelectedValue());
 
 		// txtSizeX.setText(String.valueOf(PlayBoard.getSizeXBySeedAndDifficulty(seed, difficulty)));
 		// txtSizeY.setText(String.valueOf(PlayBoard.getSizeYBySeedAndDifficulty(seed, difficulty)));
@@ -366,6 +375,8 @@ public class SoloGameCreation extends JPanel {
 	}
 	
 	private void setParams(int index) {
+
+		Logger.getGlobal().info("Set params: " + index);
 
 		int sizeX = (Integer) this.tableArrangement.getValueAt(index, 0);
 		int sizeY = (Integer) this.tableArrangement.getValueAt(index, 1);
@@ -379,6 +390,8 @@ public class SoloGameCreation extends JPanel {
 	}
 
 	protected void updateGridPreview() {
+
+		Logger.getGlobal().info("Update grid preview");
 
 		JPanel temp = null;
 		try {
@@ -404,6 +417,8 @@ public class SoloGameCreation extends JPanel {
 
 	public List<JComponent> getSettingsComponents() {
 
+		Logger.getGlobal().info("Get settings components");
+
 		List<JComponent> components = new LinkedList<>();
 
 		components.add(txtSeed);
@@ -425,15 +440,24 @@ public class SoloGameCreation extends JPanel {
 
         return () -> {
 
+			Logger.getGlobal().info("Random seed callback");
+
             final long seed = SeedUtils.generateRandomSeed();
-            soloGameCreation.seedUpdated(seed);
-            soloGameCreation.txtSeed.setText(String.valueOf(seed));
+			System.out.println(seed);
+//            soloGameCreation.seedUpdated(seed);
+            soloGameCreation.txtSeed.setText("" + seed);
         };
     }
 
     private class SeedDocumentListener extends DocumentAdapter {
 
-        @Override
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+
+			callback(e);
+		}
+
+		@Override
         public void insertUpdate(DocumentEvent e) {
 
             callback(e);
@@ -446,6 +470,8 @@ public class SoloGameCreation extends JPanel {
         }
 
         private void callback(DocumentEvent e) {
+
+			Logger.getGlobal().info("Seed document listener callback");
 
             try {
 
@@ -472,6 +498,8 @@ public class SoloGameCreation extends JPanel {
 		}
 
 		private void callback(DocumentEvent e) {
+
+			Logger.getGlobal().info("Size document listener callback");
 
 			try {
 

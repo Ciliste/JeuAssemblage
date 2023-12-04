@@ -36,11 +36,21 @@ public class PartyServer extends Server {
 		addListener(new Listener() {
 
 			@Override
+			public void connected(Connection connection) {
+
+				Logger.getGlobal().info("Connected: " + connection.getRemoteAddressTCP().getAddress().getHostAddress());
+			}
+
+			@Override
 			public void received(Connection connection, Object object) {
-				
-				System.out.println("*** PARTY SERVER ***");
-				System.out.println("Received: " + object);
-				System.out.println("From: " + connection.getID());
+
+				Logger.getGlobal().info("Received: " + object);
+			}
+
+			@Override
+			public void disconnected(Connection connection) {
+
+				Logger.getGlobal().info("Disconnected: " + connection);
 			}
 		});
 	}

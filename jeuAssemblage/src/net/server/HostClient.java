@@ -2,6 +2,7 @@ package net.server;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -24,6 +25,15 @@ public class HostClient extends Client {
 		this.udpPort = udpPort;
 
 		NetUtils.registerClasses(getKryo());
+
+		addListener(new Listener() {
+
+			@Override
+			public void received(Connection connection, Object object) {
+
+				Logger.getGlobal().info("Received: " + object);
+			}
+		});
 	}
 	
 	private final List<Runnable> onConnect = new LinkedList<>();
