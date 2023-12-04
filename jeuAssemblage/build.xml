@@ -8,7 +8,7 @@
     <property name="docs.home" value="${basedir}/docs"/>
     <property name="src.home" value="${basedir}/src"/>
     <property name="lib.home" value="${basedir}/lib"/>
-	<property name="resources.home" value="${basedir}/assets"/>
+	<property name="resources.home" value="${basedir}/resources"/>
     <property name="javac.encoding" value="UTF-8"/>
     <property name="input.encoding" value="UTF-8" />
     <!--  ==================== Compile options ===========================  -->
@@ -54,8 +54,7 @@
         <jar jarfile="${dist.home}/${app.fullname}.jar" basedir="${build.home}">
             <manifest>
                 <attribute name="Main-Class" value="main.App"/>
-                <attribute name="Class-Path" value="lib/pieces_puzzle-0.1.0.jar lib/flatlaf-2.6.jar lib/jdom-2.0.6.jar lib/jsonbeans-0.7.jar lib/kryo-2.24.0.jar lib/kryonet-2.22.0-RC1.jar lib/minlog-1.2.jar lib/objenesis-2.1.jar"/>
-                
+                <attribute name="Class-Path" value="lib/pieces_puzzle-0.1.0.jar lib/flatlaf-2.6.jar"/>
             </manifest>
 			<fileset dir="${resources.home}">
 				<include name="assets/**"/> <!-- Include all files and subdirectories in the assets folder -->

@@ -78,12 +78,12 @@ public class ArrangementList implements TableModel {
         Arrangement selected = arrangements.get(rowIndex);
 
         switch (columnIndex) {
-            case 0 : val = selected.sizeX; break;
-            case 1 : val = selected.sizeY; break;
-            case 2 : val = selected.pieceCount; break;
-            case 3 : val = selected.seed; break;
-            case 4 : val = selected.username; break;
-            case 5 : val = selected.score; break;
+            case 0 -> val = selected.sizeX;
+            case 1 -> val = selected.sizeY;
+            case 2 -> val = selected.pieceCount;
+            case 3 -> val = selected.seed;
+            case 4 -> val = selected.username;
+            case 5 -> val = selected.score;
         }
         
         return val;

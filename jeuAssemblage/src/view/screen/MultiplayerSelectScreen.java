@@ -9,7 +9,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import view.MainFrame;
-import view.screen.multi.local.LocalMultiplayerScreen;
 import view.utils.SwingUtils;
 
 public class MultiplayerSelectScreen extends JPanel {
@@ -47,11 +46,6 @@ public class MultiplayerSelectScreen extends JPanel {
 		btnVsAI.addActionListener(e -> {
 
 			mainFrame.setContentPane(new AIGameCreation(mainFrame));
-		});
-
-		btnLocal.addActionListener(e -> {
-
-			mainFrame.setContentPane(new LocalMultiplayerScreen(mainFrame));
 		});
 	}
 }
