@@ -98,9 +98,6 @@ public class SoloGameCreation extends JPanel {
 
         // LISTENERS
 
-		// ResizeListener resizeListener = new ResizeListener(createResizeCallback(this));
-		// this.addComponentListener(resizeListener);
-
 		btnCancel.putClientProperty( "JButton.buttonType", "roundRect" );
         btnCancel.addActionListener(e -> mainFrame.setContentPane(new MainScreen(mainFrame)));
 

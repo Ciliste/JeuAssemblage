@@ -57,7 +57,6 @@ public class MainScreen extends JPanel {
         add(Box.createVerticalGlue());
 
         // LISTENERS
-        //
 
         btnSolo.addActionListener(e -> {
 

@@ -120,7 +120,6 @@ public final class PieceRenderUtils {
 		}
 
 		// Register image plz
-		// fdp ?
 		try {
 			File output = new File("output.png");
 			ImageIO.write(image, "png", output);
@@ -155,27 +154,6 @@ public final class PieceRenderUtils {
 		g.fillRect(0, height * CELL_PIXEL_SIZE - 2, width * CELL_PIXEL_SIZE, 2);
 		g.fillRect(width * CELL_PIXEL_SIZE - 2, 0, 2, height * CELL_PIXEL_SIZE);
 
-		try {
-			File output = new File("test.png");
-			ImageIO.write(image, "png", output);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 		return image;
 	}
-
-	// public static void main(String[] args) {
-		
-	// 	int[][] piece = PieceFactory.createPieceT().getBounds();
-
-	// 	BufferedImage image = createPieceImage(piece, new Color(0xfa8d12));
-
-	// 	try {
-    //         File output = new File("output.png");
-    //         ImageIO.write(image, "png", output);
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-	// }
 }

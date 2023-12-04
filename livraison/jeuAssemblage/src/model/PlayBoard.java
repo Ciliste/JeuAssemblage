@@ -74,13 +74,10 @@ public class PlayBoard extends AbstractListenableHM implements Listener, Compara
 		final int MAX_ITERATIONS = 100;
 		int iteration = 0;
 		Random randomPlacement = new Random(seedPlacement + piecesMap.size() + 1);
-		// TODO: y'a des beugs
 		do {
 
 			int x = randomPlacement.nextInt(this.board[0].length - piece.getWidth() + 1);
 			int y = randomPlacement.nextInt(this.board.length - piece.getHeight() + 1);
-
-			// System.out.println("Trying to place piece at: " + x + ", " + y);
 
 			if (placePiece(x, y, piece)) {
 
@@ -97,19 +94,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, Compara
 	boolean randomlyPlacePiece(Piece piece) {
 
 		return randomlyPlacePiece(piece, this.seed);
-
-		// for (int i = 0; i < board.length; i++) {
-
-		// for (int j = 0; j < board[i].length; j++) {
-
-		// System.out.println("Trying to place piece at: " + j + ", " + i);
-
-		// if (placePiece(j, i, piece)) {
-
-		// return;
-		// }
-		// }
-		// }
 	}
 
 	private boolean placePiece(int x, int y, Piece piece) {
@@ -566,8 +550,6 @@ public class PlayBoard extends AbstractListenableHM implements Listener, Compara
 			Piece piece = pieceFactory.createPiece(0);
 
 			playBoard.randomlyPlacePiece(piece, seedPlacement);
-
-			// TODO: REFAIRE CETTE MERDE
 		}
 
 		return playBoard;
