@@ -5,10 +5,12 @@ import static view.utils.SwingUtils.getWidthTimesPourcent;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -16,16 +18,15 @@ import javax.swing.JScrollPane;
 
 import bot.difficulty.Bot;
 import model.PlayBoard;
-import model.ProfileUtils;
+import model.SettingsUtils;
 import view.MainFrame;
 import view.component.timer.Timer;
-import view.utils.PiecesColor;
 import view.utils.SwingUtils;
 
 public class AIGameCreation extends SoloGameCreation {
 
-	private final JPanel bots = new JPanel();
-	private final List<BotDescriptor> botDescriptors = new LinkedList<>();
+	protected final JPanel bots = new JPanel();
+	protected final List<BotDescriptor> botDescriptors = new LinkedList<>();
 
 	private final JButton btnAddBot = new JButton("Ajouter un robot");
 
@@ -37,6 +38,8 @@ public class AIGameCreation extends SoloGameCreation {
 
 		super(mainFrame);
 
+		Logger.getGlobal().info("AIGameCreation");
+
 		this.mainFrame = mainFrame;
 
 		bots.setLayout(new BoxLayout(bots, BoxLayout.Y_AXIS));
@@ -46,7 +49,9 @@ public class AIGameCreation extends SoloGameCreation {
 
 		btnAddBot.addActionListener(e -> {
 
-			final String botName = ProfileUtils.generateRandomProfileName();
+			Logger.getGlobal().info("AIGameCreation.btnAddBot");
+
+			final String botName = SettingsUtils.generateRandomProfileName();
 
 			BotDescriptor bot = new BotDescriptor(botName, 1, Bot.AI_STRATEGY);
 
@@ -64,6 +69,8 @@ public class AIGameCreation extends SoloGameCreation {
 	public void doLayout() {
 
 		super.doLayout();
+
+		Logger.getGlobal().info("AIGameCreation.doLayout");
 
 		final int PADDING_LEFT = getWidthTimesPourcent(this, .05f);
 		final int PADDING_TOP = getHeightTimesPourcent(this, .05f);
@@ -88,12 +95,30 @@ public class AIGameCreation extends SoloGameCreation {
 	}
 
 	@Override
-	protected void startGame(PlayBoard playBoard, PiecesColor piecesColor, Timer timer) {
+	protected void startGame(PlayBoard playBoard, Timer timer) {
 
-		mainFrame.setContentPane(new MultiplayerGameScreen(mainFrame, playBoard, piecesColor, timer, botDescriptors));
+		Logger.getGlobal().info("AIGameCreation.startGame");
+
+		mainFrame.setContentPane(new MultiplayerGameScreen(mainFrame, playBoard, timer, botDescriptors));
+	}
+
+	@Override
+	public List<JComponent> getSettingsComponents() {
+
+		Logger.getGlobal().info("AIGameCreation.getSettingsComponents");
+
+		List<JComponent> components = super.getSettingsComponents();
+
+		components.add(bots);
+
+		components.add(btnAddBot);
+
+		return components;
 	}
 
 	private JPanel createBotDescriptorRenderer(BotDescriptor botDescriptor) {
+
+		Logger.getGlobal().info("AIGameCreation.createBotDescriptorRenderer");
 
 		JPanel panel = new JPanel();
 
@@ -150,6 +175,8 @@ public class AIGameCreation extends SoloGameCreation {
 
 		public BotDescriptor(String name, int difficulty, int strategy) {
 
+			Logger.getGlobal().info("BotDescriptor");
+
 			this.name = name;
 			this.difficulty = difficulty;
 			this.strategy = strategy;
@@ -157,10 +184,14 @@ public class AIGameCreation extends SoloGameCreation {
 
 		public String getName() {
 
+			Logger.getGlobal().info("BotDescriptor.getName");
+
 			return name;
 		}
 
 		public int getDifficulty() {
+
+			Logger.getGlobal().info("BotDescriptor.getDifficulty");
 
 			return difficulty;
 		}
@@ -172,10 +203,14 @@ public class AIGameCreation extends SoloGameCreation {
 
 		public void setName(String name) {
 
+			Logger.getGlobal().info("BotDescriptor.setName");
+
 			this.name = name;
 		}
 
 		public void setDifficulty(int difficulty) {
+
+			Logger.getGlobal().info("BotDescriptor.setDifficulty");
 
 			this.difficulty = difficulty;
 		}
@@ -187,6 +222,8 @@ public class AIGameCreation extends SoloGameCreation {
 
 		@Override
 		public String toString() {
+
+			Logger.getGlobal().info("BotDescriptor.toString");
 
 			return name + " (" + difficulty + ")";
 		}
