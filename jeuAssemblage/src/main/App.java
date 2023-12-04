@@ -18,22 +18,6 @@ public class App {
 
     public static void main(String[] args) throws Exception {
 
-        //FUTURS TESTS QUI FAUT METTRE DANS LES JUNITS
-        /*
-        Arrangement a = new Arrangement(0, 0, 0, 0, "shesh", 0);
-        Arrangement b = new Arrangement(0, 0, 0, 0, "shesh10", 10);
-        
-        ArrangementList.addArrangement(a);
-        
-        PlayBoard p = PlayBoard.constructPlayBoard(Long.parseLong("2392006401451300864"), 10, 11, 5);
-        new AIStrategy(p);
-        
-        
-        AgStrategy a = new AgStrategy(PlayBoard.constructPlayBoard(new Long("1252177511074775040"), 12, 15, 6));
-        while (a.tick()) {
-        }
-        */
-
         UIManager.put( "ScrollBar.trackInsets", new Insets( 2, 4, 2, 4 ) );
         UIManager.put("ScrollBar.thumbInsets", new Insets(2, 2, 2, 2));
         UIManager.put("Component.arrowType", "triangle");
